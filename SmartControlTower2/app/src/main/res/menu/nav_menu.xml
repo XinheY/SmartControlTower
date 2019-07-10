@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_E2E"
+            android:icon="@drawable/user"
+            android:title="E2E OLK Versions" />
+        <item
+            android:id="@+id/nav_analysis"
+            android:icon="@drawable/user"
+            android:title="Change Analysis" />
+        <item
+            android:id="@+id/nav_MFG"
+            android:icon="@drawable/user"
+            android:title="MFG BL OLK" />
+        <item
+            android:id="@+id/nav_SNI"
+            android:icon="@drawable/user"
+            android:title="SNI BL OLK" />
+    </group>
+</menu>
