@@ -15,6 +15,8 @@ import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.google.android.material.navigation.NavigationView;
@@ -36,19 +38,19 @@ public class E2E extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_e2_e);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.e2e_toolbar);
+        Toolbar toolbar = findViewById(R.id.e2e_toolbar);
         setSupportActionBar(toolbar);
 
         //////////////////////////////////drop-down list//////////////////////////////////////
-        NiceSpinner niceSpinner = (NiceSpinner) findViewById(R.id.nice_spinner);
+        NiceSpinner niceSpinner = findViewById(R.id.nice_spinner);
         List<String> dataset = new LinkedList<>(Arrays.asList("QuarView", "VersionView"));
         niceSpinner.attachDataSource(dataset);
 
         niceSpinner.setOnSpinnerItemSelectedListener(new OnSpinnerItemSelectedListener() {
             @Override
             public void onItemSelected(NiceSpinner parent, View view, int position, long id) {
-                String item = (String)parent.getItemAtPosition(position);
-                Toast.makeText(E2E.this,item,Toast.LENGTH_SHORT).show();
+                String item = (String) parent.getItemAtPosition(position);
+                Toast.makeText(E2E.this, item, Toast.LENGTH_SHORT).show();
             }
         });
 ////////////////////////////////////////////left side///////////////////////////////////////////
@@ -73,17 +75,17 @@ public class E2E extends AppCompatActivity {
                     case R.id.nav_E2E:
                         break;
                     case R.id.nav_MFG:
-                        Intent intent2=new Intent(E2E.this,MFG.class);
+                        Intent intent2 = new Intent(E2E.this, MFG.class);
                         startActivity(intent2);
                         finish();
                         break;
                     case R.id.nav_SNI:
-                        Intent intent4=new Intent(E2E.this,SNI.class);
+                        Intent intent4 = new Intent(E2E.this, SNI.class);
                         startActivity(intent4);
                         finish();
                         break;
                     case R.id.nav_analysis:
-                        Intent intent3=new Intent(E2E.this,Analysis.class);
+                        Intent intent3 = new Intent(E2E.this, Analysis.class);
                         startActivity(intent3);
                         finish();
                         break;
@@ -117,6 +119,79 @@ public class E2E extends AppCompatActivity {
                 toggleRightSliding();
             }
         });
+
+
+        //Lob
+        LinearLayout e2elob = findViewById(R.id.e2e_lob);
+        String[] lob = getResources().getStringArray(R.array.Lob);
+        for (int i = 0; i < lob.length; i++) {
+            CheckBox cb = new CheckBox(this);
+            cb.setText(lob[i]);
+            cb.setTextSize(15);
+            e2elob.addView(cb);
+
+        }
+        //System Flag
+        LinearLayout e2esf = findViewById(R.id.e2e_sf);
+        String[] sf = getResources().getStringArray(R.array.system_flag);
+        for (int i = 0; i < sf.length; i++) {
+            CheckBox cb = new CheckBox(this);
+            cb.setText(sf[i]);
+            cb.setTextSize(15);
+            e2esf.addView(cb);
+        }
+
+        //Product Type
+        LinearLayout e2ept = findViewById(R.id.e2e_pt);
+        String[] pt = getResources().getStringArray(R.array.Product_Type);
+        for (int i = 0; i < pt.length; i++) {
+            CheckBox cb = new CheckBox(this);
+            cb.setText(pt[i]);
+            cb.setTextSize(15);
+            e2ept.addView(cb);
+
+        }
+        //Lob Group
+        LinearLayout e2elg = findViewById(R.id.e2e_lg);
+        String[] lg = getResources().getStringArray(R.array.LOB_Group);
+        for (int i = 0; i < lg.length; i++) {
+            CheckBox cb = new CheckBox(this);
+            cb.setText(lg[i]);
+            cb.setTextSize(15);
+            e2elg.addView(cb);
+
+        }
+        //Region
+        LinearLayout e2eregion = findViewById(R.id.e2e_region);
+        String[] region = getResources().getStringArray(R.array.Region);
+        for (int i = 0; i < region.length; i++) {
+            CheckBox cb = new CheckBox(this);
+            cb.setText(region[i]);
+            cb.setTextSize(15);
+            e2eregion.addView(cb);
+
+        }
+        //Segment
+        LinearLayout e2esegment = findViewById(R.id.e2e_segment);
+        String[] segment = getResources().getStringArray(R.array.Segment);
+        for (int i = 0; i < segment.length; i++) {
+            CheckBox cb = new CheckBox(this);
+            cb.setText(segment[i]);
+            cb.setTextSize(15);
+            e2esegment.addView(cb);
+
+        }
+        //Site
+        LinearLayout e2esite = findViewById(R.id.e2e_site);
+        String[] site = getResources().getStringArray(R.array.Site);
+        for (int i = 0; i < site.length; i++) {
+            CheckBox cb = new CheckBox(this);
+            cb.setText(site[i]);
+            cb.setTextSize(15);
+            e2esite.addView(cb);
+
+        }
+        //////////////////////////////////////////////////////////////////////////////////////////
     }
 
     //手动控制抽屉开关的
@@ -127,6 +202,45 @@ public class E2E extends AppCompatActivity {
             drawerl.openDrawer(GravityCompat.END);//打开抽屉
         }
     }
+
+    public void showMutilAlertDialog(View view) {
+        LinearLayout ll = null;
+        switch (view.getId()) {
+
+            case R.id.e2e_yq_btn:
+                ll = findViewById(R.id.e2e_yq);
+                break;
+            case R.id.e2e_lob_btn:
+                ll = findViewById(R.id.e2e_lob);
+                break;
+            case R.id.e2e_sf_btn:
+                ll = findViewById(R.id.e2e_sf);
+                break;
+            case R.id.e2e_pt_btn:
+                ll = findViewById(R.id.e2e_pt);
+                break;
+            case R.id.e2e_lg_btn:
+                ll = findViewById(R.id.e2e_lg);
+                break;
+            case R.id.e2e_region_btn:
+                ll = findViewById(R.id.e2e_region);
+                break;
+            case R.id.e2e_segment_btn:
+                ll = findViewById(R.id.e2e_segment);
+                break;
+            case R.id.e2e_site_btn:
+                ll = findViewById(R.id.e2e_site);
+                break;
+            default:
+
+        }
+        if (ll.getVisibility() == View.VISIBLE) {
+            ll.setVisibility(View.GONE);
+        } else {
+            ll.setVisibility(View.VISIBLE);
+        }
+    }
+
 
     //////////////////////////////////////////////////////////////////////////////////////////
     @Override
