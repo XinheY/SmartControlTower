@@ -77,11 +77,11 @@ public class DBUtil {
         return con;
     }
 
-    public static ArrayList<LinkedHashMap<String, String>> QuerySQL() {
+    public static ArrayList<LinkedHashMap<String, String>> QuerySQL(String sql) {
         String result = "";
         try {
             Connection conn = getSQLConnection("10.82.244.53", "sa", "Dell@2008", "PCWebsite");
-            String sql = "EXEC [SP_IDC_EOQ_SUMMARY1] '" + "IDC" + "','" + "QuarView" + "','" + "FY20Q2" + "','" + "" + "','" + "overall" + "','" + "system" + "','" + "overall" + "','" + "overall" + "','" + "overall" + "','" + "overall" + "','" + "overall" + "'";
+           // String sql = "EXEC [SP_IDC_EOQ_SUMMARY1] '" + "IDC" + "','" + "QuarView" + "','" + "FY20Q1,FY20Q2" + "','" + "" + "','" + "overall" + "','" + "system" + "','" + "overall" + "','" + "overall" + "','" + "overall" + "','" + "overall" + "','" + "overall" + "'";
             Statement stmt = conn.createStatement();//
             ResultSet rs = stmt.executeQuery(sql);
             while (rs.next()) {

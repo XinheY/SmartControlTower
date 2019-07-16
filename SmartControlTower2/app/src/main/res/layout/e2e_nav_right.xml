@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:alpha="0.9"
-    android:background="#C5CCCC"
+    android:background="@color/table_back"
     android:orientation="vertical">
 
     <TextView
@@ -78,7 +78,7 @@
                 android:layout_marginLeft="20sp"
                 android:layout_marginTop="10dp"
                 android:layout_marginRight="20sp"
-                android:background="@color/light_gray" />
+                android:background="@color/colorAccent" />
 
             <TextView
                 style="@style/SearchTitle"
@@ -101,7 +101,8 @@
                 android:id="@+id/e2e_yq_btn"
                 style="@style/e2e_btn"
                 android:onClick="showMutilAlertDialog"
-                android:text="Year/Quar" />
+                android:text="Year/Quar"
+                android:radius="15dp"/>
 
             <LinearLayout
                 android:id="@+id/e2e_yq"

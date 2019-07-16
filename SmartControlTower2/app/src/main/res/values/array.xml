@@ -27,6 +27,7 @@
     </string-array>
 
     <string-array name="Region">
+        <item>OVERALL</item>
         <item>ANZ</item>
         <item>GC</item>
         <item>India</item>
@@ -75,5 +76,57 @@
         <item>DELL STORAGE SC</item>
         <item>DELL NETWORKING</item>
         <item>OEM NETWORKING</item>
+    </string-array>
+
+    <string-array name="Version">
+        <item>FY20Q2WK9</item>
+        <item>FY20Q2WK8</item>
+        <item>FY20Q2WK5</item>
+        <item>FY20Q2WK4</item>
+        <item>FY20Q1WK13_ACT</item>
+        <item>FY20Q1WK13</item>
+        <item>FY20Q1WK12</item>
+        <item>FY20Q1WK11</item>
+        <item>FY20Q1WK10</item>
+        <item>FY20Q1WK9</item>
+        <item>FY20Q1WK8</item>
+        <item>FY20Q1WK7</item>
+        <item>FY20Q1WK6</item>
+        <item>FY20Q1WK5</item>
+        <item>FY19Q4WK13_ACT</item>
+        <item>FY19Q4WK13</item>
+        <item>FY19Q4WK12</item>
+        <item>FY19Q4WK11</item>
+        <item>FY19Q4WK10</item>
+        <item>FY19Q4WK9</item>
+        <item>FY19Q4WK8</item>
+        <item>FY19Q4WK7</item>
+        <item>FY19Q4WK6</item>
+        <item>FY19Q4WK5</item>
+        <item>FY19Q3WK13_ACT</item>
+        <item>FY19Q3WK13</item>
+        <item>FY19Q3WK12</item>
+        <item>FY19Q3WK11</item>
+        <item>FY19Q3WK10</item>
+        <item>FY19Q3WK9</item>
+        <item>FY19Q3WK5</item>
+        <item>FY19Q2WK13_ACT</item>
+        <item>FY19Q1WK13_ACT</item>
+        <item>FY18Q4WK13_ACT</item>
+    </string-array>
+
+    <string-array name="Year_quar">
+        <item>FY19Q1</item>
+        <item>FY19Q2</item>
+        <item>FY19Q3</item>
+        <item>FY19Q4</item>
+        <item>FY20Q1</item>
+        <item>FY20Q2</item>
+        <item>FY20Q3</item>
+        <item>FY20Q4</item>
+        <item>FY21Q1</item>
+        <item>FY21Q2</item>
+        <item>FY21Q3</item>
+        <item>FY21Q4</item>
     </string-array>
 </resources>

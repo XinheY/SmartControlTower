@@ -27,10 +27,12 @@ import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import com.bin.david.form.core.SmartTable;
+import com.bin.david.form.data.format.bg.BaseBackgroundFormat;
 import com.bin.david.form.data.style.FontStyle;
 import com.bin.david.form.data.table.MapTableData;
 import com.google.android.material.navigation.NavigationView;
 import com.google.gson.Gson;
+import com.xiasuhuei321.loadingdialog.view.LoadingDialog;
 
 import org.angmarch.views.NiceSpinner;
 import org.angmarch.views.OnSpinnerItemSelectedListener;
@@ -48,10 +50,16 @@ public class E2E extends AppCompatActivity {
     private DrawerLayout drawerl;
     private ActionBarDrawerToggle toggle;
     public static SmartTable<Object> table;
-    private HashMap<String, HashMap<String, CheckBox>> summary = new HashMap<>();//所有checkbox的集合
+    private HashMap<String, HashMap<String, CheckBox>> summary;//所有checkbox的集合
     private ArrayList<String> allCondition = new ArrayList<>();
     private ArrayList<String[]> allContent = new ArrayList<>();
     private ArrayList<LinkedHashMap<String, String>> answer;
+    private LoadingDialog ld;
+    private NiceSpinner niceSpinner;
+    private Button verbtn;
+    private Button yqbtn;
+    private LinearLayout yqll;
+    private LinearLayout verll;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,15 +67,19 @@ public class E2E extends AppCompatActivity {
 
         if (savedInstanceState != null) {
             // Restore value of members from saved state
-            Gson g = new Gson();
             answer = (ArrayList<LinkedHashMap<String, String>>) savedInstanceState.getSerializable("initial");
-            Log.d("initial", answer.size() + "");
+            summary = (HashMap<String, HashMap<String, CheckBox>>) savedInstanceState.getSerializable("initial2");
         } else {
             answer = new ArrayList<>();
+            summary = new HashMap<>();
         }
 
         setContentView(R.layout.activity_e2_e);
 
+        verbtn = findViewById(R.id.e2e_ver_btn);
+        yqbtn = findViewById(R.id.e2e_yq_btn);
+        yqll = findViewById(R.id.e2e_yq);
+        verll = findViewById(R.id.e2e_ver);
         /////////////////Table//////////////////////////////////////////////////
 
         table = findViewById(R.id.table);
@@ -79,21 +91,24 @@ public class E2E extends AppCompatActivity {
 
 
         //////////////////////////////////drop-down list//////////////////////////////////////
-        NiceSpinner niceSpinner = findViewById(R.id.nice_spinner);
+        niceSpinner = findViewById(R.id.nice_spinner);
         List<String> dataset = new LinkedList<>(Arrays.asList("QuarView", "VersionView"));
         niceSpinner.attachDataSource(dataset);
+
 
         niceSpinner.setOnSpinnerItemSelectedListener(new OnSpinnerItemSelectedListener() {
             @Override
             public void onItemSelected(NiceSpinner parent, View view, int position, long id) {
                 String item = (String) parent.getItemAtPosition(position);
-                Button verbtn = findViewById(R.id.e2e_ver_btn);
-                Button yqbtn = findViewById(R.id.e2e_yq_btn);
+
                 if (item.equals("VersionView")) {
                     verbtn.setVisibility(View.VISIBLE);
                     yqbtn.setVisibility(View.GONE);
+                    yqll.setVisibility(View.GONE);
+
                 } else {
                     verbtn.setVisibility(View.GONE);
+                    verll.setVisibility(View.GONE);
                     yqbtn.setVisibility(View.VISIBLE);
                 }
                 Toast.makeText(E2E.this, item, Toast.LENGTH_SHORT).show();
@@ -160,7 +175,7 @@ public class E2E extends AppCompatActivity {
             }
         };
         //右侧上方按钮
-        Button search = findViewById(R.id.e2e_search);
+        final Button search = findViewById(R.id.e2e_search);
         search.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -169,6 +184,43 @@ public class E2E extends AppCompatActivity {
         });
 
         ///////////////////////CheckBox列表/////////////////////////////////////////
+
+        //Version
+        HashMap<String, CheckBox> vermap = new LinkedHashMap<>();
+        LinearLayout e2ever = findViewById(R.id.e2e_ver);
+        String[] ver = getResources().getStringArray(R.array.Version);
+        allContent.add(ver);
+        for (int i = 0; i < ver.length; i++) {
+            CheckBox cb = new CheckBox(this);
+            cb.setTextColor(getResources().getColor(R.color.colorAccent));
+            cb.setText(ver[i]);
+            cb.setTextSize(18);
+            vermap.put(ver[i], cb);
+            e2ever.addView(cb);
+
+        }
+        summary.put("version", vermap);
+
+        allCondition.add("version");
+
+        //Year_Quar
+        HashMap<String, CheckBox> yqmap = new LinkedHashMap<>();
+        LinearLayout e2eyq = findViewById(R.id.e2e_yq);
+        String[] yq = getResources().getStringArray(R.array.Year_quar);
+        allContent.add(yq);
+        for (int i = 0; i < yq.length; i++) {
+            CheckBox cb = new CheckBox(this);
+            cb.setTextColor(getResources().getColor(R.color.colorAccent));
+            cb.setText(yq[i]);
+            cb.setTextSize(18);
+            e2eyq.addView(cb);
+            yqmap.put(yq[i], cb);
+
+        }
+
+        summary.put("yq", yqmap);
+        allCondition.add("yq");
+
         //Lob
         HashMap<String, CheckBox> lobmap = new LinkedHashMap<>();
         LinearLayout e2elob = findViewById(R.id.e2e_lob);
@@ -176,8 +228,9 @@ public class E2E extends AppCompatActivity {
         allContent.add(lob);
         for (int i = 0; i < lob.length; i++) {
             CheckBox cb = new CheckBox(this);
+            cb.setTextColor(getResources().getColor(R.color.colorAccent));
             cb.setText(lob[i]);
-            cb.setTextSize(15);
+            cb.setTextSize(18);
             e2elob.addView(cb);
             lobmap.put(lob[i], cb);
 
@@ -192,8 +245,9 @@ public class E2E extends AppCompatActivity {
         allContent.add(sf);
         for (int i = 0; i < sf.length; i++) {
             CheckBox cb = new CheckBox(this);
+            cb.setTextColor(getResources().getColor(R.color.colorAccent));
             cb.setText(sf[i]);
-            cb.setTextSize(15);
+            cb.setTextSize(18);
             e2esf.addView(cb);
             sfmap.put(sf[i], cb);
         }
@@ -207,8 +261,9 @@ public class E2E extends AppCompatActivity {
         allContent.add(pt);
         for (int i = 0; i < pt.length; i++) {
             CheckBox cb = new CheckBox(this);
+            cb.setTextColor(getResources().getColor(R.color.colorAccent));
             cb.setText(pt[i]);
-            cb.setTextSize(15);
+            cb.setTextSize(18);
             e2ept.addView(cb);
             ptmap.put(pt[i], cb);
         }
@@ -219,11 +274,13 @@ public class E2E extends AppCompatActivity {
         HashMap<String, CheckBox> lgmap = new LinkedHashMap<>();
         LinearLayout e2elg = findViewById(R.id.e2e_lg);
         String[] lg = getResources().getStringArray(R.array.LOB_Group);
+
         allContent.add(lg);
         for (int i = 0; i < lg.length; i++) {
             CheckBox cb = new CheckBox(this);
+            cb.setTextColor(getResources().getColor(R.color.colorAccent));
             cb.setText(lg[i]);
-            cb.setTextSize(15);
+            cb.setTextSize(18);
             e2elg.addView(cb);
             lgmap.put(lg[i], cb);
         }
@@ -237,8 +294,9 @@ public class E2E extends AppCompatActivity {
         allContent.add(region);
         for (int i = 0; i < region.length; i++) {
             CheckBox cb = new CheckBox(this);
+            cb.setTextColor(getResources().getColor(R.color.colorAccent));
             cb.setText(region[i]);
-            cb.setTextSize(15);
+            cb.setTextSize(18);
             e2eregion.addView(cb);
             regionmap.put(region[i], cb);
         }
@@ -252,8 +310,9 @@ public class E2E extends AppCompatActivity {
         allContent.add(segment);
         for (int i = 0; i < segment.length; i++) {
             CheckBox cb = new CheckBox(this);
+            cb.setTextColor(getResources().getColor(R.color.colorAccent));
             cb.setText(segment[i]);
-            cb.setTextSize(15);
+            cb.setTextSize(18);
             e2esegment.addView(cb);
             segmentmap.put(segment[i], cb);
         }
@@ -267,8 +326,9 @@ public class E2E extends AppCompatActivity {
         allContent.add(site);
         for (int i = 0; i < site.length; i++) {
             CheckBox cb = new CheckBox(this);
+            cb.setTextColor(getResources().getColor(R.color.colorAccent));
             cb.setText(site[i]);
-            cb.setTextSize(15);
+            cb.setTextSize(18);
             e2esite.addView(cb);
             sitemap.put(site[i], cb);
         }
@@ -281,33 +341,35 @@ public class E2E extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
+                ld = new LoadingDialog(view.getContext());
+                ld.setLoadingText("Loading...").setSuccessText("Success").show();
+
                 ArrayList<String> searchSum = new ArrayList<>();//被check的checkbox集合
                 RadioGroup radioGroup = findViewById(R.id.e2e_rg);
                 RadioButton radioButton = findViewById(radioGroup.getCheckedRadioButtonId());
-                String ratioText = "model=" + radioButton.getText().toString();
+                String ratioText = radioButton.getText().toString();
+                searchSum.add(ratioText);
+                String spinText = niceSpinner.getText().toString();
+                searchSum.add(spinText);
                 for (int i = 0; i < summary.size(); i++) {
-                    String oneCondition = allCondition.get(i) + "=";
+                    String oneCondition = "";
                     HashMap<String, CheckBox> innerMap = summary.get(allCondition.get(i));
                     for (int j = 0; j < innerMap.size(); j++) {
                         CheckBox cbc = innerMap.get((allContent.get(i))[j]);
                         if (cbc.isChecked()) {
-                            oneCondition += cbc.getText();
+                            if (j == 0) {
+                                oneCondition += cbc.getText();
+                            } else {
+                                oneCondition += "," + cbc.getText();
+                            }
                         }
                     }
                     searchSum.add(oneCondition);
                 }
-
+                String sql = "EXEC [SP_IDC_EOQ_SUMMARY1] '" + searchSum.get(0) + "','" + searchSum.get(1) + "','" + searchSum.get(3) + "','" + searchSum.get(2) + "','" + searchSum.get(4) + "','" + searchSum.get(5) + "','" + searchSum.get(6) + "','" + searchSum.get(7) + "','" + searchSum.get(8) + "','" + searchSum.get(9) + "','" + searchSum.get(10) + "'";
                 toggleRightSliding();
-                test();
+                test(sql);
 
-//                MapTableData tableData = MapTableData.create("E2E OLK Version", maplist2);
-//                //Column groupColumn = new Column("组合", tableData.getColumns().get(2), tableData.getColumns().get(3));
-//                tableData.getColumns().get(0).setFixed(true);//first column
-//                table.setTableData(tableData);
-////        table.getConfig().setContentStyle(new FontStyle(50, Color.BLUE));
-//                table.getConfig().setColumnTitleStyle(new FontStyle(35, Color.DKGRAY));
-//                table.getConfig().setTableTitleStyle(new FontStyle(43, Color.rgb(0, 0, 0)));
-//                toggleRightSliding();
             }
         });
     }
@@ -375,13 +437,13 @@ public class E2E extends AppCompatActivity {
         return true;
     }
 
-    private void test() {
+    private void test(final String sql) {
         Runnable run = new Runnable() {
             @Override
             public void run() {
                 //测试数据库的语句,在子线程操作
-                answer= DBUtil.QuerySQL();
-               // answer = DBUtil.sendRequestWithOkHttp();
+                answer = DBUtil.QuerySQL(sql);
+                // answer = DBUtil.sendRequestWithOkHttp();
                 setNumber();
                 Message msg = new Message();
                 msg.what = 1001;
@@ -400,6 +462,8 @@ public class E2E extends AppCompatActivity {
             switch (msg.what) {
                 case 1001:
                     String str = msg.getData().getString("result");
+                    ld.loadSuccess();
+                    //ld.close();
                     break;
 
                 default:
@@ -416,7 +480,7 @@ public class E2E extends AppCompatActivity {
             maplist.add(a);
         }
 
-        MapTableData tableData = MapTableData.create("表格名", maplist);
+        MapTableData tableData = MapTableData.create("EOQ", maplist);
         //Column groupColumn = new Column("组合", tableData.getColumns().get(0), tableData.getColumns().get(1));
         table.getConfig().setFixedTitle(true);
         tableData.getColumns().get(0).setFixed(true);
@@ -424,8 +488,11 @@ public class E2E extends AppCompatActivity {
         table.getConfig().setShowXSequence(false);
         table.getConfig().setShowYSequence(false);
         table.setTableData(tableData);
-        table.getConfig().setContentStyle(new FontStyle(40, Color.BLUE));
-        table.getConfig().setColumnTitleStyle(new FontStyle(40, Color.BLUE));
+
+        table.getConfig().setTableTitleStyle(new FontStyle(50, getResources().getColor(R.color.table_gray)));
+        table.getConfig().setColumnTitleBackground(new BaseBackgroundFormat(getResources().getColor(R.color.table_gray)));
+        table.getConfig().setContentStyle(new FontStyle(40, getResources().getColor(R.color.table_gray)));
+        table.getConfig().setColumnTitleStyle(new FontStyle(40, getResources().getColor(R.color.white)));
     }
 
     //在界面刷新之前保存旧数据
@@ -433,6 +500,7 @@ public class E2E extends AppCompatActivity {
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putSerializable("initial", answer);
+        outState.putSerializable("initial2", summary);
     }
 
 }
