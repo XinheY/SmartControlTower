@@ -16,6 +16,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -26,78 +27,56 @@ import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import com.bin.david.form.core.SmartTable;
-import com.bin.david.form.data.column.Column;
 import com.bin.david.form.data.style.FontStyle;
 import com.bin.david.form.data.table.MapTableData;
 import com.google.android.material.navigation.NavigationView;
+import com.google.gson.Gson;
 
 import org.angmarch.views.NiceSpinner;
 import org.angmarch.views.OnSpinnerItemSelectedListener;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 
 public class E2E extends AppCompatActivity {
 
     private DrawerLayout drawerl;
     private ActionBarDrawerToggle toggle;
-    public SmartTable<Object> table;
+    public static SmartTable<Object> table;
     private HashMap<String, HashMap<String, CheckBox>> summary = new HashMap<>();//所有checkbox的集合
     private ArrayList<String> allCondition = new ArrayList<>();
     private ArrayList<String[]> allContent = new ArrayList<>();
+    private ArrayList<LinkedHashMap<String, String>> answer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_e2_e);
 
-        Toolbar toolbar = findViewById(R.id.e2e_toolbar);
-        setSupportActionBar(toolbar);
+        if (savedInstanceState != null) {
+            // Restore value of members from saved state
+            Gson g = new Gson();
+            answer = (ArrayList<LinkedHashMap<String, String>>) savedInstanceState.getSerializable("initial");
+            Log.d("initial", answer.size() + "");
+        } else {
+            answer = new ArrayList<>();
+        }
+
+        setContentView(R.layout.activity_e2_e);
 
         /////////////////Table//////////////////////////////////////////////////
 
         table = findViewById(R.id.table);
-
         //表格数据 datas 是需要填充的数据
-        List<Object> maplist = new ArrayList<>();
-        for (int i = 0; i < 20; i++) {
-            Map<String, String> a = new LinkedHashMap<>();
-            a.put("city", "Shenyang");
-            a.put("name", "Peter");
-            a.put("no", "12");
-            a.put("count", "2");
-            a.put("no12", "1222");
-            a.put("count2", "2cc");
-            Map<String, String> b = new LinkedHashMap<>();
-            b.put("city", "Xiamen");
-            b.put("name", "Jason");
-            b.put("no", "12");
-            b.put("count", "2");
-            b.put("no12", "1233");
-            b.put("count2", "2ff");
-            maplist.add(a);
-            maplist.add(b);
+//        List<Object> maplist = new ArrayList<>();
+        if (answer.size() != 0) {
+            setNumber();
         }
 
-        MapTableData tableData = MapTableData.create("E2E OLK Version", maplist);
-        Column groupColumn = new Column("组合", tableData.getColumns().get(2), tableData.getColumns().get(3));
-        table.getConfig().setFixedTitle(true);//first row
-        tableData.getColumns().get(0).setFixed(true);//first column
-        table.setZoom(true, 2, 1);//zoom in & out
-        table.getConfig().setShowXSequence(false);//hide
-        table.getConfig().setShowYSequence(false);//hide
-//设置数据
-        table.setTableData(tableData);
-//        table.getConfig().setContentStyle(new FontStyle(50, Color.BLUE));
-        table.getConfig().setColumnTitleStyle(new FontStyle(35, Color.DKGRAY));
-        table.getConfig().setTableTitleStyle(new FontStyle(43, Color.rgb(0, 0, 0)));
 
         //////////////////////////////////drop-down list//////////////////////////////////////
         NiceSpinner niceSpinner = findViewById(R.id.nice_spinner);
@@ -121,6 +100,9 @@ public class E2E extends AppCompatActivity {
             }
         });
 ////////////////////////////////////////////left side///////////////////////////////////////////
+        Toolbar toolbar = findViewById(R.id.e2e_toolbar);
+        setSupportActionBar(toolbar);
+
         drawerl = findViewById(R.id.e2e_drawer);
         ActionBar actionb = getSupportActionBar();
         NavigationView nv = findViewById(R.id.nav_view);
@@ -186,7 +168,7 @@ public class E2E extends AppCompatActivity {
             }
         });
 
-         ///////////////////////CheckBox列表/////////////////////////////////////////
+        ///////////////////////CheckBox列表/////////////////////////////////////////
         //Lob
         HashMap<String, CheckBox> lobmap = new LinkedHashMap<>();
         LinearLayout e2elob = findViewById(R.id.e2e_lob);
@@ -295,7 +277,7 @@ public class E2E extends AppCompatActivity {
         ////////////////////////Checkbox列表结束////////////////////////////////////
 
         Button refresh = findViewById(R.id.e2e_refresh);
-        refresh.setOnClickListener(new View.OnClickListener() {
+        refresh.setOnClickListener(new View.OnClickListener() {//Refresh的动态监控
             @Override
             public void onClick(View view) {
 
@@ -315,8 +297,8 @@ public class E2E extends AppCompatActivity {
                     searchSum.add(oneCondition);
                 }
 
-                test();
                 toggleRightSliding();
+                test();
 
 //                MapTableData tableData = MapTableData.create("E2E OLK Version", maplist2);
 //                //Column groupColumn = new Column("组合", tableData.getColumns().get(2), tableData.getColumns().get(3));
@@ -393,18 +375,16 @@ public class E2E extends AppCompatActivity {
         return true;
     }
 
-    private void test()
-    {
-        Runnable run = new Runnable()
-        {
+    private void test() {
+        Runnable run = new Runnable() {
             @Override
-            public void run()
-            {
+            public void run() {
                 //测试数据库的语句,在子线程操作
-                //String ret = DBUtil.QuerySQL();
-                DBUtil.sendRequestWithOkHttp(table);
+                answer= DBUtil.QuerySQL();
+               // answer = DBUtil.sendRequestWithOkHttp();
+                setNumber();
                 Message msg = new Message();
-                msg.what=1001;
+                msg.what = 1001;
                 Bundle data = new Bundle();
                 msg.setData(data);
                 mHandler.sendMessage(msg);
@@ -415,10 +395,9 @@ public class E2E extends AppCompatActivity {
     }
 
     @SuppressLint("HandlerLeak")
-    Handler mHandler = new Handler(){
+    Handler mHandler = new Handler() {
         public void handleMessage(android.os.Message msg) {
-            switch (msg.what)
-            {
+            switch (msg.what) {
                 case 1001:
                     String str = msg.getData().getString("result");
                     break;
@@ -426,6 +405,34 @@ public class E2E extends AppCompatActivity {
                 default:
                     break;
             }
-        };
+        }
+
+        ;
     };
+
+    public void setNumber() {
+        List<Object> maplist = new ArrayList<>();
+        for (LinkedHashMap<String, String> a : answer) {
+            maplist.add(a);
+        }
+
+        MapTableData tableData = MapTableData.create("表格名", maplist);
+        //Column groupColumn = new Column("组合", tableData.getColumns().get(0), tableData.getColumns().get(1));
+        table.getConfig().setFixedTitle(true);
+        tableData.getColumns().get(0).setFixed(true);
+        table.setZoom(true, 2, 1);
+        table.getConfig().setShowXSequence(false);
+        table.getConfig().setShowYSequence(false);
+        table.setTableData(tableData);
+        table.getConfig().setContentStyle(new FontStyle(40, Color.BLUE));
+        table.getConfig().setColumnTitleStyle(new FontStyle(40, Color.BLUE));
+    }
+
+    //在界面刷新之前保存旧数据
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putSerializable("initial", answer);
+    }
+
 }
