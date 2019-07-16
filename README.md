@@ -1,2 +1,2 @@
 # SmartControlTower
-Intern project for Dell Intern
+Android project for Dell Intern
