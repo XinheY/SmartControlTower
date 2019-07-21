@@ -86,7 +86,7 @@ public class E2E extends AppCompatActivity {
             ld = new LoadingDialog(this);
             ld.setLoadingText("Loading...").setSuccessText("Success").setFailedText("Failed")
                     .closeSuccessAnim().show();
-            test("EXEC [SP_IDC_EOQ_SUMMARY1] '" + "EoQ" + "','" + "QuarView" + "','" + "FY20Q2" + "','" + "" + "','" + "overall" + "','" + "system" + "','" + "overall" + "','" + "overall" + "','" + "overall" + "','" + "overall" + "','" + "overall" + "'");
+            test("EXEC [SP_IDC_EOQ_SUMMARY] '" + "EoQ" + "','" + "QuarView" + "','" + "FY20Q2" + "','" + "" + "','" + "overall" + "','" + "system" + "','" + "overall" + "','" + "overall" + "','" + "overall" + "','" + "overall" + "','" + "overall" + "'");
         }
 
         //////////////////////////////////RadioGroup//////////////////////////////////////
@@ -274,7 +274,7 @@ public class E2E extends AppCompatActivity {
                 }
                 if (canrun) {
                     if (searchSum.get(2) != "" || searchSum.get(3) != "") {
-                        String sql = "EXEC [SP_IDC_EOQ_SUMMARY1] '" + searchSum.get(0) + "','" + searchSum.get(1) + "','" + searchSum.get(3) + "','" + searchSum.get(2) + "','" + searchSum.get(4) + "','" + searchSum.get(5) + "','" + searchSum.get(6) + "','" + searchSum.get(7) + "','" + searchSum.get(8) + "','" + searchSum.get(9) + "','" + searchSum.get(10) + "'";
+                        String sql = "EXEC [SP_IDC_EOQ_SUMMARY] '" + searchSum.get(0) + "','" + searchSum.get(1) + "','" + searchSum.get(3) + "','" + searchSum.get(2) + "','" + searchSum.get(4) + "','" + searchSum.get(5) + "','" + searchSum.get(6) + "','" + searchSum.get(7) + "','" + searchSum.get(8) + "','" + searchSum.get(9) + "','" + searchSum.get(10) + "'";
                         toggleRightSliding();
                         Log.e("ERROR",sql);
                         test(sql);
