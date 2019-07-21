@@ -12,7 +12,6 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.content.res.Resources;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -31,17 +30,13 @@ import com.bin.david.form.data.format.bg.BaseBackgroundFormat;
 import com.bin.david.form.data.style.FontStyle;
 import com.bin.david.form.data.table.MapTableData;
 import com.google.android.material.navigation.NavigationView;
-import com.google.gson.Gson;
 import com.xiasuhuei321.loadingdialog.view.LoadingDialog;
 
 import org.angmarch.views.NiceSpinner;
-import org.angmarch.views.OnSpinnerItemSelectedListener;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.List;
 
 
@@ -50,16 +45,18 @@ public class E2E extends AppCompatActivity {
     private DrawerLayout drawerl;
     private ActionBarDrawerToggle toggle;
     public static SmartTable<Object> table;
-    private HashMap<String, HashMap<String, CheckBox>> summary;//所有checkbox的集合
+    private HashMap<String, HashMap<String, CheckBox>> summary = new HashMap<>();//所有checkbox的集合
+    private HashMap<String, HashMap<String, CheckBox>> summaryOld = new HashMap<>();//之前所有checkbox的集合
     private ArrayList<String> allCondition = new ArrayList<>();
     private ArrayList<String[]> allContent = new ArrayList<>();
     private ArrayList<LinkedHashMap<String, String>> answer;
     private LoadingDialog ld;
-    private NiceSpinner niceSpinner;
     private Button verbtn;
     private Button yqbtn;
     private LinearLayout yqll;
     private LinearLayout verll;
+    private RadioGroup viewType;
+    private RadioGroup radioGroup;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,52 +65,62 @@ public class E2E extends AppCompatActivity {
         if (savedInstanceState != null) {
             // Restore value of members from saved state
             answer = (ArrayList<LinkedHashMap<String, String>>) savedInstanceState.getSerializable("initial");
-            summary = (HashMap<String, HashMap<String, CheckBox>>) savedInstanceState.getSerializable("initial2");
+            summaryOld = (HashMap<String, HashMap<String, CheckBox>>) savedInstanceState.getSerializable("initial2");
         } else {
             answer = new ArrayList<>();
-            summary = new HashMap<>();
         }
 
         setContentView(R.layout.activity_e2_e);
-
+        radioGroup = findViewById(R.id.e2e_range);
+        viewType = findViewById(R.id.e2e_spinner);
         verbtn = findViewById(R.id.e2e_ver_btn);
         yqbtn = findViewById(R.id.e2e_yq_btn);
         yqll = findViewById(R.id.e2e_yq);
         verll = findViewById(R.id.e2e_ver);
-        /////////////////Table//////////////////////////////////////////////////
-
         table = findViewById(R.id.table);
-        //表格数据 datas 是需要填充的数据
-//        List<Object> maplist = new ArrayList<>();
+        /////////////////Table//////////////////////////////////////////////////
+        //设置初始值
         if (answer.size() != 0) {
-            setNumber();
+            setNumber(selectRadioBtn(radioGroup));
+        } else {
+            ld = new LoadingDialog(this);
+            ld.setLoadingText("Loading...").setSuccessText("Success").setFailedText("Failed")
+                    .closeSuccessAnim().show();
+            test("EXEC [SP_IDC_EOQ_SUMMARY1] '" + "EoQ" + "','" + "QuarView" + "','" + "FY20Q2" + "','" + "" + "','" + "overall" + "','" + "system" + "','" + "overall" + "','" + "overall" + "','" + "overall" + "','" + "overall" + "','" + "overall" + "'");
         }
 
+        //////////////////////////////////RadioGroup//////////////////////////////////////
+        RadioGroup.OnCheckedChangeListener listener = new RadioGroup.OnCheckedChangeListener() {
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                setNumber(selectRadioBtn(radioGroup));
+            }
+        };
 
-        //////////////////////////////////drop-down list//////////////////////////////////////
-        niceSpinner = findViewById(R.id.nice_spinner);
-        List<String> dataset = new LinkedList<>(Arrays.asList("QuarView", "VersionView"));
-        niceSpinner.attachDataSource(dataset);
+        radioGroup.setOnCheckedChangeListener(listener);
 
-
-        niceSpinner.setOnSpinnerItemSelectedListener(new OnSpinnerItemSelectedListener() {
-            @Override
-            public void onItemSelected(NiceSpinner parent, View view, int position, long id) {
-                String item = (String) parent.getItemAtPosition(position);
-
-                if (item.equals("VersionView")) {
+        RadioGroup.OnCheckedChangeListener listener2 = new RadioGroup.OnCheckedChangeListener() {
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                if (selectRadioBtn(viewType).equals("VersionView")) {
                     verbtn.setVisibility(View.VISIBLE);
                     yqbtn.setVisibility(View.GONE);
                     yqll.setVisibility(View.GONE);
-
+                    for (String checkb : summary.get("yq").keySet()) {
+                        CheckBox cbb = summary.get("yq").get(checkb);
+                        cbb.setChecked(false);
+                    }
                 } else {
                     verbtn.setVisibility(View.GONE);
                     verll.setVisibility(View.GONE);
                     yqbtn.setVisibility(View.VISIBLE);
+                    for (String checkb : summary.get("version").keySet()) {
+                        CheckBox cbb = summary.get("version").get(checkb);
+                        cbb.setChecked(false);
+                    }
                 }
-                Toast.makeText(E2E.this, item, Toast.LENGTH_SHORT).show();
             }
-        });
+        };
+        viewType.setOnCheckedChangeListener(listener2);
+
 ////////////////////////////////////////////left side///////////////////////////////////////////
         Toolbar toolbar = findViewById(R.id.e2e_toolbar);
         setSupportActionBar(toolbar);
@@ -126,8 +133,8 @@ public class E2E extends AppCompatActivity {
             actionb.setHomeAsUpIndicator(R.drawable.menu);
         }
         nv.setCheckedItem(R.id.nav_E2E);
-        Resources resource = (Resources) getBaseContext().getResources();
-        ColorStateList csl = (ColorStateList) resource.getColorStateList(R.color.nav_status_color);
+        Resources resource = getBaseContext().getResources();
+        ColorStateList csl = resource.getColorStateList(R.color.nav_status_color);
         nv.setItemTextColor(csl);
 
         //界面切换
@@ -185,155 +192,43 @@ public class E2E extends AppCompatActivity {
 
         ///////////////////////CheckBox列表/////////////////////////////////////////
 
-        //Version
-        HashMap<String, CheckBox> vermap = new LinkedHashMap<>();
         LinearLayout e2ever = findViewById(R.id.e2e_ver);
         String[] ver = getResources().getStringArray(R.array.Version);
-        allContent.add(ver);
-        for (int i = 0; i < ver.length; i++) {
-            CheckBox cb = new CheckBox(this);
-            cb.setTextColor(getResources().getColor(R.color.colorAccent));
-            cb.setText(ver[i]);
-            cb.setTextSize(18);
-            vermap.put(ver[i], cb);
-            e2ever.addView(cb);
+        ConstructCheck("version", ver, e2ever, "");
 
-        }
-        summary.put("version", vermap);
-
-        allCondition.add("version");
-
-        //Year_Quar
-        HashMap<String, CheckBox> yqmap = new LinkedHashMap<>();
         LinearLayout e2eyq = findViewById(R.id.e2e_yq);
         String[] yq = getResources().getStringArray(R.array.Year_quar);
-        allContent.add(yq);
-        for (int i = 0; i < yq.length; i++) {
-            CheckBox cb = new CheckBox(this);
-            cb.setTextColor(getResources().getColor(R.color.colorAccent));
-            cb.setText(yq[i]);
-            cb.setTextSize(18);
-            e2eyq.addView(cb);
-            yqmap.put(yq[i], cb);
+        ConstructCheck("yq", yq, e2eyq, "FY20Q2");
 
-        }
-
-        summary.put("yq", yqmap);
-        allCondition.add("yq");
-
-        //Lob
-        HashMap<String, CheckBox> lobmap = new LinkedHashMap<>();
         LinearLayout e2elob = findViewById(R.id.e2e_lob);
         String[] lob = getResources().getStringArray(R.array.Lob);
-        allContent.add(lob);
-        for (int i = 0; i < lob.length; i++) {
-            CheckBox cb = new CheckBox(this);
-            cb.setTextColor(getResources().getColor(R.color.colorAccent));
-            cb.setText(lob[i]);
-            cb.setTextSize(18);
-            e2elob.addView(cb);
-            lobmap.put(lob[i], cb);
+        ConstructCheck("lob", lob, e2elob, "OVERALL");
 
-        }
-        summary.put("lob", lobmap);
-        allCondition.add("lob");
-
-        //System Flag
-        HashMap<String, CheckBox> sfmap = new LinkedHashMap<>();
         LinearLayout e2esf = findViewById(R.id.e2e_sf);
         String[] sf = getResources().getStringArray(R.array.system_flag);
-        allContent.add(sf);
-        for (int i = 0; i < sf.length; i++) {
-            CheckBox cb = new CheckBox(this);
-            cb.setTextColor(getResources().getColor(R.color.colorAccent));
-            cb.setText(sf[i]);
-            cb.setTextSize(18);
-            e2esf.addView(cb);
-            sfmap.put(sf[i], cb);
-        }
-        summary.put("is_system", sfmap);
-        allCondition.add("is_system");
+        ConstructCheck("is_system", sf, e2esf, "System");
 
-        //Product Type
-        HashMap<String, CheckBox> ptmap = new LinkedHashMap<>();
         LinearLayout e2ept = findViewById(R.id.e2e_pt);
         String[] pt = getResources().getStringArray(R.array.Product_Type);
-        allContent.add(pt);
-        for (int i = 0; i < pt.length; i++) {
-            CheckBox cb = new CheckBox(this);
-            cb.setTextColor(getResources().getColor(R.color.colorAccent));
-            cb.setText(pt[i]);
-            cb.setTextSize(18);
-            e2ept.addView(cb);
-            ptmap.put(pt[i], cb);
-        }
-        summary.put("product_type", ptmap);
-        allCondition.add("product_type");
+        ConstructCheck("product_type", pt, e2ept, "OVERALL");
 
-        //Lob Group
-        HashMap<String, CheckBox> lgmap = new LinkedHashMap<>();
         LinearLayout e2elg = findViewById(R.id.e2e_lg);
         String[] lg = getResources().getStringArray(R.array.LOB_Group);
+        ConstructCheck("lob_group", lg, e2elg, "OVERALL");
 
-        allContent.add(lg);
-        for (int i = 0; i < lg.length; i++) {
-            CheckBox cb = new CheckBox(this);
-            cb.setTextColor(getResources().getColor(R.color.colorAccent));
-            cb.setText(lg[i]);
-            cb.setTextSize(18);
-            e2elg.addView(cb);
-            lgmap.put(lg[i], cb);
-        }
-        summary.put("lob_group", lgmap);
-        allCondition.add("lob_group");
-
-        //Region
-        HashMap<String, CheckBox> regionmap = new LinkedHashMap<>();
         LinearLayout e2eregion = findViewById(R.id.e2e_region);
         String[] region = getResources().getStringArray(R.array.Region);
-        allContent.add(region);
-        for (int i = 0; i < region.length; i++) {
-            CheckBox cb = new CheckBox(this);
-            cb.setTextColor(getResources().getColor(R.color.colorAccent));
-            cb.setText(region[i]);
-            cb.setTextSize(18);
-            e2eregion.addView(cb);
-            regionmap.put(region[i], cb);
-        }
-        summary.put("region", regionmap);
-        allCondition.add("region");
+        ConstructCheck("region", region, e2eregion, "OVERALL");
 
-        //Segment
-        HashMap<String, CheckBox> segmentmap = new LinkedHashMap<>();
         LinearLayout e2esegment = findViewById(R.id.e2e_segment);
         String[] segment = getResources().getStringArray(R.array.Segment);
-        allContent.add(segment);
-        for (int i = 0; i < segment.length; i++) {
-            CheckBox cb = new CheckBox(this);
-            cb.setTextColor(getResources().getColor(R.color.colorAccent));
-            cb.setText(segment[i]);
-            cb.setTextSize(18);
-            e2esegment.addView(cb);
-            segmentmap.put(segment[i], cb);
-        }
-        summary.put("segment", segmentmap);
-        allCondition.add("segment");
+        ConstructCheck("segment", segment, e2esegment, "OVERALL");
 
-        //Site
-        HashMap<String, CheckBox> sitemap = new LinkedHashMap<>();
         LinearLayout e2esite = findViewById(R.id.e2e_site);
         String[] site = getResources().getStringArray(R.array.Site);
-        allContent.add(site);
-        for (int i = 0; i < site.length; i++) {
-            CheckBox cb = new CheckBox(this);
-            cb.setTextColor(getResources().getColor(R.color.colorAccent));
-            cb.setText(site[i]);
-            cb.setTextSize(18);
-            e2esite.addView(cb);
-            sitemap.put(site[i], cb);
-        }
-        summary.put("site", sitemap);
-        allCondition.add("site");
+        ConstructCheck("site", site, e2esite, "OVERALL");
+
+
         ////////////////////////Checkbox列表结束////////////////////////////////////
 
         Button refresh = findViewById(R.id.e2e_refresh);
@@ -342,33 +237,53 @@ public class E2E extends AppCompatActivity {
             public void onClick(View view) {
 
                 ld = new LoadingDialog(view.getContext());
-                ld.setLoadingText("Loading...").setSuccessText("Success").show();
-
+                ld.setLoadingText("Loading...").setSuccessText("Success").setFailedText("Failed")
+                        .closeSuccessAnim().show();
+                answer.clear();
                 ArrayList<String> searchSum = new ArrayList<>();//被check的checkbox集合
-                RadioGroup radioGroup = findViewById(R.id.e2e_rg);
-                RadioButton radioButton = findViewById(radioGroup.getCheckedRadioButtonId());
+                RadioGroup radio = findViewById(R.id.e2e_rg);
+                RadioButton radioButton = findViewById(radio.getCheckedRadioButtonId());
                 String ratioText = radioButton.getText().toString();
                 searchSum.add(ratioText);
-                String spinText = niceSpinner.getText().toString();
-                searchSum.add(spinText);
+                RadioButton radioButton2 = findViewById(viewType.getCheckedRadioButtonId());
+                String ratioText2 = radioButton2.getText().toString();
+                searchSum.add(ratioText2);
+                boolean canrun = true;
                 for (int i = 0; i < summary.size(); i++) {
                     String oneCondition = "";
                     HashMap<String, CheckBox> innerMap = summary.get(allCondition.get(i));
+                    int count = 0;
                     for (int j = 0; j < innerMap.size(); j++) {
                         CheckBox cbc = innerMap.get((allContent.get(i))[j]);
                         if (cbc.isChecked()) {
-                            if (j == 0) {
+                            count++;
+                            if (oneCondition.equals("")) {
                                 oneCondition += cbc.getText();
                             } else {
                                 oneCondition += "," + cbc.getText();
                             }
                         }
                     }
+                    if (count == 0 && i > 1) {
+                        canrun = false;
+                        Toast.makeText(E2E.this, "Blank " + allCondition.get(i), Toast.LENGTH_LONG).show();
+                        ld.closeFailedAnim().loadFailed();
+                        break;
+                    }
                     searchSum.add(oneCondition);
                 }
-                String sql = "EXEC [SP_IDC_EOQ_SUMMARY1] '" + searchSum.get(0) + "','" + searchSum.get(1) + "','" + searchSum.get(3) + "','" + searchSum.get(2) + "','" + searchSum.get(4) + "','" + searchSum.get(5) + "','" + searchSum.get(6) + "','" + searchSum.get(7) + "','" + searchSum.get(8) + "','" + searchSum.get(9) + "','" + searchSum.get(10) + "'";
-                toggleRightSliding();
-                test(sql);
+                if (canrun) {
+                    if (searchSum.get(2) != "" || searchSum.get(3) != "") {
+                        String sql = "EXEC [SP_IDC_EOQ_SUMMARY1] '" + searchSum.get(0) + "','" + searchSum.get(1) + "','" + searchSum.get(3) + "','" + searchSum.get(2) + "','" + searchSum.get(4) + "','" + searchSum.get(5) + "','" + searchSum.get(6) + "','" + searchSum.get(7) + "','" + searchSum.get(8) + "','" + searchSum.get(9) + "','" + searchSum.get(10) + "'";
+                        toggleRightSliding();
+                        Log.e("ERROR",sql);
+                        test(sql);
+                    }
+                    else{
+                        Toast.makeText(E2E.this, "Blank Error", Toast.LENGTH_LONG).show();
+                        ld.closeFailedAnim().loadFailed();
+                    }
+                }
 
             }
         });
@@ -419,6 +334,7 @@ public class E2E extends AppCompatActivity {
 
         }
         if (ll.getVisibility() == View.VISIBLE) {
+
             ll.setVisibility(View.GONE);
         } else {
             ll.setVisibility(View.VISIBLE);
@@ -444,7 +360,7 @@ public class E2E extends AppCompatActivity {
                 //测试数据库的语句,在子线程操作
                 answer = DBUtil.QuerySQL(sql);
                 // answer = DBUtil.sendRequestWithOkHttp();
-                setNumber();
+                setNumber(selectRadioBtn(radioGroup));
                 Message msg = new Message();
                 msg.what = 1001;
                 Bundle data = new Bundle();
@@ -453,7 +369,6 @@ public class E2E extends AppCompatActivity {
             }
         };
         new Thread(run).start();
-
     }
 
     @SuppressLint("HandlerLeak")
@@ -463,21 +378,64 @@ public class E2E extends AppCompatActivity {
                 case 1001:
                     String str = msg.getData().getString("result");
                     ld.loadSuccess();
-                    //ld.close();
                     break;
 
                 default:
+                    ld.loadFailed();
                     break;
             }
         }
-
-        ;
     };
 
-    public void setNumber() {
+    /////////////////////////////////////////////////////////////////////////////////////////
+    //将checklist放进界面中
+    public void ConstructCheck(String title, String[] items, LinearLayout ll, String ini) {
+        String[] initial = ini.split(",");
+        HashMap<String, CheckBox> map = new LinkedHashMap<>();
+        allContent.add(items);
+        for (int i = 0; i < items.length; i++) {
+            CheckBox cb = new CheckBox(this);
+            cb.setTextColor(getResources().getColor(R.color.colorAccent));
+            cb.setText(items[i]);
+            cb.setTextSize(18);
+            map.put(items[i], cb);
+            Log.d("sss", items[i] + " " + summaryOld.size());
+            if (summaryOld.size() != 0) {
+                if (summaryOld.get(title).get(items[i]).isChecked()) {
+                    cb.setChecked(true);
+                }
+            } else {
+                for (int j = 0; j < initial.length; j++) {
+                    if (items[i].equals(ini)) {
+                        cb.setChecked(true);
+                    }
+                }
+            }
+            ll.addView(cb);
+        }
+        summary.put(title, map);
+        allCondition.add(title);
+    }
+
+    //将数字放进table里
+    public void setNumber(String unit) {
         List<Object> maplist = new ArrayList<>();
         for (LinkedHashMap<String, String> a : answer) {
-            maplist.add(a);
+            LinkedHashMap<String, String> lhm = new LinkedHashMap<>();
+            if (unit.equals("K")) {
+                for (String b : a.keySet()) {
+                    if (!b.equals("COL_TYPE")) {
+                        double dou = Double.parseDouble(a.get(b));
+                        dou = dou / 1000;
+                        lhm.put(b, String.format("%.1f", dou));
+                    } else {
+                        lhm.put(b, a.get(b));
+                    }
+                }
+                maplist.add(lhm);
+            } else {
+                maplist.add(a);
+            }
         }
 
         MapTableData tableData = MapTableData.create("EOQ", maplist);
@@ -502,5 +460,12 @@ public class E2E extends AppCompatActivity {
         outState.putSerializable("initial", answer);
         outState.putSerializable("initial2", summary);
     }
+
+    private String selectRadioBtn(RadioGroup rg) {
+        RadioButton rb = E2E.this.findViewById(rg.getCheckedRadioButtonId());
+        return rb.getText() + "";
+
+    }
+
 
 }

@@ -36,6 +36,45 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
+            <RadioGroup
+                android:id="@+id/e2e_range"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:orientation="horizontal"
+                android:layout_marginTop="12dp">
+
+                <RadioButton
+                    android:id="@+id/e2e_k"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="10dp"
+                    android:drawablePadding="8dp"
+                    android:text="K"
+                    android:textColor="@color/white"
+                    android:textSize="18sp" />
+
+                <RadioButton
+                    android:id="@+id/e2e_unit"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:text="Unit"
+                    android:checked="true"
+                    android:textColor="@color/white"
+                    android:textSize="18sp" />
+
+
+            </RadioGroup>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="3dp"
+                android:layout_marginLeft="20sp"
+                android:layout_marginTop="10dp"
+                android:layout_marginRight="20sp"
+                android:background="@color/colorAccent" />
+
             <TextView
                 style="@style/SearchTitle"
                 android:layout_width="match_parent"
@@ -54,7 +93,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginRight="10dp"
-                    android:checked="true"
                     android:drawablePadding="8dp"
                     android:text="IDC"
                     android:textColor="@color/white"
@@ -66,19 +104,14 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="10dp"
                     android:text="EoQ"
+                    android:checked="true"
                     android:textColor="@color/white"
                     android:textSize="18sp" />
 
 
             </RadioGroup>
 
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="2dp"
-                android:layout_marginLeft="20sp"
-                android:layout_marginTop="10dp"
-                android:layout_marginRight="20sp"
-                android:background="@color/colorAccent" />
+
 
             <TextView
                 style="@style/SearchTitle"
@@ -86,16 +119,36 @@
                 android:layout_height="wrap_content"
                 android:text="View Type" />
 
-            <org.angmarch.views.NiceSpinner
-                android:id="@+id/nice_spinner"
+
+            <RadioGroup
+                android:id="@+id/e2e_spinner"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:layout_margin="16dp"
-                android:layout_marginLeft="20sp"
-                android:layout_marginRight="20sp"
-                android:gravity="center"
-                android:textSize="18sp" />
+                android:orientation="horizontal">
+
+                <RadioButton
+                    android:id="@+id/e2e_QuarView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="10dp"
+                    android:drawablePadding="8dp"
+                    android:text="QuarView"
+                    android:checked="true"
+                    android:textColor="@color/white"
+                    android:textSize="18sp" />
+
+                <RadioButton
+                    android:id="@+id/e2e_Version"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:text="VersionView"
+                    android:textColor="@color/white"
+                    android:textSize="18sp" />
+
+
+            </RadioGroup>
 
             <Button
                 android:id="@+id/e2e_yq_btn"

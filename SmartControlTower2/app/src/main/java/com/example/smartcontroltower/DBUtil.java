@@ -20,7 +20,9 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.SQLTimeoutException;
 import java.sql.Statement;
+import java.sql.Time;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -28,6 +30,7 @@ import java.util.List;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import okio.Timeout;
 
 
 public class DBUtil {
@@ -80,22 +83,21 @@ public class DBUtil {
     public static ArrayList<LinkedHashMap<String, String>> QuerySQL(String sql) {
         String result = "";
         try {
+
             Connection conn = getSQLConnection("10.82.244.53", "sa", "Dell@2008", "PCWebsite");
-           // String sql = "EXEC [SP_IDC_EOQ_SUMMARY1] '" + "IDC" + "','" + "QuarView" + "','" + "FY20Q1,FY20Q2" + "','" + "" + "','" + "overall" + "','" + "system" + "','" + "overall" + "','" + "overall" + "','" + "overall" + "','" + "overall" + "','" + "overall" + "'";
             Statement stmt = conn.createStatement();//
             ResultSet rs = stmt.executeQuery(sql);
             while (rs.next()) {
                 String after = strChangeXML(rs.getString(1));
                 parseXMLWithPull(after);
-
             }
 
-            for(int i=0;i<answer.size();i++){
-                LinkedHashMap<String,String> count=answer.get(i);
-                for(String s:count.keySet()){
-                    Log.d("jieguo",s+":"+count.get(s)+":"+i);
-                }
-            }
+//            for(int i=0;i<answer.size();i++){
+//                LinkedHashMap<String,String> count=answer.get(i);
+//                for(String s:count.keySet()){
+//                    Log.d("jieguo",s+":"+count.get(s)+":"+i);
+//                }
+//            }
 
             rs.close();
             stmt.close();
