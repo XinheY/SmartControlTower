@@ -44,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
                         finish();
                     }
                 };
-                timer.schedule(task, 2000);//3秒后执行TimeTask的run方法
+                timer.schedule(task, 1500);//1.5秒后执行TimeTask的run方法
                 //////////////////////////////////////////////
             }
         });

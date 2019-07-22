@@ -41,8 +41,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:orientation="horizontal"
-                android:layout_marginTop="12dp">
+                android:layout_marginTop="12dp"
+                android:orientation="horizontal">
 
                 <RadioButton
                     android:id="@+id/ana_k"
@@ -59,8 +59,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="10dp"
-                    android:text="Unit"
                     android:checked="true"
+                    android:text="Unit"
                     android:textColor="@color/white"
                     android:textSize="18sp" />
 
@@ -103,8 +103,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="10dp"
-                    android:text="EoQ"
                     android:checked="true"
+                    android:text="EoQ"
                     android:textColor="@color/white"
                     android:textSize="18sp" />
 
@@ -112,81 +112,110 @@
             </RadioGroup>
 
             <Button
+                android:id="@+id/ana_sv_btn"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Submit Version"
-                android:id="@+id/ana_sv_btn"/>
+                android:onClick="showMutilAlertDialog"
+                android:text="Submit Version" />
+
             <LinearLayout
+                android:id="@+id/ana_sv"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/ana_sv"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <RadioGroup
+                    android:id="@+id/ana_rg_sv"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"></RadioGroup>
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/ana_cv_btn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:onClick="showMutilAlertDialog"
+                android:text="Compare Version" />
+
+            <LinearLayout
+                android:id="@+id/ana_cv"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <RadioGroup
+                    android:id="@+id/ana_rg_cv"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"></RadioGroup>
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/ana_gb_btn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:onClick="showMutilAlertDialog"
+                android:text="GroupBy" />
+
+            <LinearLayout
+                android:id="@+id/ana_gb"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone" />
+
+            <Button
+                android:id="@+id/ana_vt_btn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:onClick="showMutilAlertDialog"
+                android:text="ViewType" />
+
+            <LinearLayout
+                android:id="@+id/ana_vt"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone" />
+
+            <Button
+                android:id="@+id/ana_source_btn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:onClick="showMutilAlertDialog"
+                android:text="Source" />
+
+            <LinearLayout
+                android:id="@+id/ana_source"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
 
                 <RadioGroup
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:id="@+id/ana_rg_sv"></RadioGroup>
+                    android:id="@+id/ana_rg_source"></RadioGroup>
             </LinearLayout>
 
-            <Button
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Compare Version"
-                android:id="@+id/ana_cv_btn"/>
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/ana_cv"
-                android:orientation="vertical"/>
 
             <Button
-                android:layout_width="match_parent"
+                android:id="@+id/ana_refresh"
+                android:layout_width="120dp"
                 android:layout_height="wrap_content"
-                android:text="GroupBy"
-                android:id="@+id/ana_gb_btn"/>
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/ana_gb"
-                android:orientation="vertical"/>
-
-            <Button
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="ViewType"
-                android:id="@+id/ana_vt_btn"/>
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/ana_vt"
-                android:orientation="vertical"/>
-
-            <Button
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Source"
-                android:id="@+id/ana_source_btn"/>
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/ana_source"
-                android:orientation="vertical"/>
+                android:layout_gravity="bottom|center"
+                android:layout_marginTop="7sp"
+                android:layout_marginBottom="15dp"
+                android:background="@drawable/btn_shape"
+                android:padding="3dp"
+                android:text="Refresh"
+                android:textColor="@color/white"
+                android:textSize="18sp" />
 
         </LinearLayout>
 
     </ScrollView>
 
-    <Button
-        android:id="@+id/ana_refresh"
-        android:layout_width="120dp"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|center"
-        android:layout_marginTop="7sp"
-        android:background="@drawable/btn_shape"
-        android:padding="3dp"
-        android:text="Refresh"
-        android:textColor="@color/white"
-        android:textSize="18sp"
-        android:layout_marginBottom="15dp" />
 
 </LinearLayout>

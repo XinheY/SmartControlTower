@@ -15,7 +15,6 @@ import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -32,8 +31,7 @@ import com.bin.david.form.data.table.MapTableData;
 import com.google.android.material.navigation.NavigationView;
 import com.xiasuhuei321.loadingdialog.view.LoadingDialog;
 
-import org.angmarch.views.NiceSpinner;
-
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -50,13 +48,21 @@ public class E2E extends AppCompatActivity {
     private ArrayList<String> allCondition = new ArrayList<>();
     private ArrayList<String[]> allContent = new ArrayList<>();
     private ArrayList<LinkedHashMap<String, String>> answer;
-    private LoadingDialog ld;
+    private LoadingDialog ld=null;
     private Button verbtn;
     private Button yqbtn;
     private LinearLayout yqll;
     private LinearLayout verll;
     private RadioGroup viewType;
     private RadioGroup radioGroup;
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if(ld!=null){
+            ld.close();
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -276,7 +282,6 @@ public class E2E extends AppCompatActivity {
                     if (searchSum.get(2) != "" || searchSum.get(3) != "") {
                         String sql = "EXEC [SP_IDC_EOQ_SUMMARY] '" + searchSum.get(0) + "','" + searchSum.get(1) + "','" + searchSum.get(3) + "','" + searchSum.get(2) + "','" + searchSum.get(4) + "','" + searchSum.get(5) + "','" + searchSum.get(6) + "','" + searchSum.get(7) + "','" + searchSum.get(8) + "','" + searchSum.get(9) + "','" + searchSum.get(10) + "'";
                         toggleRightSliding();
-                        Log.e("ERROR",sql);
                         test(sql);
                     }
                     else{
@@ -399,7 +404,6 @@ public class E2E extends AppCompatActivity {
             cb.setText(items[i]);
             cb.setTextSize(18);
             map.put(items[i], cb);
-            Log.d("sss", items[i] + " " + summaryOld.size());
             if (summaryOld.size() != 0) {
                 if (summaryOld.get(title).get(items[i]).isChecked()) {
                     cb.setChecked(true);
@@ -458,7 +462,7 @@ public class E2E extends AppCompatActivity {
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putSerializable("initial", answer);
-        outState.putSerializable("initial2", summary);
+        outState.putSerializable("initial2",summary);
     }
 
     private String selectRadioBtn(RadioGroup rg) {

@@ -129,4 +129,152 @@
         <item>FY21Q3</item>
         <item>FY21Q4</item>
     </string-array>
+
+    <string-array name="ana_sv">
+        <item>FY20Q2WK10</item>
+        <item>FY20Q2WK9</item>
+        <item>FY20Q2WK8</item>
+        <item>FY20Q2WK5</item>
+        <item>FY20Q2WK4</item>
+        <item>FY20Q1WK13_ACT</item>
+        <item>FY20Q1WK13_Closing</item>
+        <item>FY20Q1WK13</item>
+        <item>FY20Q1WK12</item>
+        <item>FY20Q1WK11</item>
+        <item>FY20Q1WK10</item>
+        <item>FY20Q1WK9</item>
+        <item>FY20Q1WK8</item>
+        <item>FY20Q1WK7</item>
+        <item>FY20Q1WK6</item>
+        <item>FY20Q1WK5</item>
+        <item>FY19Q4WK13_ACT</item>
+        <item>FY19Q4WK13_Closing</item>
+        <item>FY19Q4WK13</item>
+        <item>FY19Q4WK12</item>
+        <item>FY19Q4WK11</item>
+        <item>FY19Q4WK10</item>
+        <item>FY19Q4WK9</item>
+        <item>FY19Q4WK8</item>
+        <item>FY19Q4WK7</item>
+        <item>FY19Q4WK6</item>
+        <item>FY19Q4WK5</item>
+        <item>FY19Q3WK13_ACT</item>
+        <item>FY19Q3WK13_Closing</item>
+        <item>FY19Q3WK13</item>
+        <item>FY19Q3WK12</item>
+        <item>FY19Q3WK11</item>
+        <item>FY19Q3WK10</item>
+        <item>FY19Q3WK9</item>
+        <item>FY19Q3WK5</item>
+        <item>FY19Q2WK13_ACT</item>
+        <item>FY19Q2WK13_Closing</item>
+        <item>FY19Q1WK13_ACT</item>
+        <item>FY19Q1WK13_Closing</item>
+        <item>FY18Q4WK13_ACT</item>
+        <item>FY18Q4WK13_Closing</item>
+    </string-array>
+
+    <string-array name="ana_cv">
+        <item>FY20Q2WK11</item>
+        <item>FY20Q2WK10</item>
+        <item>FY20Q2WK9</item>
+        <item>FY20Q2WK8</item>
+        <item>FY20Q2WK5</item>
+        <item>FY20Q2WK4</item>
+        <item>FY20Q1WK13_ACT</item>
+        <item>FY20Q1WK13_Closing</item>
+        <item>FY20Q1WK13</item>
+        <item>FY20Q1WK12</item>
+        <item>FY20Q1WK11</item>
+        <item>FY20Q1WK10</item>
+        <item>FY20Q1WK9</item>
+        <item>FY20Q1WK8</item>
+        <item>FY20Q1WK7</item>
+        <item>FY20Q1WK6</item>
+        <item>FY20Q1WK5</item>
+        <item>FY19Q4WK13_ACT</item>
+        <item>FY19Q4WK13_Closing</item>
+        <item>FY19Q4WK13</item>
+        <item>FY19Q4WK12</item>
+        <item>FY19Q4WK11</item>
+        <item>FY19Q4WK10</item>
+        <item>FY19Q4WK9</item>
+        <item>FY19Q4WK8</item>
+        <item>FY19Q4WK7</item>
+        <item>FY19Q4WK6</item>
+        <item>FY19Q4WK5</item>
+        <item>FY19Q3WK13_ACT</item>
+        <item>FY19Q3WK13_Closing</item>
+        <item>FY19Q3WK13</item>
+        <item>FY19Q3WK12</item>
+        <item>FY19Q3WK11</item>
+        <item>FY19Q3WK10</item>
+        <item>FY19Q3WK9</item>
+        <item>FY19Q3WK5</item>
+        <item>FY19Q2WK13_ACT</item>
+        <item>FY19Q2WK13_Closing</item>
+        <item>FY19Q1WK13_ACT</item>
+        <item>FY19Q1WK13_Closing</item>
+        <item>FY18Q4WK13_ACT</item>
+        <item>FY18Q4WK13_Closing</item>
+    </string-array>
+
+    <string-array name="ana_groupby">
+        <item>Country</item>
+        <item>Site</item>
+        <item>Facility</item>
+        <item>OrderType</item>
+    </string-array>
+
+    <string-array name="ana_viewtype">
+        <item>MFG-Backlog</item>
+        <item>MFG-Phasing</item>
+        <item>MFG-Unshippable</item>
+        <item>SNI-Backlog</item>
+        <item>SNI-Phasing</item>
+        <item>SNI-Unshippable</item>
+        <item>Invoice</item>
+    </string-array>
+
+    <string-array name="ana_sources">
+        <item>Sales Impact</item>
+        <item>Sales</item>
+        <item>Parameters Impact</item>
+        <item>E2E Sales Phasing</item>
+        <item>MFG Sales Phasing</item>
+        <item>Customer FDD</item>
+        <item>Supply FDD</item>
+        <item>Allocation</item>
+        <item>OPR</item>
+        <item>VOI</item>
+        <item>STBL</item>
+        <item>Hold</item>
+        <item>Wip</item>
+        <item>--------------</item>
+        <item>SNI Customer Hold OnHand</item>
+        <item>SNI Customer Hold MFG</item>
+        <item>SNI Customer Hold NewComing</item>
+        <item>SNI SI Process OnHand</item>
+        <item>SNI SI Process MFG</item>
+        <item>SNI SI Process NewComing</item>
+        <item>SNI Consolidation OnHand</item>
+        <item>SNI Consolidation MFG</item>
+        <item>SNI Consolidation NewComing</item>
+        <item>SNI CFG 2T OnHand</item>
+        <item>SNI CFG 2T MFG</item>
+        <item>SNI CFG 2T NewComing</item>
+        <item>SNI STBL OnHand</item>
+        <item>SNI STBL MFG</item>
+        <item>SNI STBL NewComing</item>
+        <item>SNI Others Hold OnHand</item>
+        <item>SNI Others Hold MFG</item>
+        <item>SNI Others Hold NewComing</item>
+        <item>SNI Shippable OnHand</item>
+        <item>SNI Shippable MFG</item>
+        <item>SNI Shippable NewComing</item>
+        <item>--------------</item>
+        <item>Adjust</item>
+        <item>E2E Summary</item>
+        <item>Summary</item>
+    </string-array>
 </resources>

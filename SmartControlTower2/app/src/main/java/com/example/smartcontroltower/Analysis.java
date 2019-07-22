@@ -18,21 +18,25 @@ import android.os.Message;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
-import android.widget.Toast;
 
 import com.bin.david.form.core.SmartTable;
 import com.bin.david.form.data.format.bg.BaseBackgroundFormat;
 import com.bin.david.form.data.style.FontStyle;
 import com.bin.david.form.data.table.MapTableData;
+import com.example.smartcontroltower.Fragment_ana.FragmentClient;
+import com.example.smartcontroltower.Fragment_ana.FragmentClientLob;
+import com.example.smartcontroltower.Fragment_ana.FragmentISG;
+import com.example.smartcontroltower.Fragment_ana.FragmentISGLOB;
+import com.example.smartcontroltower.Fragment_ana.FragmentSystem;
 import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.tabs.TabLayout;
 import com.xiasuhuei321.loadingdialog.view.LoadingDialog;
-
-import org.angmarch.views.NiceSpinner;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -43,15 +47,20 @@ import java.util.List;
 public class Analysis extends AppCompatActivity {
 
     private DrawerLayout drawerl;
+    private int radioid = 0;//给每个radiobutton设立唯一的id
     private ActionBarDrawerToggle toggle;
     public static SmartTable<Object> table;
-    private HashMap<String, HashMap<String, CheckBox>> summary = new HashMap<>();//所有checkbox的集合
-    private HashMap<String, HashMap<String, CheckBox>> summaryOld = new HashMap<>();//之前所有checkbox的集合
+    private HashMap<String, HashMap<String, CheckBox>> summary = new LinkedHashMap<>();//所有checkbox的集合
+    private HashMap<String, ArrayList<RadioButton>> radioSummary = new LinkedHashMap<>();
+    private HashMap<String, HashMap<String, CheckBox>> summaryOld = new LinkedHashMap<>();//之前所有checkbox的集合
+    private HashMap<String, ArrayList<RadioButton>> radioOld = new LinkedHashMap<>();
     private ArrayList<String> allCondition = new ArrayList<>();
     private ArrayList<String[]> allContent = new ArrayList<>();
     private ArrayList<LinkedHashMap<String, String>> answer;
     private LoadingDialog ld;
     private RadioGroup radioGroup;
+    private TabLayout tl;
+    private NoSrcoll vp;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,16 +70,32 @@ public class Analysis extends AppCompatActivity {
             // Restore value of members from saved state
             answer = (ArrayList<LinkedHashMap<String, String>>) savedInstanceState.getSerializable("initial");
             summaryOld = (HashMap<String, HashMap<String, CheckBox>>) savedInstanceState.getSerializable("initial2");
+            radioOld = (LinkedHashMap<String, ArrayList<RadioButton>>) savedInstanceState.getSerializable("initial3");
         } else {
             answer = new ArrayList<>();
         }
         setContentView(R.layout.activity_analysis);
-
         radioGroup = findViewById(R.id.ana_range);
+        ////////////////////////////////////////////////////////////////////////
+
+        tl = findViewById(R.id.ana_tablayout);
+        vp = findViewById(R.id.ana_viewpager);
+
+        ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
+
+        adapter.addFragment(new FragmentSystem(), "System");
+        adapter.addFragment(new FragmentClient(), "Client");
+        adapter.addFragment(new FragmentClientLob(), "Client(LOB)");
+        adapter.addFragment(new FragmentISG(), "ISG");
+        adapter.addFragment(new FragmentISGLOB(), "ISG(LOB)");
+
+        vp.setAdapter(adapter);
+        tl.setupWithViewPager(vp);
+
         /////////////////Table//////////////////////////////////////////////////
         //设置初始值
         if (answer.size() != 0) {
-            setNumber(selectRadioBtn(radioGroup));
+            // setNumber(selectRadioBtn(radioGroup));
         } else {
 //            ld = new LoadingDialog(this);
 //            ld.setLoadingText("Loading...").setSuccessText("Success").setFailedText("Failed")
@@ -80,12 +105,12 @@ public class Analysis extends AppCompatActivity {
 
         //////////////////////////////////RadioGroup//////////////////////////////////////
         //K && Unit
-        RadioGroup.OnCheckedChangeListener listener = new RadioGroup.OnCheckedChangeListener() {
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-                setNumber(selectRadioBtn(radioGroup));
-            }
-        };
-        radioGroup.setOnCheckedChangeListener(listener);
+//        RadioGroup.OnCheckedChangeListener listener = new RadioGroup.OnCheckedChangeListener() {
+//            public void onCheckedChanged(RadioGroup group, int checkedId) {
+//                setNumber(selectRadioBtn(radioGroup));
+//            }
+//        };
+//        radioGroup.setOnCheckedChangeListener(listener);
 
 ///////////////////////////////////////***left side///////////////////////////////////////////
         Toolbar toolbar = findViewById(R.id.ana_toolbar);
@@ -157,9 +182,41 @@ public class Analysis extends AppCompatActivity {
         });
 
         ///////////////////////CheckBox列表/////////////////////////////////////////
+        RadioGroup anaSources = findViewById(R.id.ana_rg_source);
+        String[] sources = getResources().getStringArray(R.array.ana_sources);
+        ConstructRadio("sources", sources, anaSources, "Sales");
+
+        RadioGroup anasv = findViewById(R.id.ana_rg_sv);
+        String[] submitVersion = getResources().getStringArray(R.array.ana_sv);
+        ConstructRadio("sv", submitVersion, anasv, "FY20Q2WK10");
+
+        RadioGroup anacv = findViewById(R.id.ana_rg_cv);
+        String[] compareVersion = getResources().getStringArray(R.array.ana_cv);
+        ConstructRadio("cv", compareVersion, anacv, "FY20Q2WK9");
+
+        LinearLayout anagroupby = findViewById(R.id.ana_gb);
+        String[] groupby = getResources().getStringArray(R.array.ana_groupby);
+        ConstructCheck("groupby", groupby, anagroupby, "Country");
+
+        LinearLayout anaviewtype = findViewById(R.id.ana_vt);
+        String[] viewtype = getResources().getStringArray(R.array.ana_viewtype);
+        ConstructCheck("viewtype", viewtype, anaviewtype, "MFG-Phasing,MFG-Unshippable,SNI-Backlog,SNI-Phasing,SNI-Unshippable,Invoice");
 
 
-
+        anaSources.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup radioGroup, int i) {
+                RadioButton checkView = (RadioButton) radioGroup.getChildAt(i);
+                Button vt = findViewById(R.id.ana_vt_btn);
+                LinearLayout vtll = findViewById(R.id.ana_vt);
+                if (!(checkView.getText() + "").equals("Sales")) {
+                    vt.setVisibility(View.GONE);
+                    vtll.setVisibility(View.GONE);
+                } else {
+                    vt.setVisibility(View.VISIBLE);
+                }
+            }
+        });
 
         ////////////////////////Checkbox列表结束////////////////////////////////////
 
@@ -233,27 +290,25 @@ public class Analysis extends AppCompatActivity {
     public void showMutilAlertDialog(View view) {
         LinearLayout ll = null;
         switch (view.getId()) {
-
             case R.id.ana_sv_btn:
-                ll=findViewById(R.id.ana_sv);
+                ll = findViewById(R.id.ana_sv);
                 break;
             case R.id.ana_cv_btn:
-                ll=findViewById(R.id.ana_cv);
+                ll = findViewById(R.id.ana_cv);
                 break;
             case R.id.ana_gb_btn:
-                ll=findViewById(R.id.ana_gb);
+                ll = findViewById(R.id.ana_gb);
                 break;
             case R.id.ana_vt_btn:
-                ll=findViewById(R.id.ana_vt);
+                ll = findViewById(R.id.ana_vt);
                 break;
             case R.id.ana_source_btn:
-                ll=findViewById(R.id.ana_source);
+                ll = findViewById(R.id.ana_source);
                 break;
             default:
 
         }
         if (ll.getVisibility() == View.VISIBLE) {
-
             ll.setVisibility(View.GONE);
         } else {
             ll.setVisibility(View.VISIBLE);
@@ -318,14 +373,22 @@ public class Analysis extends AppCompatActivity {
             cb.setText(items[i]);
             cb.setTextSize(18);
             map.put(items[i], cb);
-            Log.d("sss", items[i] + " " + summaryOld.size());
+            if (title.equals("viewtype")) {
+                if (items[i].equals("MFG-Backlog") || items[i].equals("SNI-Backlog")) {
+                    cb.setEnabled(false);
+                } else if (!items[i].equals("Invoice")) {
+                    ViewGroup.LayoutParams layoutParam = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.FILL_PARENT);
+                    ((LinearLayout.LayoutParams) layoutParam).setMargins(40, 0, 0, 0);
+                    cb.setLayoutParams(layoutParam);
+                }
+            }
             if (summaryOld.size() != 0) {
                 if (summaryOld.get(title).get(items[i]).isChecked()) {
                     cb.setChecked(true);
                 }
             } else {
                 for (int j = 0; j < initial.length; j++) {
-                    if (items[i].equals(ini)) {
+                    if (items[i].equals(initial[j])) {
                         cb.setChecked(true);
                     }
                 }
@@ -333,6 +396,52 @@ public class Analysis extends AppCompatActivity {
             ll.addView(cb);
         }
         summary.put(title, map);
+        allCondition.add(title);
+    }
+
+    public void ConstructRadio(String title, String[] items, RadioGroup rg, String ini) {
+        ArrayList<RadioButton> radioButtons = new ArrayList<>();
+        allContent.add(items);
+        for (int i = 0; i < items.length; i++) {
+            RadioButton rb = new RadioButton(rg.getContext());
+            rb.setText(items[i]);
+            rb.setTextSize(18);
+            rb.setId(radioid);
+            radioid += 1;
+            rb.setTextColor(getResources().getColor(R.color.colorAccent));
+            radioButtons.add(rb);
+            rg.addView(rb);
+            if (title.equals("sources")) {
+                if (items[i].equals("Sales Impact") || items[i].equals("Parameters Impact") || items[i].equals("E2E Summary")) {
+                    rb.setEnabled(false);
+                } else {
+                    ViewGroup.LayoutParams layoutParam = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.FILL_PARENT);
+                    ((LinearLayout.LayoutParams) layoutParam).setMargins(40, 0, 0, 0);
+                    rb.setLayoutParams(layoutParam);
+                }
+            }
+            if (radioOld.size() != 0) {
+                if (radioOld.get(title).get(i).isChecked()) {
+                    rb.setChecked(true);
+                    Button vt = findViewById(R.id.ana_vt_btn);
+                    LinearLayout vtll = findViewById(R.id.ana_vt);
+                   if (title.equals("sources")) {
+                        if (!(radioOld.get(title).get(i).getText() + "").equals("Sales")) {
+                            vt.setVisibility(View.GONE);
+                            vtll.setVisibility(View.GONE);
+                        } else {
+                            vt.setVisibility(View.VISIBLE);
+                        }
+                    }
+                }
+            } else {
+                if (items[i].equals(ini)) {
+                    Log.d("initial", items[i]);
+                    rb.setChecked(true);
+                }
+            }
+        }
+        radioSummary.put(title, radioButtons);
         allCondition.add(title);
     }
 
@@ -378,6 +487,7 @@ public class Analysis extends AppCompatActivity {
         super.onSaveInstanceState(outState);
         outState.putSerializable("initial", answer);
         outState.putSerializable("initial2", summary);
+        outState.putSerializable("initial3", radioSummary);
     }
 
     private String selectRadioBtn(RadioGroup rg) {
