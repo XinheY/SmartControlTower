@@ -39,4 +39,5 @@ dependencies {
     implementation 'dom4j:dom4j:1.6.1'
     implementation 'com.google.code.gson:gson:2.8.5'
     implementation 'com.github.ForgetAll:LoadingDialog:v1.0.1'
+    implementation 'com.github.Jay-Goo:RangeSeekBar:v3.0.0'
 }

@@ -36,6 +36,8 @@ import com.example.smartcontroltower.Fragment_ana.FragmentISGLOB;
 import com.example.smartcontroltower.Fragment_ana.FragmentSystem;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.tabs.TabLayout;
+import com.jaygoo.widget.OnRangeChangedListener;
+import com.jaygoo.widget.RangeSeekBar;
 import com.xiasuhuei321.loadingdialog.view.LoadingDialog;
 
 import java.util.ArrayList;
@@ -61,6 +63,7 @@ public class Analysis extends AppCompatActivity {
     private RadioGroup radioGroup;
     private TabLayout tl;
     private NoSrcoll vp;
+    private RangeSeekBar rsb;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -181,7 +184,7 @@ public class Analysis extends AppCompatActivity {
             }
         });
 
-        ///////////////////////CheckBox列表/////////////////////////////////////////
+/////////////////////////////CheckBox列表/////////////////////////////////////////
         RadioGroup anaSources = findViewById(R.id.ana_rg_source);
         String[] sources = getResources().getStringArray(R.array.ana_sources);
         ConstructRadio("sources", sources, anaSources, "Sales");
@@ -218,7 +221,29 @@ public class Analysis extends AppCompatActivity {
             }
         });
 
-        ////////////////////////Checkbox列表结束////////////////////////////////////
+        rsb = findViewById(R.id.rangeseek);
+        rsb.setProgress(1f, 10f);
+        rsb.setRange(1f,13f,0f);
+        rsb.setProgressHeight(4);
+        rsb.setIndicatorTextDecimalFormat("0");
+        rsb.setSteps(12);
+        rsb.setStepsWidth(10f);
+        rsb.setStepsHeight(25f);
+        rsb.setOnRangeChangedListener(new OnRangeChangedListener() {
+            @Override
+            public void onRangeChanged(RangeSeekBar view, float leftValue, float rightValue, boolean isFromUser) {
+            }
+            @Override
+            public void onStartTrackingTouch(RangeSeekBar view,  boolean isLeft) {
+            }
+
+            @Override
+            public void onStopTrackingTouch(RangeSeekBar view,  boolean isLeft) {
+                //stop tracking touch
+                Log.e("stop",rsb.getRightSeekBar().getProgress()+"");
+            }
+        });
+///////////////////////////////Checkbox列表结束////////////////////////////////////
 
         Button refresh = findViewById(R.id.ana_refresh);
 //        refresh.setOnClickListener(new View.OnClickListener() {//Refresh的动态监控

@@ -2,6 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:alpha="0.9"
     android:background="@color/table_back"
     android:orientation="vertical">
@@ -13,7 +14,7 @@
         android:layout_marginTop="10dp"
         android:fontFamily="sans-serif"
         android:gravity="center"
-        android:text="Citical Search"
+        android:text="Critical Search"
         android:textColor="@color/white"
         android:textSize="30sp"
         android:textStyle="italic|bold" />
@@ -110,6 +111,30 @@
 
 
             </RadioGroup>
+
+            <com.jaygoo.widget.RangeSeekBar
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:rsb_mode="range"
+                android:id="@+id/rangeseek"
+                app:rsb_tick_mark_mode="other"
+                app:rsb_tick_mark_text_color="@color/colorAccent"
+                app:rsb_tick_mark_gravity="center"
+                app:rsb_tick_mark_layout_gravity="bottom"
+                app:rsb_tick_mark_text_array="@array/mark"
+                app:rsb_tick_mark_text_margin="10dp"
+                app:rsb_tick_mark_text_size="17sp"
+                app:rsb_step_radius="10dp"
+                app:rsb_step_auto_bonding="true"
+                app:rsb_indicator_show_mode="alwaysShow"
+                app:rsb_indicator_width="30dp"
+                app:rsb_indicator_height="35dp"
+                app:rsb_indicator_text_size="15dp"
+                app:rsb_indicator_background_color="@color/white"
+                app:rsb_indicator_text_color="@color/black"
+                android:layout_margin="8dp"
+                app:rsb_progress_color="#4096FF"
+                />
 
             <Button
                 android:id="@+id/ana_sv_btn"
