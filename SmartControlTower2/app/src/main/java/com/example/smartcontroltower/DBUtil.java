@@ -42,7 +42,7 @@ public class DBUtil {
         try {
             OkHttpClient client = new OkHttpClient();
             Request request = new Request.Builder()
-                    .url("http://10.0.2.2/test.xml")
+                    .url("http://10.0.2.2/dyndyn.xml")
                     .build();
             Log.d("URL", request.toString());
             Response response = client.newCall(request).execute();
@@ -126,7 +126,7 @@ public class DBUtil {
 
                 switch (eventType) {
                     case XmlPullParser.START_TAG: {
-                        if ((!"rawdata".equals(nodeName)) && (!"Summary".equals(nodeName)) && (!"row".equals(nodeName)) && (!"ref_date".equals(nodeName))) {
+                        if ((!"rawdata".equals(nodeName)) && (!"Summary".equals(nodeName)) && (!"row".equals(nodeName)) && (!"ref_date".equals(nodeName))&&(!"gva".equals(nodeName))) {
                             String id = xmlPullParser.nextText();
                             map.put(nodeName, id);
                         }

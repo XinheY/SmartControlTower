@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/table_back"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/dyn_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:fontFamily="sans-serif"
+        android:gravity="center"
+        android:text="Citical Search"
+        android:textColor="@color/white"
+        android:textSize="30sp"
+        android:textStyle="italic|bold" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <Button
+                android:id="@+id/dyn_ot_btn"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:onClick="showMutilAlertDialog"
+                android:radius="15dp"
+                android:text="OrderType"
+                android:background="@drawable/btn_inlist"
+                android:layout_margin="10dp"
+                android:textSize="17dp"
+                android:textColor="@color/white"/>
+
+            <LinearLayout
+                android:id="@+id/dyn_ot"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginLeft="20dp"
+                android:visibility="gone">
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/dyn_lob_btn"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:onClick="showMutilAlertDialog"
+                android:text="LOB Type(Dynamic BL Only)"
+                android:background="@drawable/btn_inlist"
+                android:layout_margin="10dp"
+                android:textColor="@color/white"
+                android:textSize="17dp"/>
+
+            <LinearLayout
+                android:id="@+id/dyn_lob"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginLeft="20dp"
+                android:visibility="gone">
+            </LinearLayout>
+
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:background="@drawable/btn_inlist"
+                android:id="@+id/dyn_datepicker"
+                android:layout_marginTop="10dp"
+                android:layout_margin="10dp"
+                android:paddingLeft="30dp"
+                android:textColor="@color/white"
+                android:textSize="17dp"
+                android:gravity="center"
+                android:drawablePadding="10dp"
+                android:drawableLeft="@drawable/calendar"
+                />
+
+            <Button
+                android:id="@+id/dyn_hour_btn"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:onClick="showMutilAlertDialog"
+                android:text="Hour"
+                android:background="@drawable/btn_inlist"
+                android:layout_margin="10dp"
+                android:textColor="@color/white"
+                android:textSize="17dp"/>
+
+            <LinearLayout
+                android:id="@+id/dyn_hour"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginLeft="20dp"
+                android:visibility="gone">
+
+                <RadioGroup
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/dyn_rg_hour"/>
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/dyn_refresh"
+                android:layout_width="120dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="7sp"
+                android:background="@drawable/btn_shape"
+                android:padding="3dp"
+                android:text="Refresh"
+                android:textColor="@color/white"
+                android:textSize="18sp"
+                android:layout_marginBottom="15dp"/>
+
+        </LinearLayout>
+    </ScrollView>
+
+
+</LinearLayout>

@@ -150,13 +150,13 @@ public class E2E extends AppCompatActivity {
                 switch (menuItem.getItemId()) {
                     case R.id.nav_E2E:
                         break;
-                    case R.id.nav_MFG:
-                        Intent intent2 = new Intent(E2E.this, MFG.class);
+                    case R.id.nav_Dynamic:
+                        Intent intent2 = new Intent(E2E.this, Dynamic.class);
                         startActivity(intent2);
                         finish();
                         break;
-                    case R.id.nav_SNI:
-                        Intent intent4 = new Intent(E2E.this, SNI.class);
+                    case R.id.nav_DirectBL:
+                        Intent intent4 = new Intent(E2E.this, DirectBL.class);
                         startActivity(intent4);
                         finish();
                         break;

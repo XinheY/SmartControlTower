@@ -20,7 +20,7 @@
             android:layout_height="?attr/actionBarSize"
             android:popupTheme="@style/ThemeOverlay.AppCompat.Light"
             android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-            app:title="@string/app_name">
+            app:title="Change Analysis">
 
             <Button
                 android:id="@+id/ana_search"
@@ -61,6 +61,7 @@
         android:layout_gravity="start"
         app:headerLayout="@layout/nav_header"
         app:menu="@menu/nav_menu"
+        android:background="@color/table_back"
         app:theme="@style/NavigationDrawerStyle" />
 
     <include

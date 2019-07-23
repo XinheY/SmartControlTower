@@ -1,10 +1,12 @@
 package com.example.smartcontroltower.Fragment_ana;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ExpandableListView;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -59,6 +61,16 @@ public class FragmentClient extends Fragment {
                 }
             }
         });
+
+//        TextView tt=view.findViewById(R.id.texttext);
+//        Bundle bundle =this.getArguments();//得到从Activity传来的数据
+//        String mess = null;
+//        if(bundle!=null){
+//            mess = bundle.getString("data");
+//        }
+//        tt.setText(mess);
+//        System.out.println(tt.getText());
+
 
         return view;
     }

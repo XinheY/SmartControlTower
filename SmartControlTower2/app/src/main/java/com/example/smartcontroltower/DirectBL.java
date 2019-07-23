@@ -12,15 +12,13 @@ import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.content.res.Resources;
 import android.os.Bundle;
-import android.transition.Slide;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.Toast;
 
 import com.google.android.material.navigation.NavigationView;
 
-public class MFG extends AppCompatActivity {
+public class DirectBL extends AppCompatActivity {
 
     private DrawerLayout drawerl;
     private ActionBarDrawerToggle toggle;
@@ -28,21 +26,21 @@ public class MFG extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_mfg);
+        setContentView(R.layout.activity_directbl);
 
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.mfg_toolbar);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.sni_toolbar);
         setSupportActionBar(toolbar);
 ////////////////////////////////////////////left side///////////////////////////////////////////
-        drawerl = findViewById(R.id.mfg_drawer);
+        drawerl = findViewById(R.id.sni_drawer);
         ActionBar actionb = getSupportActionBar();
-        NavigationView nv = findViewById(R.id.nav_view);
+        NavigationView nv = findViewById(R.id.sni_view);
         if (actionb != null) {
             actionb.setDisplayHomeAsUpEnabled(true);
             actionb.setHomeAsUpIndicator(R.drawable.menu);
         }
 
-        nv.setCheckedItem(R.id.nav_MFG);
+        nv.setCheckedItem(R.id.nav_DirectBL);
         Resources resource = (Resources) getBaseContext().getResources();
         ColorStateList csl = (ColorStateList) resource.getColorStateList(R.color.nav_status_color);
         nv.setItemTextColor(csl);
@@ -53,19 +51,19 @@ public class MFG extends AppCompatActivity {
             public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
                 switch (menuItem.getItemId()) {
                     case R.id.nav_E2E:
-                        Intent intent2=new Intent(MFG.this,E2E.class);
+                        Intent intent2=new Intent(DirectBL.this,E2E.class);
                         startActivity(intent2);
                         finish();
                         break;
-                    case R.id.nav_MFG:
-                        break;
-                    case R.id.nav_SNI:
-                        Intent intent4=new Intent(MFG.this,SNI.class);
+                    case R.id.nav_Dynamic:
+                        Intent intent4=new Intent(DirectBL.this,Dynamic.class);
                         startActivity(intent4);
                         finish();
                         break;
+                    case R.id.nav_DirectBL:
+                        break;
                     case R.id.nav_analysis:
-                        Intent intent3=new Intent(MFG.this,Analysis.class);
+                        Intent intent3=new Intent(DirectBL.this,Analysis.class);
                         startActivity(intent3);
                         finish();
                         break;
@@ -92,7 +90,7 @@ public class MFG extends AppCompatActivity {
         };
 //        drawerl.setDrawerListener(toggle);
 
-        Button search = findViewById(R.id.mfg_search);
+        Button search = findViewById(R.id.sni_search);
         search.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

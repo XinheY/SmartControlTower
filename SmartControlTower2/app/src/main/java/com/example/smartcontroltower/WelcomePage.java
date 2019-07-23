@@ -9,12 +9,10 @@ import androidx.drawerlayout.widget.DrawerLayout;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MenuItem;
-import android.widget.Toast;
+import android.widget.TextView;
 
 import com.google.android.material.navigation.NavigationView;
-
 
 public class WelcomePage extends AppCompatActivity {
 
@@ -42,26 +40,31 @@ public class WelcomePage extends AppCompatActivity {
                 switch (menuItem.getItemId()) {
                     case R.id.nav_E2E:
                        Intent intent=new Intent(WelcomePage.this,E2E.class);
+                        TextView tt=findViewById(R.id.nav_E2E);
                        startActivity(intent);
                        finish();
+                        drawerl.closeDrawers();
                         break;
-                    case R.id.nav_MFG:
-                        Intent intent2=new Intent(WelcomePage.this,MFG.class);
+                    case R.id.nav_Dynamic:
+                        Intent intent2=new Intent(WelcomePage.this,Dynamic.class);
                         startActivity(intent2);
                         finish();
+                        drawerl.closeDrawers();
                         break;
-                    case R.id.nav_SNI:
-                        Intent intent4=new Intent(WelcomePage.this,SNI.class);
+                    case R.id.nav_DirectBL:
+                        Intent intent4=new Intent(WelcomePage.this,DirectBL.class);
                         startActivity(intent4);
+                        finish();
+                        drawerl.closeDrawers();
                         break;
                     case R.id.nav_analysis:
                         Intent intent3=new Intent(WelcomePage.this,Analysis.class);
                         startActivity(intent3);
                         finish();
+                        drawerl.closeDrawers();
                         break;
                     default:
                 }
-                drawerl.closeDrawers();
                 return true;
             }
         });

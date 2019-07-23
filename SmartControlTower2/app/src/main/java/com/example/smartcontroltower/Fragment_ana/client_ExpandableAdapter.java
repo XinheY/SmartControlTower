@@ -16,11 +16,13 @@ import com.example.smartcontroltower.R;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 public class client_ExpandableAdapter extends BaseExpandableListAdapter {
     private static ArrayList<SmartTable<Object>> tables=new ArrayList<>();
+    private List<Object> maplist=new LinkedList<>();
     public String[] groupString = {"OVERALL", "CONSUMER", "COMMERCIAL","ALIENWARE","PERSONAL/VOSTRO",
             "XPS","LAT/OPT","WORKSTATION","CHROME","CLOUD CLIENT"};
 
@@ -166,5 +168,10 @@ public class client_ExpandableAdapter extends BaseExpandableListAdapter {
     static class ChildViewHolder {
         TextView tvTitle;
 
+    }
+
+    public void inputdata(List<Object> maplist){
+        this.maplist=null;
+        this.maplist=maplist;
     }
 }

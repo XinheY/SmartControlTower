@@ -11,8 +11,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".SNI"></activity>
-        <activity android:name=".MFG" />
+        <activity android:name=".DirectBL"></activity>
+        <activity android:name=".Dynamic" />
         <activity android:name=".Analysis" />
         <activity android:name=".E2E" />
         <activity android:name=".WelcomePage" />

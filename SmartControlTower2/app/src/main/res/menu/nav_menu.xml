@@ -3,19 +3,19 @@
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/nav_E2E"
-            android:icon="@drawable/user"
-            android:title="E2E OLK Versions" />
+            android:title="E2E OLK Versions"
+            android:icon="@drawable/user"/>
         <item
             android:id="@+id/nav_analysis"
-            android:icon="@drawable/user"
-            android:title="Change Analysis" />
+            android:title="Change Analysis"
+            android:icon="@drawable/user"/>
         <item
-            android:id="@+id/nav_MFG"
-            android:icon="@drawable/user"
-            android:title="MFG BL OLK" />
+            android:id="@+id/nav_Dynamic"
+            android:title="Dynamic CSR BL"
+            android:icon="@drawable/user"/>
         <item
-            android:id="@+id/nav_SNI"
-            android:icon="@drawable/user"
-            android:title="SNI BL OLK" />
+            android:id="@+id/nav_DirectBL"
+            android:title="Direct BL- Daily"
+            android:icon="@drawable/user"/>
     </group>
 </menu>

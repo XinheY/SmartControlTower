@@ -40,4 +40,5 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.8.5'
     implementation 'com.github.ForgetAll:LoadingDialog:v1.0.1'
     implementation 'com.github.Jay-Goo:RangeSeekBar:v3.0.0'
+    implementation 'com.github.GinGod:BasisDependency:v1.1.4'
 }

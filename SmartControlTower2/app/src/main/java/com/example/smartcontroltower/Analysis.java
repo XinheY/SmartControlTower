@@ -7,6 +7,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
@@ -64,11 +67,12 @@ public class Analysis extends AppCompatActivity {
     private TabLayout tl;
     private NoSrcoll vp;
     private RangeSeekBar rsb;
+    private ViewPagerAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+////////////////////////////////继承之前的数据//////////////////////////////////////////
         if (savedInstanceState != null) {
             // Restore value of members from saved state
             answer = (ArrayList<LinkedHashMap<String, String>>) savedInstanceState.getSerializable("initial");
@@ -79,12 +83,12 @@ public class Analysis extends AppCompatActivity {
         }
         setContentView(R.layout.activity_analysis);
         radioGroup = findViewById(R.id.ana_range);
-        ////////////////////////////////////////////////////////////////////////
+        ///////////////////////////////////添加fragment/////////////////////////////////////
 
         tl = findViewById(R.id.ana_tablayout);
         vp = findViewById(R.id.ana_viewpager);
 
-        ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
+        adapter = new ViewPagerAdapter(getSupportFragmentManager());
 
         adapter.addFragment(new FragmentSystem(), "System");
         adapter.addFragment(new FragmentClient(), "Client");
@@ -94,6 +98,8 @@ public class Analysis extends AppCompatActivity {
 
         vp.setAdapter(adapter);
         tl.setupWithViewPager(vp);
+
+
 
         /////////////////Table//////////////////////////////////////////////////
         //设置初始值
@@ -141,13 +147,13 @@ public class Analysis extends AppCompatActivity {
                         startActivity(intent3);
                         finish();
                         break;
-                    case R.id.nav_MFG:
-                        Intent intent2 = new Intent(Analysis.this, MFG.class);
+                    case R.id.nav_Dynamic:
+                        Intent intent2 = new Intent(Analysis.this, Dynamic.class);
                         startActivity(intent2);
                         finish();
                         break;
-                    case R.id.nav_SNI:
-                        Intent intent4 = new Intent(Analysis.this, SNI.class);
+                    case R.id.nav_DirectBL:
+                        Intent intent4 = new Intent(Analysis.this, DirectBL.class);
                         startActivity(intent4);
                         finish();
                         break;
@@ -246,9 +252,19 @@ public class Analysis extends AppCompatActivity {
 ///////////////////////////////Checkbox列表结束////////////////////////////////////
 
         Button refresh = findViewById(R.id.ana_refresh);
-//        refresh.setOnClickListener(new View.OnClickListener() {//Refresh的动态监控
-//            @Override
-//           public void onClick(View view) {
+       refresh.setOnClickListener(new View.OnClickListener() {//Refresh的动态监控
+            @Override
+           public void onClick(View view) {
+
+//                Bundle bundle = new Bundle();
+//                bundle.putString("data","传递到的数据");
+//                Fragment fragment=new FragmentClient();
+//                fragment.setArguments(bundle);//数据传递到fragment中
+//                FragmentManager fragmentManager = getSupportFragmentManager();
+//                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+//                fragmentTransaction.replace(R.id.client_layout,fragment);
+//                fragmentTransaction.commit();
+//                adapter.notifyDataSetChanged();
 //
 //                ld = new LoadingDialog(view.getContext());
 //                ld.setLoadingText("Loading...").setSuccessText("Success").setFailedText("Failed")
@@ -298,8 +314,8 @@ public class Analysis extends AppCompatActivity {
 //                    }
 //                }
 //
-//            }
-//        });
+            }
+        });
     }
     //////////////////////////////////////////////////////////////////////////////////////////
 
