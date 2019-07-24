@@ -3,7 +3,6 @@ package com.example.smartcontroltower.Fragment_dynamic;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,7 +30,7 @@ import java.util.Map;
 
 public class Fragment_Dynamic extends Fragment {
 
-    public static View view;
+    View view;
     private ArrayList<Object> maplist = new ArrayList<>();
     public static final String Tag = "Dynamic";
 
@@ -42,7 +41,39 @@ public class Fragment_Dynamic extends Fragment {
         view = inflater.inflate(R.layout.dynamic_fragment, container, false);
         Bundle bundle = this.getArguments();//得到从Activity传来的数据
 
-        Log.e("TAG", "oncreate view" + " " + (bundle == null));
+        if (bundle != null) {
+//            maplist= (ArrayList<Object>) bundle.getSerializable("dynamic");
+            //          Log.e("Length",maplist.size()+"");
+
+//            SmartTable<Object> table = view.findViewById(R.id.dyn_table);
+            TextView tt = view.findViewById(R.id.textte);
+//            maplist= (ArrayList<Object>) bundle.getSerializable("dynamic");
+//            String str=bundle.getString("string");
+            tt.setText("why");
+            Log.e("tt", tt.getText() + "");
+//            MapTableData tableData = MapTableData.create("表格名", maplist);
+//            Column groupColumn = new Column("Factory Backlog", tableData.getColumns().get(2), tableData.getColumns().get(3), tableData.getColumns().get(4), tableData.getColumns().get(5), tableData.getColumns().get(6));
+//            Column groupColumn1 = new Column("APJ", tableData.getColumns().get(1));
+//            List<Column> a = new LinkedList<>();
+//            a.add(tableData.getColumns().get(0));
+//            a.add(groupColumn1);
+//            a.add(groupColumn);
+//            for (int i = 7; i < tableData.getColumns().size(); i++) {
+//                a.add(tableData.getColumns().get(i));
+//            }
+//            tableData.setColumns(a);
+//            table.getConfig().setFixedTitle(true);
+//            tableData.getColumns().get(0).setFixed(true);
+//            tableData.getColumns().get(0).setWidth(190);
+//            table.setZoom(true, 2, 1);
+//            table.getConfig().setShowXSequence(false);
+//            table.getConfig().setShowYSequence(false);
+////设置数据
+//            table.setTableData(tableData);
+//            table.getConfig().setContentStyle(new FontStyle(40, Color.BLACK));
+//            table.getConfig().setColumnTitleStyle(new FontStyle(40, Color.BLACK));
+        }
+        Log.e("TAG", "oncreate view" + " " + (bundle != null));
         return view;
     }
 
@@ -62,12 +93,6 @@ public class Fragment_Dynamic extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         Log.e("Tag", "on activity create");
-    }
-
-    @Override
-    public void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
-        Log.e("Tag", "onSaveInstance");
     }
 
     @Override
@@ -114,9 +139,10 @@ public class Fragment_Dynamic extends Fragment {
 
     public void refreshDate(ArrayList<Object> map) {
         if (map.size() != 0) {
+            TextView tt = tt = view.findViewById(R.id.textte);
             SmartTable<Object> table = view.findViewById(R.id.dyn_table);
             maplist = map;
-            Log.e("size_dynamic", maplist.size() + "");
+            Log.e("size", maplist.size() + "");
             MapTableData tableData = MapTableData.create("表格名", maplist);
             Column groupColumn = new Column("Factory Backlog", tableData.getColumns().get(2), tableData.getColumns().get(3), tableData.getColumns().get(4), tableData.getColumns().get(5), tableData.getColumns().get(6));
             Column groupColumn1 = new Column("APJ", tableData.getColumns().get(1));
@@ -140,6 +166,4 @@ public class Fragment_Dynamic extends Fragment {
             table.getConfig().setColumnTitleStyle(new FontStyle(40, Color.BLACK));
         }
     }
-
-
 }
