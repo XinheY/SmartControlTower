@@ -1,21 +1,18 @@
 package com.example.smartcontroltower;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.content.res.Resources;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -44,12 +41,14 @@ import java.util.LinkedHashMap;
 
 public class Dynamic extends AppCompatActivity {
 
+    private int finish = 0;
     private DrawerLayout drawerl;
     private ActionBarDrawerToggle toggle;
     private TabLayout tl;
     private NoSrcoll vp;
     private Button datepicker;
     private ArrayList<Object> maplist = new ArrayList<>();
+    private ArrayList<Object> maplist2 = new ArrayList<>();
     private HashMap<String, HashMap<String, CheckBox>> summary = new LinkedHashMap<>();//所有checkbox的集合
     private HashMap<String, ArrayList<RadioButton>> radioSummary = new LinkedHashMap<>();
     private HashMap<String, HashMap<String, CheckBox>> summaryOld = new LinkedHashMap<>();//之前所有checkbox的集合
@@ -57,6 +56,7 @@ public class Dynamic extends AppCompatActivity {
     private ArrayList<String> allCondition = new ArrayList<>();
     private ArrayList<String[]> allContent = new ArrayList<>();
     private ArrayList<LinkedHashMap<String, String>> answer;
+    private ArrayList<LinkedHashMap<String, String>> answer2;
     private LoadingDialog ld = null;
     public static SmartTable<Object> table;
     private ViewPagerAdapter adapter;
@@ -70,8 +70,10 @@ public class Dynamic extends AppCompatActivity {
             answer = (ArrayList<LinkedHashMap<String, String>>) savedInstanceState.getSerializable("initial");
             summaryOld = (HashMap<String, HashMap<String, CheckBox>>) savedInstanceState.getSerializable("initial2");
             radioOld = (LinkedHashMap<String, ArrayList<RadioButton>>) savedInstanceState.getSerializable("initial3");
+            answer2 = (ArrayList<LinkedHashMap<String, String>>) savedInstanceState.getSerializable("initial4");
         } else {
             answer = new ArrayList<>();
+            answer2 = new ArrayList<>();
         }
 
 
@@ -85,14 +87,18 @@ public class Dynamic extends AppCompatActivity {
         adapter.addFragment(new Fragment_goal(), "vs Goal");
         vp.setAdapter(adapter);
         tl.setupWithViewPager(vp);
+        adapter.notifyDataSetChanged();
 
         if (answer.size() != 0) {
-            setNumber();
+            //setNumber();
+            //adapter.notifyDataSetChanged();
+
         } else {
-            ld = new LoadingDialog(this);
-            ld.setLoadingText("Loading...").setSuccessText("Success").setFailedText("Failed")
-                    .closeSuccessAnim().show();
-            test("EXEC [P_DYNAMIC_BACKLOG_XMN_RESULTE] '" + "DIRECT" + "','" + "SYSTEM" + "','" + "07/17/2019" + "','" + 12 + "'");
+            Log.e("me", "asd");
+//            ld = new LoadingDialog(this);
+//            ld.setLoadingText("Loading...").setSuccessText("Success").setFailedText("Failed")
+//                    .closeSuccessAnim().show();
+            //test("EXEC [P_DYNAMIC_BACKLOG_XMN_RESULTE] '" + "DIRECT" + "','" + "SYSTEM" + "','" + "07/17/2019" + "','" + 12 + "'");
         }
 
 ////////////////////////////////////////////left side///////////////////////////////////////////
@@ -187,19 +193,22 @@ public class Dynamic extends AppCompatActivity {
         });
 
 
-        Button refresh=findViewById(R.id.dyn_refresh);
+        Button refresh = findViewById(R.id.dyn_refresh);
         refresh.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Bundle bundle = new Bundle();
-                bundle.putSerializable("dynamic",maplist);
-                bundle.putString("string","Why?");
-                Fragment fragment = new Fragment_Dynamic();
-                fragment.setArguments(bundle);//数据传递到fragment中
-                FragmentManager fragmentManager = getSupportFragmentManager();
-                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                fragmentTransaction.replace(R.id.dynamic_layout, fragment);
-                fragmentTransaction.commit();
+                finish = 0;
+                String[] sql=new String[2];
+                sql[0]="EXEC [P_DYNAMIC_BACKLOG_XMN_RESULTE] '" + "DIRECT" + "','" + "SYSTEM" + "','" + "07/17/2019" + "','" + 7 + "'";
+                 sql[1]="EXEC [P_DYNAMIC_BACKLOG_TRACK] '" + "DIRECT" + "','" + "07/17/2019" + "','" + 7 + "'";
+                 test(sql);
+                while (finish == 0) {
+                }
+                Fragment_Dynamic fd = (Fragment_Dynamic) adapter.getItem(0);
+                Fragment_goal fg = (Fragment_goal) adapter.getItem(1);
+                fd.refreshDate(maplist);
+//                adapter.notifyDataSetChanged();
+                fg.refreshDate(maplist2);
                 adapter.notifyDataSetChanged();
             }
         });
@@ -217,19 +226,23 @@ public class Dynamic extends AppCompatActivity {
         }
     }
 
-    private void test(final String sql) {
+    private void test(final String[] sql) {
         Runnable run = new Runnable() {
             @Override
             public void run() {
                 //测试数据库的语句,在子线程操作
-                //answer = DBUtil.QuerySQL(sql);
-                answer = DBUtil.sendRequestWithOkHttp();
+                answer.clear();
+                answer2.clear();
+                answer = DBUtil.QuerySQL(sql[0]);
+                answer2 = DBUtil.QuerySQL(sql[1]);
+                //answer = DBUtil.sendRequestWithOkHttp();
                 setNumber();
                 Message msg = new Message();
                 msg.what = 1001;
                 Bundle data = new Bundle();
                 msg.setData(data);
                 mHandler.sendMessage(msg);
+                finish = 1;
             }
         };
         new Thread(run).start();
@@ -241,9 +254,8 @@ public class Dynamic extends AppCompatActivity {
             switch (msg.what) {
                 case 1001:
                     String str = msg.getData().getString("result");
-                    ld.loadSuccess();
+                    //ld.loadSuccess();
                     break;
-
                 default:
                     ld.loadFailed();
                     break;
@@ -358,19 +370,16 @@ public class Dynamic extends AppCompatActivity {
 
     //将数字放进table里
     public void setNumber() {
+        maplist.clear();
         for (LinkedHashMap<String, String> a : answer) {
-            LinkedHashMap<String, String> lhm = new LinkedHashMap<>();
             maplist.add(a);
         }
 
-//        Fragment_Dynamic f= (Fragment_Dynamic) adapter.getItem(0);
-//        Bundle bun=new Bundle();
-//        bun.putString("a","bcd");
-//        f.setArguments(bun);
-//        FragmentManager fragmentManager = getSupportFragmentManager();
-//        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-//        fragmentTransaction.add(R.id.dynamic_layout, f);
-//        fragmentTransaction.commit();
+        maplist2.clear();
+        for (LinkedHashMap<String, String> b : answer2) {
+            maplist2.add(b);
+        }
+        Log.e("Setnumber",maplist.size()+" "+maplist2.size());
 
     }
 
@@ -380,5 +389,12 @@ public class Dynamic extends AppCompatActivity {
         outState.putSerializable("initial", answer);
         outState.putSerializable("initial2", summary);
         outState.putSerializable("initial3", radioSummary);
+        outState.putSerializable("initial4", answer2);
     }
+
+    @Override
+    protected void onPostCreate(@Nullable Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+    }
+
 }

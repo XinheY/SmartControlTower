@@ -35,10 +35,8 @@ import okio.Timeout;
 
 public class DBUtil {
 
-    private static ArrayList<LinkedHashMap<String, String>> answer = new ArrayList<>();
-
     public static ArrayList<LinkedHashMap<String,String>> sendRequestWithOkHttp() {
-
+        ArrayList<LinkedHashMap<String, String>> anss=new ArrayList<>();
         try {
             OkHttpClient client = new OkHttpClient();
             Request request = new Request.Builder()
@@ -48,10 +46,10 @@ public class DBUtil {
             Response response = client.newCall(request).execute();
             Log.d("Content", response.toString());
             String responseData = response.body().string();
-            parseXMLWithPull(responseData);
+            parseXMLWithPull(responseData,anss);
 
-            for (int i = 0; i < answer.size(); i++) {
-                LinkedHashMap<String, String> count = answer.get(i);
+            for (int i = 0; i < anss.size(); i++) {
+                LinkedHashMap<String, String> count = anss.get(i);
                 for (String s : count.keySet()) {
                     Log.d("jieguo", s + ":" + count.get(s) + ":" + i);
                 }
@@ -62,7 +60,7 @@ public class DBUtil {
             e.printStackTrace();
         }
 
-        return answer;
+        return anss;
 
     }
 
@@ -82,14 +80,14 @@ public class DBUtil {
 
     public static ArrayList<LinkedHashMap<String, String>> QuerySQL(String sql) {
         String result = "";
+        ArrayList<LinkedHashMap<String, String>> answer=new ArrayList<>();
         try {
-
             Connection conn = getSQLConnection("10.82.244.53", "sa", "Dell@2008", "PCWebsite");
             Statement stmt = conn.createStatement();//
             ResultSet rs = stmt.executeQuery(sql);
             while (rs.next()) {
                 String after = strChangeXML(rs.getString(1));
-                parseXMLWithPull(after);
+                answer=parseXMLWithPull(after,answer);
             }
 
 //            for(int i=0;i<answer.size();i++){
@@ -111,8 +109,9 @@ public class DBUtil {
     }
 
 
-    private static void parseXMLWithPull(String xmlData) {
+    private static ArrayList<LinkedHashMap<String, String>>  parseXMLWithPull(String xmlData,ArrayList<LinkedHashMap<String, String>> answer) {
         try {
+            //ans.clear();
             XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
             // System.out.println(xmlData);
             XmlPullParser xmlPullParser = factory.newPullParser();
@@ -147,6 +146,8 @@ public class DBUtil {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+        return answer;
 
     }
 

@@ -3,6 +3,7 @@ package com.example.smartcontroltower.Fragment_dynamic;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,22 +31,92 @@ import java.util.Map;
 
 public class Fragment_Dynamic extends Fragment {
 
-    View view;
+    public static View view;
     private ArrayList<Object> maplist = new ArrayList<>();
+    public static final String Tag = "Dynamic";
 
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.dynamic_fragment, container, false);
-
         Bundle bundle = this.getArguments();//得到从Activity传来的数据
-        if (bundle != null) {
+
+        Log.e("TAG", "oncreate view" + " " + (bundle == null));
+        return view;
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        Log.e("Tag", "onattach");
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        Log.e("Tag", "oncreate");
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        Log.e("Tag", "on activity create");
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        Log.e("Tag", "onSaveInstance");
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        Log.e("Tag", "on start");
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.e("Tag", "on resume");
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        Log.e("Tag", "on pause");
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        Log.e("Tag", "on stop");
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        Log.e("Tag", "des view");
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Log.e("Tag", "destroy");
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        Log.e("Tag", "detach");
+    }
+
+    public void refreshDate(ArrayList<Object> map) {
+        if (map.size() != 0) {
             SmartTable<Object> table = view.findViewById(R.id.dyn_table);
-            TextView tt=view.findViewById(R.id.textte);
-            maplist= (ArrayList<Object>) bundle.getSerializable("dynamic");
-            String str=bundle.getString("string");
-            tt.setText(str);
+            maplist = map;
+            Log.e("size_dynamic", maplist.size() + "");
             MapTableData tableData = MapTableData.create("表格名", maplist);
             Column groupColumn = new Column("Factory Backlog", tableData.getColumns().get(2), tableData.getColumns().get(3), tableData.getColumns().get(4), tableData.getColumns().get(5), tableData.getColumns().get(6));
             Column groupColumn1 = new Column("APJ", tableData.getColumns().get(1));
@@ -68,10 +139,6 @@ public class Fragment_Dynamic extends Fragment {
             table.getConfig().setContentStyle(new FontStyle(40, Color.BLACK));
             table.getConfig().setColumnTitleStyle(new FontStyle(40, Color.BLACK));
         }
-
-
-
-        return view;
     }
 
 
