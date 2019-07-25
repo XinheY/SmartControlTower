@@ -94,7 +94,6 @@ public class Dynamic extends AppCompatActivity {
             //adapter.notifyDataSetChanged();
 
         } else {
-            Log.e("me", "asd");
 //            ld = new LoadingDialog(this);
 //            ld.setLoadingText("Loading...").setSuccessText("Success").setFailedText("Failed")
 //                    .closeSuccessAnim().show();
@@ -212,7 +211,6 @@ public class Dynamic extends AppCompatActivity {
                         }
                     }
                 }
-                Log.e("first",first);
 
 
                 for (String str:summary.get("lob").keySet()) {
@@ -226,7 +224,6 @@ public class Dynamic extends AppCompatActivity {
                         }
                     }
                 }
-                Log.e("second",second);
 
                 for (int k=0;k<radioSummary.get("hour").size();k++) {
                     RadioButton rb=radioSummary.get("hour").get(k);
@@ -235,10 +232,8 @@ public class Dynamic extends AppCompatActivity {
                     }
                 }
                 third=(third.split(":"))[0];
-                Log.e("third",third);
 
                 fourth=datepicker.getText()+"";
-                Log.e("fourth",fourth);
                 //////////////////////////////////////////////////////////////////
                 finish = 0;
                 String[] sql = new String[2];
@@ -249,7 +244,8 @@ public class Dynamic extends AppCompatActivity {
                 }
                 Fragment_Dynamic fd = (Fragment_Dynamic) adapter.getItem(0);
                 Fragment_goal fg = (Fragment_goal) adapter.getItem(1);
-                fd.refreshDate(maplist);
+                Log.e("refreshDate",maplist.size()+"");
+                fd.refreshDate(maplist,"APJ Dynamic CSR BL ("+datepicker.getText()+" "+third+":00)");
 //                adapter.notifyDataSetChanged();
                 fg.refreshDate(maplist2);
                 adapter.notifyDataSetChanged();

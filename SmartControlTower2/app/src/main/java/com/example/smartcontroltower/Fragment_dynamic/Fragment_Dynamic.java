@@ -24,6 +24,7 @@ import com.bin.david.form.data.table.MapTableData;
 import com.example.smartcontroltower.Dynamic;
 import com.example.smartcontroltower.R;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -33,17 +34,22 @@ import java.util.List;
 public class Fragment_Dynamic extends Fragment {
 
     public static View view;
-    private ArrayList<Object> maplist = new ArrayList<>();
+    private ArrayList<Object> maplist1 = new ArrayList<>();
     public static final String Tag = "Dynamic";
+    private String title = "";
 
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.dynamic_fragment, container, false);
-        Bundle bundle = this.getArguments();//得到从Activity传来的数据
-
-        Log.e("TAG", "oncreate view" + " " + (bundle == null));
+        if (savedInstanceState != null) {
+            ArrayList<Object> maplist1old = new ArrayList<>();
+            maplist1old = (ArrayList<Object>) savedInstanceState.getSerializable("map");
+            Log.e("Change Screen", maplist1.size() + "");
+            refreshDate(maplist1old, savedInstanceState.getString("title"));
+        }
+        Log.e("TAG", "oncreate view");
         return view;
     }
 
@@ -68,6 +74,8 @@ public class Fragment_Dynamic extends Fragment {
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
+        outState.putSerializable("map", maplist1);
+        outState.putString("title", title);
         Log.e("Tag", "onSaveInstance");
     }
 
@@ -113,12 +121,15 @@ public class Fragment_Dynamic extends Fragment {
         Log.e("Tag", "detach");
     }
 
-    public void refreshDate(ArrayList<Object> map) {
+    public void refreshDate(ArrayList<Object> map, String title) {
+        Log.e("Summary1", "map:" + map.size());
+        SmartTable<Object> table = view.findViewById(R.id.dyn_table);
+        this.title = title;
         if (map.size() != 0) {
-            SmartTable<Object> table = view.findViewById(R.id.dyn_table);
-            maplist = map;
-            Log.e("size_dynamic", maplist.size() + "");
-            MapTableData tableData = MapTableData.create("表格名", maplist);
+            table.setVisibility(View.VISIBLE);
+            Log.e("Summary2", "map:" + map.size() + " table:" + table.getVisibility());
+            maplist1 = map;
+            MapTableData tableData = MapTableData.create(title, maplist1);
             Column groupColumn = new Column("Factory Backlog", tableData.getColumns().get(2), tableData.getColumns().get(3), tableData.getColumns().get(4), tableData.getColumns().get(5), tableData.getColumns().get(6));
             Column groupColumn1 = new Column("APJ", tableData.getColumns().get(1));
             List<Column> a = new LinkedList<>();
@@ -137,17 +148,12 @@ public class Fragment_Dynamic extends Fragment {
             table.getConfig().setShowYSequence(false);
 //设置数据
             table.setTableData(tableData);
-            table.getConfig().setContentCellBackgroundFormat(new BaseCellBackgroundFormat<CellInfo>() {
-                @Override
-                public int getBackGroundColor(CellInfo cellInfo) {
-                    return ContextCompat.getColor(getContext(),R.color.white);
-                }
-            });
-
             table.getConfig().setTableTitleStyle(new FontStyle(50, R.color.table_gray));
-            table.getConfig().setColumnTitleBackground(new BaseBackgroundFormat(getResources().getColor(R.color.table_gray)));
-            table.getConfig().setContentStyle(new FontStyle(40, getResources().getColor(R.color.table_gray)));
-            table.getConfig().setColumnTitleStyle(new FontStyle(40, getResources().getColor(R.color.white)));
+            table.getConfig().setColumnTitleBackground(new BaseBackgroundFormat(Color.rgb(115, 135, 156)));
+            table.getConfig().setContentStyle(new FontStyle(40, Color.rgb(115, 135, 156)));
+            table.getConfig().setColumnTitleStyle(new FontStyle(40, Color.WHITE));
+        } else {
+            table.setVisibility(View.GONE);
         }
     }
 
