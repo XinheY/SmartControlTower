@@ -3,34 +3,36 @@ package com.example.smartcontroltower.Fragment_dynamic;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ExpandableListView;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.bin.david.form.core.SmartTable;
+import com.bin.david.form.data.CellInfo;
 import com.bin.david.form.data.column.Column;
 import com.bin.david.form.data.format.bg.BaseBackgroundFormat;
+import com.bin.david.form.data.format.bg.BaseCellBackgroundFormat;
 import com.bin.david.form.data.style.FontStyle;
 import com.bin.david.form.data.table.MapTableData;
+import com.example.smartcontroltower.Dynamic;
 import com.example.smartcontroltower.R;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 
 public class Fragment_Dynamic extends Fragment {
 
-    View view;
+    public static View view;
     private ArrayList<Object> maplist = new ArrayList<>();
     public static final String Tag = "Dynamic";
 
@@ -41,39 +43,7 @@ public class Fragment_Dynamic extends Fragment {
         view = inflater.inflate(R.layout.dynamic_fragment, container, false);
         Bundle bundle = this.getArguments();//得到从Activity传来的数据
 
-        if (bundle != null) {
-//            maplist= (ArrayList<Object>) bundle.getSerializable("dynamic");
-            //          Log.e("Length",maplist.size()+"");
-
-//            SmartTable<Object> table = view.findViewById(R.id.dyn_table);
-            TextView tt = view.findViewById(R.id.textte);
-//            maplist= (ArrayList<Object>) bundle.getSerializable("dynamic");
-//            String str=bundle.getString("string");
-            tt.setText("why");
-            Log.e("tt", tt.getText() + "");
-//            MapTableData tableData = MapTableData.create("表格名", maplist);
-//            Column groupColumn = new Column("Factory Backlog", tableData.getColumns().get(2), tableData.getColumns().get(3), tableData.getColumns().get(4), tableData.getColumns().get(5), tableData.getColumns().get(6));
-//            Column groupColumn1 = new Column("APJ", tableData.getColumns().get(1));
-//            List<Column> a = new LinkedList<>();
-//            a.add(tableData.getColumns().get(0));
-//            a.add(groupColumn1);
-//            a.add(groupColumn);
-//            for (int i = 7; i < tableData.getColumns().size(); i++) {
-//                a.add(tableData.getColumns().get(i));
-//            }
-//            tableData.setColumns(a);
-//            table.getConfig().setFixedTitle(true);
-//            tableData.getColumns().get(0).setFixed(true);
-//            tableData.getColumns().get(0).setWidth(190);
-//            table.setZoom(true, 2, 1);
-//            table.getConfig().setShowXSequence(false);
-//            table.getConfig().setShowYSequence(false);
-////设置数据
-//            table.setTableData(tableData);
-//            table.getConfig().setContentStyle(new FontStyle(40, Color.BLACK));
-//            table.getConfig().setColumnTitleStyle(new FontStyle(40, Color.BLACK));
-        }
-        Log.e("TAG", "oncreate view" + " " + (bundle != null));
+        Log.e("TAG", "oncreate view" + " " + (bundle == null));
         return view;
     }
 
@@ -93,6 +63,12 @@ public class Fragment_Dynamic extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         Log.e("Tag", "on activity create");
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        Log.e("Tag", "onSaveInstance");
     }
 
     @Override
@@ -139,10 +115,9 @@ public class Fragment_Dynamic extends Fragment {
 
     public void refreshDate(ArrayList<Object> map) {
         if (map.size() != 0) {
-            TextView tt = tt = view.findViewById(R.id.textte);
             SmartTable<Object> table = view.findViewById(R.id.dyn_table);
             maplist = map;
-            Log.e("size", maplist.size() + "");
+            Log.e("size_dynamic", maplist.size() + "");
             MapTableData tableData = MapTableData.create("表格名", maplist);
             Column groupColumn = new Column("Factory Backlog", tableData.getColumns().get(2), tableData.getColumns().get(3), tableData.getColumns().get(4), tableData.getColumns().get(5), tableData.getColumns().get(6));
             Column groupColumn1 = new Column("APJ", tableData.getColumns().get(1));
@@ -162,8 +137,19 @@ public class Fragment_Dynamic extends Fragment {
             table.getConfig().setShowYSequence(false);
 //设置数据
             table.setTableData(tableData);
-            table.getConfig().setContentStyle(new FontStyle(40, Color.BLACK));
-            table.getConfig().setColumnTitleStyle(new FontStyle(40, Color.BLACK));
+            table.getConfig().setContentCellBackgroundFormat(new BaseCellBackgroundFormat<CellInfo>() {
+                @Override
+                public int getBackGroundColor(CellInfo cellInfo) {
+                    return ContextCompat.getColor(getContext(),R.color.white);
+                }
+            });
+
+            table.getConfig().setTableTitleStyle(new FontStyle(50, R.color.table_gray));
+            table.getConfig().setColumnTitleBackground(new BaseBackgroundFormat(getResources().getColor(R.color.table_gray)));
+            table.getConfig().setContentStyle(new FontStyle(40, getResources().getColor(R.color.table_gray)));
+            table.getConfig().setColumnTitleStyle(new FontStyle(40, getResources().getColor(R.color.white)));
         }
     }
+
+
 }

@@ -1,21 +1,18 @@
 package com.example.smartcontroltower;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.content.res.Resources;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -44,13 +41,14 @@ import java.util.LinkedHashMap;
 
 public class Dynamic extends AppCompatActivity {
 
-    private int finish=0;
+    private int finish = 0;
     private DrawerLayout drawerl;
     private ActionBarDrawerToggle toggle;
     private TabLayout tl;
     private NoSrcoll vp;
     private Button datepicker;
     private ArrayList<Object> maplist = new ArrayList<>();
+    private ArrayList<Object> maplist2 = new ArrayList<>();
     private HashMap<String, HashMap<String, CheckBox>> summary = new LinkedHashMap<>();//所有checkbox的集合
     private HashMap<String, ArrayList<RadioButton>> radioSummary = new LinkedHashMap<>();
     private HashMap<String, HashMap<String, CheckBox>> summaryOld = new LinkedHashMap<>();//之前所有checkbox的集合
@@ -58,6 +56,7 @@ public class Dynamic extends AppCompatActivity {
     private ArrayList<String> allCondition = new ArrayList<>();
     private ArrayList<String[]> allContent = new ArrayList<>();
     private ArrayList<LinkedHashMap<String, String>> answer;
+    private ArrayList<LinkedHashMap<String, String>> answer2;
     private LoadingDialog ld = null;
     public static SmartTable<Object> table;
     private ViewPagerAdapter adapter;
@@ -71,8 +70,10 @@ public class Dynamic extends AppCompatActivity {
             answer = (ArrayList<LinkedHashMap<String, String>>) savedInstanceState.getSerializable("initial");
             summaryOld = (HashMap<String, HashMap<String, CheckBox>>) savedInstanceState.getSerializable("initial2");
             radioOld = (LinkedHashMap<String, ArrayList<RadioButton>>) savedInstanceState.getSerializable("initial3");
+            answer2 = (ArrayList<LinkedHashMap<String, String>>) savedInstanceState.getSerializable("initial4");
         } else {
             answer = new ArrayList<>();
+            answer2 = new ArrayList<>();
         }
 
 
@@ -86,10 +87,14 @@ public class Dynamic extends AppCompatActivity {
         adapter.addFragment(new Fragment_goal(), "vs Goal");
         vp.setAdapter(adapter);
         tl.setupWithViewPager(vp);
+        adapter.notifyDataSetChanged();
 
         if (answer.size() != 0) {
-            setNumber();
+            //setNumber();
+            //adapter.notifyDataSetChanged();
+
         } else {
+            Log.e("me", "asd");
 //            ld = new LoadingDialog(this);
 //            ld.setLoadingText("Loading...").setSuccessText("Success").setFailedText("Failed")
 //                    .closeSuccessAnim().show();
@@ -176,7 +181,7 @@ public class Dynamic extends AppCompatActivity {
         });
 
         datepicker = findViewById(R.id.dyn_datepicker);
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM/dd/yyyy");
         //获取当前时间
         final Date date = new Date(System.currentTimeMillis());
         datepicker.setText(simpleDateFormat.format(date));
@@ -192,13 +197,61 @@ public class Dynamic extends AppCompatActivity {
         refresh.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                finish=0;
-                test("EXEC [P_DYNAMIC_BACKLOG_XMN_RESULTE] '" + "DIRECT" + "','" + "SYSTEM" + "','" + "07/17/2019" + "','" + 7 + "'");
-                while(finish==0){
-                    Log.e("click",finish+"");
+                String first = "";
+                String second = "";
+                String third = "";
+                String fourth="";
+                for (String str:summary.get("ordertype").keySet()) {
+                    CheckBox cb=summary.get("ordertype").get(str);
+                    if(cb.isChecked()){
+                        if(first.equals("")){
+                            first+=cb.getText();
+                        }
+                        else{
+                            first=first+","+cb.getText();
+                        }
+                    }
                 }
-                Fragment_Dynamic fd= (Fragment_Dynamic) adapter.getItem(0);
+                Log.e("first",first);
+
+
+                for (String str:summary.get("lob").keySet()) {
+                    CheckBox cb=summary.get("lob").get(str);
+                    if(cb.isChecked()){
+                        if(second.equals("")){
+                            second+=cb.getText();
+                        }
+                        else{
+                            second=second+","+cb.getText();
+                        }
+                    }
+                }
+                Log.e("second",second);
+
+                for (int k=0;k<radioSummary.get("hour").size();k++) {
+                    RadioButton rb=radioSummary.get("hour").get(k);
+                    if(rb.isChecked()){
+                        third=rb.getText()+"";
+                    }
+                }
+                third=(third.split(":"))[0];
+                Log.e("third",third);
+
+                fourth=datepicker.getText()+"";
+                Log.e("fourth",fourth);
+                //////////////////////////////////////////////////////////////////
+                finish = 0;
+                String[] sql = new String[2];
+                sql[0] = "EXEC [P_DYNAMIC_BACKLOG_XMN_RESULTE] '" + first + "','" + second + "','" + fourth + "','" + third + "'";
+                sql[1] = "EXEC [P_DYNAMIC_BACKLOG_TRACK] '" + first + "','" + fourth + "','" + third + "'";
+                test(sql);
+                while (finish == 0) {
+                }
+                Fragment_Dynamic fd = (Fragment_Dynamic) adapter.getItem(0);
+                Fragment_goal fg = (Fragment_goal) adapter.getItem(1);
                 fd.refreshDate(maplist);
+//                adapter.notifyDataSetChanged();
+                fg.refreshDate(maplist2);
                 adapter.notifyDataSetChanged();
             }
         });
@@ -216,21 +269,23 @@ public class Dynamic extends AppCompatActivity {
         }
     }
 
-    private void test(final String sql) {
+    private void test(final String[] sql) {
         Runnable run = new Runnable() {
             @Override
             public void run() {
                 //测试数据库的语句,在子线程操作
-                answer = DBUtil.QuerySQL(sql);
+                answer.clear();
+                answer2.clear();
+                answer = DBUtil.QuerySQL(sql[0]);
+                answer2 = DBUtil.QuerySQL(sql[1]);
                 //answer = DBUtil.sendRequestWithOkHttp();
                 setNumber();
-                Log.e("test",maplist.size()+"");
                 Message msg = new Message();
                 msg.what = 1001;
                 Bundle data = new Bundle();
                 msg.setData(data);
                 mHandler.sendMessage(msg);
-                finish=1;
+                finish = 1;
             }
         };
         new Thread(run).start();
@@ -344,9 +399,17 @@ public class Dynamic extends AppCompatActivity {
             @Override
             public void onConfirm(int year, int month, int dayOfMonth) {
                 if (month < 10) {
-                    datepicker.setText(year + "-" + "0" + month + "-" + dayOfMonth);
+                    if (dayOfMonth >= 10) {
+                        datepicker.setText("0" + month + "/" + dayOfMonth + "/" + year);
+                    } else {
+                        datepicker.setText("0" + month + "/" + "0" + dayOfMonth + "/" + year);
+                    }
                 } else {
-                    datepicker.setText(year + "-" + month + "-" + dayOfMonth);
+                    if (dayOfMonth >= 10) {
+                        datepicker.setText(month + "/" + dayOfMonth + "/" + year);
+                    } else {
+                        datepicker.setText(month + "/" + "0" + dayOfMonth + "/" + year);
+                    }
                 }
             }
 
@@ -358,14 +421,16 @@ public class Dynamic extends AppCompatActivity {
 
     //将数字放进table里
     public void setNumber() {
+        maplist.clear();
         for (LinkedHashMap<String, String> a : answer) {
-            LinkedHashMap<String, String> lhm = new LinkedHashMap<>();
             maplist.add(a);
         }
-        Log.e("SetNumber",maplist.size()+"");
 
-        //Log.e("Previous", "PRE");
-        //updateFragment(new Fragment_Dynamic());
+        maplist2.clear();
+        for (LinkedHashMap<String, String> b : answer2) {
+            maplist2.add(b);
+        }
+        Log.e("Setnumber", maplist.size() + " " + maplist2.size());
 
     }
 
@@ -375,17 +440,12 @@ public class Dynamic extends AppCompatActivity {
         outState.putSerializable("initial", answer);
         outState.putSerializable("initial2", summary);
         outState.putSerializable("initial3", radioSummary);
+        outState.putSerializable("initial4", answer2);
     }
 
-    public void updateFragment(Fragment f) {
-        Bundle bun = new Bundle();
-        bun.putSerializable("dynamic", maplist);
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        FragmentTransaction transaction = fragmentManager.beginTransaction();
-        f.setArguments(bun);
-        transaction.replace(R.id.dyn_viewpager, f);
-        transaction.commit();
-        adapter.notifyDataSetChanged();
-        Log.e("Update","update");
+    @Override
+    protected void onPostCreate(@Nullable Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
     }
+
 }
