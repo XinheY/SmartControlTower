@@ -89,17 +89,6 @@ public class Dynamic extends AppCompatActivity {
         tl.setupWithViewPager(vp);
         adapter.notifyDataSetChanged();
 
-        if (answer.size() != 0) {
-            //setNumber();
-            //adapter.notifyDataSetChanged();
-
-        } else {
-//            ld = new LoadingDialog(this);
-//            ld.setLoadingText("Loading...").setSuccessText("Success").setFailedText("Failed")
-//                    .closeSuccessAnim().show();
-            //test("EXEC [P_DYNAMIC_BACKLOG_XMN_RESULTE] '" + "DIRECT" + "','" + "SYSTEM" + "','" + "07/17/2019" + "','" + 12 + "'");
-        }
-
 ////////////////////////////////////////////left side///////////////////////////////////////////
         drawerl = findViewById(R.id.dyn_drawer);
         ActionBar actionb = getSupportActionBar();
@@ -199,41 +188,39 @@ public class Dynamic extends AppCompatActivity {
                 String first = "";
                 String second = "";
                 String third = "";
-                String fourth="";
-                for (String str:summary.get("ordertype").keySet()) {
-                    CheckBox cb=summary.get("ordertype").get(str);
-                    if(cb.isChecked()){
-                        if(first.equals("")){
-                            first+=cb.getText();
-                        }
-                        else{
-                            first=first+","+cb.getText();
-                        }
-                    }
-                }
-
-
-                for (String str:summary.get("lob").keySet()) {
-                    CheckBox cb=summary.get("lob").get(str);
-                    if(cb.isChecked()){
-                        if(second.equals("")){
-                            second+=cb.getText();
-                        }
-                        else{
-                            second=second+","+cb.getText();
+                String fourth = "";
+                for (String str : summary.get("ordertype").keySet()) {
+                    CheckBox cb = summary.get("ordertype").get(str);
+                    if (cb.isChecked()) {
+                        if (first.equals("")) {
+                            first += cb.getText();
+                        } else {
+                            first = first + "," + cb.getText();
                         }
                     }
                 }
 
-                for (int k=0;k<radioSummary.get("hour").size();k++) {
-                    RadioButton rb=radioSummary.get("hour").get(k);
-                    if(rb.isChecked()){
-                        third=rb.getText()+"";
+
+                for (String str : summary.get("lob").keySet()) {
+                    CheckBox cb = summary.get("lob").get(str);
+                    if (cb.isChecked()) {
+                        if (second.equals("")) {
+                            second += cb.getText();
+                        } else {
+                            second = second + "," + cb.getText();
+                        }
                     }
                 }
-                third=(third.split(":"))[0];
 
-                fourth=datepicker.getText()+"";
+                for (int k = 0; k < radioSummary.get("hour").size(); k++) {
+                    RadioButton rb = radioSummary.get("hour").get(k);
+                    if (rb.isChecked()) {
+                        third = rb.getText() + "";
+                    }
+                }
+                third = (third.split(":"))[0];
+
+                fourth = datepicker.getText() + "";
                 //////////////////////////////////////////////////////////////////
                 finish = 0;
                 String[] sql = new String[2];
@@ -244,13 +231,17 @@ public class Dynamic extends AppCompatActivity {
                 }
                 Fragment_Dynamic fd = (Fragment_Dynamic) adapter.getItem(0);
                 Fragment_goal fg = (Fragment_goal) adapter.getItem(1);
-                Log.e("refreshDate",maplist.size()+"");
-                fd.refreshDate(maplist,"APJ Dynamic CSR BL ("+datepicker.getText()+" "+third+":00)");
+                Log.e("refreshDate", maplist.size() + "");
+                fd.refreshDate(maplist, "APJ Dynamic CSR BL (" + datepicker.getText() + " " + third + ":00)");
 //                adapter.notifyDataSetChanged();
                 fg.refreshDate(maplist2);
                 adapter.notifyDataSetChanged();
             }
         });
+
+        ////////////////////////////////Initialize Table//////////////////////////////////
+        if(answer.size()==0&&answer2.size()==0)  updateTable();
+
     }
 /////////////////////////////////////////////////////////////////////////////////////////
 
@@ -293,10 +284,8 @@ public class Dynamic extends AppCompatActivity {
             switch (msg.what) {
                 case 1001:
                     String str = msg.getData().getString("result");
-                    //ld.loadSuccess();
                     break;
                 default:
-                    ld.loadFailed();
                     break;
             }
         }
@@ -442,6 +431,63 @@ public class Dynamic extends AppCompatActivity {
     @Override
     protected void onPostCreate(@Nullable Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
+    }
+
+    public void updateTable() {
+        String first = "";
+        String second = "";
+        String third = "";
+        String fourth = "";
+        for (String str : summary.get("ordertype").keySet()) {
+            CheckBox cb = summary.get("ordertype").get(str);
+            if (cb.isChecked()) {
+                if (first.equals("")) {
+                    first += cb.getText();
+                } else {
+                    first = first + "," + cb.getText();
+                }
+            }
+        }
+
+
+        for (String str : summary.get("lob").keySet()) {
+            CheckBox cb = summary.get("lob").get(str);
+            if (cb.isChecked()) {
+                if (second.equals("")) {
+                    second += cb.getText();
+                } else {
+                    second = second + "," + cb.getText();
+                }
+            }
+        }
+
+        for (int k = 0; k < radioSummary.get("hour").size(); k++) {
+            RadioButton rb = radioSummary.get("hour").get(k);
+            if (rb.isChecked()) {
+                third = rb.getText() + "";
+            }
+        }
+        third = (third.split(":"))[0];
+
+        fourth = datepicker.getText() + "";
+
+        Log.e("!!!!!!", first + " " + second + " " + third + " " + fourth);
+        finish = 0;
+        String[] sql = new String[2];
+        sql[0] = "EXEC [P_DYNAMIC_BACKLOG_XMN_RESULTE] '" + first + "','" + second + "','" + fourth + "','" + third + "'";
+        sql[1] = "EXEC [P_DYNAMIC_BACKLOG_TRACK] '" + first + "','" + fourth + "','" + third + "'";
+        test(sql);
+        Log.e("Size",answer.size()+" "+answer2.size());
+        while (finish == 0) {
+        }
+        Fragment_Dynamic fd = (Fragment_Dynamic) adapter.getItem(0);
+        Fragment_goal fg = (Fragment_goal) adapter.getItem(1);
+        fd.initialFragment(maplist, "APJ Dynamic CSR BL (" + datepicker.getText() + " " + third + ":00)");
+//                adapter.notifyDataSetChanged();
+        fg.initialFragment(maplist2);
+        adapter.notifyDataSetChanged();
+
+
     }
 
 }

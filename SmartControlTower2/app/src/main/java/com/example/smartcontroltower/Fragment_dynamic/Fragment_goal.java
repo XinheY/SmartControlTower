@@ -33,7 +33,7 @@ public class Fragment_goal extends Fragment {
 
     public static View view2;
     private ArrayList<Object> maplist22 = new ArrayList<>();
-
+    private ArrayList<Object> maplistNew = new ArrayList<>();
 
     public Fragment_goal() {
 
@@ -48,6 +48,9 @@ public class Fragment_goal extends Fragment {
             maplistold = (ArrayList<Object>) savedInstanceState.getSerializable("map");
             Log.e("Change Screen", maplistold.size() + "");
             refreshDate(maplistold);
+        }
+        else if(maplistNew.size()!=0){
+            refreshDate(maplistNew);
         }
         Log.e("Tag222", "on create view");
         return view2;
@@ -189,5 +192,9 @@ public class Fragment_goal extends Fragment {
         Log.e("Tag222", "detach");
     }
 
+    public void initialFragment(ArrayList<Object> map){
+        maplistNew.clear();
+        maplistNew = map;
+    }
 
 }

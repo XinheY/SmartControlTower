@@ -49,6 +49,9 @@ public class Fragment_Dynamic extends Fragment {
             Log.e("Change Screen", maplist1.size() + "");
             refreshDate(maplist1old, savedInstanceState.getString("title"));
         }
+        else if(maplist1.size()!=0){
+            refreshDate(maplist1, title);
+        }
         Log.e("TAG", "oncreate view");
         return view;
     }
@@ -155,6 +158,12 @@ public class Fragment_Dynamic extends Fragment {
         } else {
             table.setVisibility(View.GONE);
         }
+    }
+
+    public void initialFragment(ArrayList<Object> map, String title) {
+        maplist1.clear();
+        maplist1 = map;
+        this.title = title;
     }
 
 
