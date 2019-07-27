@@ -40,7 +40,7 @@ public class DBUtil {
         try {
             OkHttpClient client = new OkHttpClient();
             Request request = new Request.Builder()
-                    .url("http://10.0.2.2/dyndyn.xml")
+                    .url("http://10.0.2.2/analysis.xml")
                     .build();
             Log.d("URL", request.toString());
             Response response = client.newCall(request).execute();

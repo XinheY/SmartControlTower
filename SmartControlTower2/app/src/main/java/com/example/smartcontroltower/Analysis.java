@@ -55,6 +55,7 @@ public class Analysis extends AppCompatActivity {
     private int radioid = 0;//给每个radiobutton设立唯一的id
     private ActionBarDrawerToggle toggle;
     public static SmartTable<Object> table;
+    List<Object> maplist = new ArrayList<>();
     private HashMap<String, HashMap<String, CheckBox>> summary = new LinkedHashMap<>();//所有checkbox的集合
     private HashMap<String, ArrayList<RadioButton>> radioSummary = new LinkedHashMap<>();
     private HashMap<String, HashMap<String, CheckBox>> summaryOld = new LinkedHashMap<>();//之前所有checkbox的集合
@@ -256,64 +257,11 @@ public class Analysis extends AppCompatActivity {
             @Override
            public void onClick(View view) {
 
-//                Bundle bundle = new Bundle();
-//                bundle.putString("data","传递到的数据");
-//                Fragment fragment=new FragmentClient();
-//                fragment.setArguments(bundle);//数据传递到fragment中
-//                FragmentManager fragmentManager = getSupportFragmentManager();
-//                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-//                fragmentTransaction.replace(R.id.client_layout,fragment);
-//                fragmentTransaction.commit();
-//                adapter.notifyDataSetChanged();
-//
-//                ld = new LoadingDialog(view.getContext());
-//                ld.setLoadingText("Loading...").setSuccessText("Success").setFailedText("Failed")
-//                        .closeSuccessAnim().show();
-//                answer.clear();
-//                ArrayList<String> searchSum = new ArrayList<>();//被check的checkbox集合
-//                RadioGroup radio = findViewById(R.id.ana_rg);
-//                RadioButton radioButton = findViewById(radio.getCheckedRadioButtonId());
-//                String ratioText = radioButton.getText().toString();
-//                searchSum.add(ratioText);
-//                RadioButton radioButton2 = findViewById(viewType.getCheckedRadioButtonId());
-//                String ratioText2 = radioButton2.getText().toString();
-//                searchSum.add(ratioText2);
-//                boolean canrun = true;
-//                for (int i = 0; i < summary.size(); i++) {
-//                    String oneCondition = "";
-//                    HashMap<String, CheckBox> innerMap = summary.get(allCondition.get(i));
-//                    int count = 0;
-//                    for (int j = 0; j < innerMap.size(); j++) {
-//                        CheckBox cbc = innerMap.get((allContent.get(i))[j]);
-//                        if (cbc.isChecked()) {
-//                            count++;
-//                            if (oneCondition.equals("")) {
-//                                oneCondition += cbc.getText();
-//                            } else {
-//                                oneCondition += "," + cbc.getText();
-//                            }
-//                        }
-//                    }
-//                    if (count == 0 && i > 1) {
-//                        canrun = false;
-//                        Toast.makeText(Analysis.this, "Blank " + allCondition.get(i), Toast.LENGTH_LONG).show();
-//                        ld.closeFailedAnim().loadFailed();
-//                        break;
-//                    }
-//                    searchSum.add(oneCondition);
-//                }
-//                if (canrun) {
-//                    if (searchSum.get(2) != "" || searchSum.get(3) != "") {
-//                        String sql = "EXEC [SP_IDC_EOQ_SUMMARY1] '" + searchSum.get(0) + "','" + searchSum.get(1) + "','" + searchSum.get(3) + "','" + searchSum.get(2) + "','" + searchSum.get(4) + "','" + searchSum.get(5) + "','" + searchSum.get(6) + "','" + searchSum.get(7) + "','" + searchSum.get(8) + "','" + searchSum.get(9) + "','" + searchSum.get(10) + "'";
-//                        toggleRightSliding();
-//                        test(sql);
-//                    }
-//                    else{
-//                        Toast.makeText(Analysis.this, "Blank Error", Toast.LENGTH_LONG).show();
-//                        ld.closeFailedAnim().loadFailed();
-//                    }
-//                }
-//
+                FragmentSystem fs=new FragmentSystem();
+                test("sql");
+                Log.e("Analysis",maplist.size()+"");
+                fs.setMaplistInFragSys(maplist);
+                adapter.notifyDataSetChanged();
             }
         });
     }
@@ -373,8 +321,8 @@ public class Analysis extends AppCompatActivity {
             @Override
             public void run() {
                 //测试数据库的语句,在子线程操作
-                answer = DBUtil.QuerySQL(sql);
-                // answer = DBUtil.sendRequestWithOkHttp();
+                //answer = DBUtil.QuerySQL(sql);
+                 answer = DBUtil.sendRequestWithOkHttp();
                 setNumber(selectRadioBtn(radioGroup));
                 Message msg = new Message();
                 msg.what = 1001;
@@ -392,11 +340,11 @@ public class Analysis extends AppCompatActivity {
             switch (msg.what) {
                 case 1001:
                     String str = msg.getData().getString("result");
-                    ld.loadSuccess();
+                    //ld.loadSuccess();
                     break;
 
                 default:
-                    ld.loadFailed();
+                    //ld.loadFailed();
                     break;
             }
         }
@@ -488,7 +436,6 @@ public class Analysis extends AppCompatActivity {
 
     //将数字放进table里
     public void setNumber(String unit) {
-        List<Object> maplist = new ArrayList<>();
         for (LinkedHashMap<String, String> a : answer) {
             LinkedHashMap<String, String> lhm = new LinkedHashMap<>();
             if (unit.equals("K")) {
@@ -507,19 +454,6 @@ public class Analysis extends AppCompatActivity {
             }
         }
 
-        MapTableData tableData = MapTableData.create("EOQ", maplist);
-        //Column groupColumn = new Column("组合", tableData.getColumns().get(0), tableData.getColumns().get(1));
-        table.getConfig().setFixedTitle(true);
-        tableData.getColumns().get(0).setFixed(true);
-        table.setZoom(true, 2, 1);
-        table.getConfig().setShowXSequence(false);
-        table.getConfig().setShowYSequence(false);
-        table.setTableData(tableData);
-
-        table.getConfig().setTableTitleStyle(new FontStyle(50, getResources().getColor(R.color.table_gray)));
-        table.getConfig().setColumnTitleBackground(new BaseBackgroundFormat(getResources().getColor(R.color.table_gray)));
-        table.getConfig().setContentStyle(new FontStyle(40, getResources().getColor(R.color.table_gray)));
-        table.getConfig().setColumnTitleStyle(new FontStyle(40, getResources().getColor(R.color.white)));
     }
 
     //在界面刷新之前保存旧数据

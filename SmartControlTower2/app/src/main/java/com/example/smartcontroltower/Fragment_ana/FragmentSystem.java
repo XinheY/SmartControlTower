@@ -1,6 +1,7 @@
 package com.example.smartcontroltower.Fragment_ana;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,24 +14,26 @@ import androidx.fragment.app.Fragment;
 import com.example.smartcontroltower.Fragment_ana.system_ExpandableAdapter;
 import com.example.smartcontroltower.R;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 public class FragmentSystem extends Fragment {
 
     View view;
     private ExpandableListView expandableListView;
+    private List<Object> maplistInFragSys = new ArrayList<>();
 
-
-    public FragmentSystem() {
-
-    }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.system_fragment, container, false);
-
-        expandableListView = (ExpandableListView)view.findViewById(R.id.system_expand_list);
-        expandableListView.setAdapter(new system_ExpandableAdapter());
+        Log.e("FragSys","onCreateView");
+        expandableListView = (ExpandableListView) view.findViewById(R.id.system_expand_list);
+        system_ExpandableAdapter adapter = new system_ExpandableAdapter();
+        expandableListView.setAdapter(adapter);
+        adapter.getMaplist(maplistInFragSys);
 //        //设置分组的监听
 //        expandableListView.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
 //            @Override
@@ -53,8 +56,8 @@ public class FragmentSystem extends Fragment {
             @Override
             public void onGroupExpand(int groupPosition) {
                 int count = new system_ExpandableAdapter().getGroupCount();
-                for(int i = 0;i < count;i++){
-                    if (i!=groupPosition){
+                for (int i = 0; i < count; i++) {
+                    if (i != groupPosition) {
                         expandableListView.collapseGroup(i);
                     }
                 }
@@ -64,9 +67,11 @@ public class FragmentSystem extends Fragment {
         return view;
     }
 
-
-
-
+    public void setMaplistInFragSys(List<Object> m){
+        maplistInFragSys.clear();
+        maplistInFragSys=m;
+        Log.e("FragSysSETMAP",maplistInFragSys.size()+"");
+    }
 
 
 }
