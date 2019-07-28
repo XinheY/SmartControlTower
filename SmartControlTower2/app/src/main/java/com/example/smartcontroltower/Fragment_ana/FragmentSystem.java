@@ -23,6 +23,7 @@ public class FragmentSystem extends Fragment {
     View view;
     private ExpandableListView expandableListView;
     private List<Object> maplistInFragSys = new ArrayList<>();
+    private system_ExpandableAdapter adapter=new system_ExpandableAdapter();
 
 
     @Nullable
@@ -31,9 +32,7 @@ public class FragmentSystem extends Fragment {
         view = inflater.inflate(R.layout.system_fragment, container, false);
         Log.e("FragSys","onCreateView");
         expandableListView = (ExpandableListView) view.findViewById(R.id.system_expand_list);
-        system_ExpandableAdapter adapter = new system_ExpandableAdapter();
         expandableListView.setAdapter(adapter);
-        adapter.getMaplist(maplistInFragSys);
 //        //设置分组的监听
 //        expandableListView.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
 //            @Override
@@ -71,6 +70,7 @@ public class FragmentSystem extends Fragment {
         maplistInFragSys.clear();
         maplistInFragSys=m;
         Log.e("FragSysSETMAP",maplistInFragSys.size()+"");
+        adapter.getMaplist(maplistInFragSys);
     }
 
 

@@ -69,6 +69,7 @@ public class Analysis extends AppCompatActivity {
     private NoSrcoll vp;
     private RangeSeekBar rsb;
     private ViewPagerAdapter adapter;
+    private int finishAna=0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -257,8 +258,10 @@ public class Analysis extends AppCompatActivity {
             @Override
            public void onClick(View view) {
 
+                finishAna=0;
                 FragmentSystem fs=new FragmentSystem();
                 test("sql");
+                while(finishAna==0){}
                 Log.e("Analysis",maplist.size()+"");
                 fs.setMaplistInFragSys(maplist);
                 adapter.notifyDataSetChanged();
@@ -329,6 +332,7 @@ public class Analysis extends AppCompatActivity {
                 Bundle data = new Bundle();
                 msg.setData(data);
                 mHandler.sendMessage(msg);
+                finishAna=1;
             }
         };
         new Thread(run).start();

@@ -26,7 +26,7 @@ import java.util.Map;
 public class system_ExpandableAdapter extends BaseExpandableListAdapter {
     private static ArrayList<SmartTable<Object>> tables = new ArrayList<>();
     public String[] groupString = {"OVERALL", "CLIENT", "ISG"};
-    private List<Object> maplistInSysExp = new ArrayList<>();
+    private static List<Object> maplistInSysExp = new ArrayList<>();
 
 
     @Override
@@ -82,6 +82,7 @@ public class system_ExpandableAdapter extends BaseExpandableListAdapter {
     @Override
     public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
         GroupViewHolder groupViewHolder;
+        Log.e("SE","getGroupView");
         if (convertView == null) {
             convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.parent_item, parent, false);
             groupViewHolder = new GroupViewHolder();
@@ -111,6 +112,7 @@ public class system_ExpandableAdapter extends BaseExpandableListAdapter {
     @Override
     public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
         ChildViewHolder childViewHolder;
+        Log.e("mapSize1", maplistInSysExp.size() + "");
         Log.e("Expan", "getChildView");
         convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.child_item, parent, false);
         SmartTable<Object> table = convertView.findViewById(R.id.ana_table);
@@ -155,5 +157,6 @@ public class system_ExpandableAdapter extends BaseExpandableListAdapter {
     public void getMaplist(List<Object> m) {
         maplistInSysExp.clear();
         maplistInSysExp = m;
+        Log.e("SEgetmap",maplistInSysExp.size()+"");
     }
 }
