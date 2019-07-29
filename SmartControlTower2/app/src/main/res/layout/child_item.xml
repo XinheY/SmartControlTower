@@ -9,12 +9,13 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <com.bin.david.form.core.SmartTable
+        <com.example.smartcontroltower.MySmartTable
             android:id="@+id/ana_table"
             android:layout_width="match_parent"
-            android:layout_height="500dp"
+            android:layout_height="350dp"
             android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp" />
+            android:layout_marginRight="10dp"
+            android:layout_marginBottom="5dp"/>
 
     </LinearLayout>
 </ScrollView>

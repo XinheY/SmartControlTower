@@ -48,6 +48,7 @@ public class DBUtil {
             String responseData = response.body().string();
             parseXMLWithPull(responseData,anss);
 
+
             for (int i = 0; i < anss.size(); i++) {
                 LinkedHashMap<String, String> count = anss.get(i);
                 for (String s : count.keySet()) {
@@ -86,9 +87,11 @@ public class DBUtil {
             Statement stmt = conn.createStatement();//
             ResultSet rs = stmt.executeQuery(sql);
             while (rs.next()) {
+                Log.e("rs",rs.getString(1));
                 String after = strChangeXML(rs.getString(1));
                 answer=parseXMLWithPull(after,answer);
             }
+
 
 //            for(int i=0;i<answer.size();i++){
 //                LinkedHashMap<String,String> count=answer.get(i);
@@ -119,13 +122,12 @@ public class DBUtil {
             int eventType = xmlPullParser.getEventType();
 
             LinkedHashMap<String, String> map = new LinkedHashMap<>();
-
             while (eventType != XmlPullParser.END_DOCUMENT) {
                 String nodeName = xmlPullParser.getName();
 
                 switch (eventType) {
                     case XmlPullParser.START_TAG: {
-                        if ((!"rawdata".equals(nodeName)) && (!"systemoverall".equals(nodeName)) && (!"row".equals(nodeName)) &&(!"systemclient".equals(nodeName))
+                        if ((!"Summary".equals(nodeName))&&(!"gva".equals(nodeName))&&(!"rawdata".equals(nodeName)) && (!"systemoverall".equals(nodeName)) && (!"row".equals(nodeName)) &&(!"systemclient".equals(nodeName))
                                 &&(!"systemisg".equals(nodeName))&&(!"client".equals(nodeName))&&(!"Consumer".equals(nodeName))&&(!"Commercial".equals(nodeName))&&(!"Workstation".equals(nodeName))&&(!"Alienware".equals(nodeName))&&(!"Lat_Opt".equals(nodeName))
                                 &&(!"ALIENWARE_DESKTOPS".equals(nodeName))&&(!"Personal_Vostro".equals(nodeName))&&(!"XPS_DT_NB".equals(nodeName))&&(!"CLOUD_CLIENT_IOT".equals(nodeName))&&(!"CHROME".equals(nodeName))&&(!"ALIENWARE_NOTEBOOKS".equals(nodeName))
                                 &&(!"OPTIPLEX_DESKTOPS".equals(nodeName))&&(!"LATITUDE".equals(nodeName))&&(!"PERSONAL_DESKTOPS".equals(nodeName))&&(!"PERSONAL_NOTEBOOKS".equals(nodeName))&&(!"VOSTRO_DESKTOPS".equals(nodeName))&&(!"VOSTRO_NOTEBOOKS".equals(nodeName))
@@ -138,13 +140,7 @@ public class DBUtil {
                         break;
                     }
                     case XmlPullParser.END_TAG: {
-                        if (("rawdata".equals(nodeName)) || ("systemoverall".equals(nodeName)) || ("row".equals(nodeName)) || ("Commercial".equals(nodeName))||("systemclient".equals(nodeName))||
-                                ("systemisg".equals(nodeName))||("client".equals(nodeName))||("Consumer".equals(nodeName))||("Workstation".equals(nodeName))||("Alienware".equals(nodeName))||("Lat_Opt".equals(nodeName))
-                                ||("ALIENWARE_DESKTOPS".equals(nodeName))||("Personal_Vostro".equals(nodeName))||("XPS_DT_NB".equals(nodeName))||("CLOUD_CLIENT_IOT".equals(nodeName))||("CHROME".equals(nodeName))||("ALIENWARE_NOTEBOOKS".equals(nodeName))
-                                ||("OPTIPLEX_DESKTOPS".equals(nodeName))||("LATITUDE".equals(nodeName))||("PERSONAL_DESKTOPS".equals(nodeName))||("PERSONAL_NOTEBOOKS".equals(nodeName))||("VOSTRO_DESKTOPS".equals(nodeName))||("VOSTRO_NOTEBOOKS".equals(nodeName))
-                                ||("FIXED_WORKSTATIONS".equals(nodeName))||("MOBILE_WORKSTATIONS".equals(nodeName))||("XPS_DESKTOPS".equals(nodeName))||("XPS_NOTEBOOKS".equals(nodeName))||("CLOUD_CLIENT".equals(nodeName))||("INTERNET_OF_THINGS".equals(nodeName))
-                                ||("isg_overall".equals(nodeName))||("isg_system".equals(nodeName))||("isg_PowerEdge".equals(nodeName))||("isg_Cloud".equals(nodeName))||("isg_Non_Sys".equals(nodeName))||("isg_storage".equals(nodeName))
-                                ||("isg_Networking".equals(nodeName))||("isg_hit".equals(nodeName)))  {
+                        if ("row".equals(nodeName) )  {
                             answer.add(map);
                             map = new LinkedHashMap<>();
                         }

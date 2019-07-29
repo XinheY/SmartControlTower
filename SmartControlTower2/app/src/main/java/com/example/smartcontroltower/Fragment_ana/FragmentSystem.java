@@ -21,8 +21,8 @@ import java.util.List;
 public class FragmentSystem extends Fragment {
 
     View view;
-    private ExpandableListView expandableListView;
-    private List<Object> maplistInFragSys = new ArrayList<>();
+    private static ExpandableListView expandableListView;
+    private ArrayList<List<Object>> maplistInFragSys = new ArrayList<>();
     private system_ExpandableAdapter adapter=new system_ExpandableAdapter();
 
 
@@ -33,24 +33,8 @@ public class FragmentSystem extends Fragment {
         Log.e("FragSys","onCreateView");
         expandableListView = (ExpandableListView) view.findViewById(R.id.system_expand_list);
         expandableListView.setAdapter(adapter);
-//        //设置分组的监听
-//        expandableListView.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
-//            @Override
-//            public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
-//                Toast.makeText(view.getContext(), groupString[groupPosition], Toast.LENGTH_SHORT).show();
-//                return false;
-//            }
-//        });
-//        //设置子项布局监听
-//        expandableListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
-//            @Override
-//            public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
-//                Toast.makeText(view.getContext(), childString[groupPosition][childPosition], Toast.LENGTH_SHORT).show();
-//                return true;
-//
-//            }
-//        });
-//        //控制他只能打开一个组
+
+        //控制他只能打开一个组
         expandableListView.setOnGroupExpandListener(new ExpandableListView.OnGroupExpandListener() {
             @Override
             public void onGroupExpand(int groupPosition) {
@@ -66,11 +50,16 @@ public class FragmentSystem extends Fragment {
         return view;
     }
 
-    public void setMaplistInFragSys(List<Object> m){
+    public void setMaplistInFragSys(ArrayList<List<Object>> m){
         maplistInFragSys.clear();
         maplistInFragSys=m;
         Log.e("FragSysSETMAP",maplistInFragSys.size()+"");
         adapter.getMaplist(maplistInFragSys);
+        Log.e("setMapFragSys",(expandableListView==null)+" "+new system_ExpandableAdapter().getGroupCount());
+        if(expandableListView!=null){
+            for(int i=0;i<new system_ExpandableAdapter().getGroupCount();i++){
+                expandableListView.collapseGroup(i);}
+        }
     }
 
 

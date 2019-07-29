@@ -7,9 +7,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
@@ -28,10 +25,6 @@ import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 
-import com.bin.david.form.core.SmartTable;
-import com.bin.david.form.data.format.bg.BaseBackgroundFormat;
-import com.bin.david.form.data.style.FontStyle;
-import com.bin.david.form.data.table.MapTableData;
 import com.example.smartcontroltower.Fragment_ana.FragmentClient;
 import com.example.smartcontroltower.Fragment_ana.FragmentClientLob;
 import com.example.smartcontroltower.Fragment_ana.FragmentISG;
@@ -47,29 +40,30 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
-
+import java.util.concurrent.CountDownLatch;
 
 public class Analysis extends AppCompatActivity {
 
     private DrawerLayout drawerl;
     private int radioid = 0;//给每个radiobutton设立唯一的id
     private ActionBarDrawerToggle toggle;
-    public static SmartTable<Object> table;
-    List<Object> maplist = new ArrayList<>();
+    public static MySmartTable<Object> table;
+    private ArrayList<List<Object>> maplistSum = new ArrayList<>();
     private HashMap<String, HashMap<String, CheckBox>> summary = new LinkedHashMap<>();//所有checkbox的集合
     private HashMap<String, ArrayList<RadioButton>> radioSummary = new LinkedHashMap<>();
     private HashMap<String, HashMap<String, CheckBox>> summaryOld = new LinkedHashMap<>();//之前所有checkbox的集合
     private HashMap<String, ArrayList<RadioButton>> radioOld = new LinkedHashMap<>();
     private ArrayList<String> allCondition = new ArrayList<>();
     private ArrayList<String[]> allContent = new ArrayList<>();
-    private ArrayList<LinkedHashMap<String, String>> answer;
+    private ArrayList<LinkedHashMap<String, String>> answerAna;
     private LoadingDialog ld;
     private RadioGroup radioGroup;
     private TabLayout tl;
     private NoSrcoll vp;
     private RangeSeekBar rsb;
     private ViewPagerAdapter adapter;
-    private int finishAna=0;
+    private int finishAna = 0;
+    private static CountDownLatch cdl = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,14 +71,17 @@ public class Analysis extends AppCompatActivity {
 ////////////////////////////////继承之前的数据//////////////////////////////////////////
         if (savedInstanceState != null) {
             // Restore value of members from saved state
-            answer = (ArrayList<LinkedHashMap<String, String>>) savedInstanceState.getSerializable("initial");
+            answerAna = (ArrayList<LinkedHashMap<String, String>>) savedInstanceState.getSerializable("initial");
             summaryOld = (HashMap<String, HashMap<String, CheckBox>>) savedInstanceState.getSerializable("initial2");
             radioOld = (LinkedHashMap<String, ArrayList<RadioButton>>) savedInstanceState.getSerializable("initial3");
         } else {
-            answer = new ArrayList<>();
+            answerAna = new ArrayList<>();
         }
         setContentView(R.layout.activity_analysis);
         radioGroup = findViewById(R.id.ana_range);
+        ld = new LoadingDialog(this);
+        ld.setLoadingText("Loading...").setSuccessText("Success").setFailedText("Failed")
+                .closeSuccessAnim();
         ///////////////////////////////////添加fragment/////////////////////////////////////
 
         tl = findViewById(R.id.ana_tablayout);
@@ -102,10 +99,9 @@ public class Analysis extends AppCompatActivity {
         tl.setupWithViewPager(vp);
 
 
-
         /////////////////Table//////////////////////////////////////////////////
         //设置初始值
-        if (answer.size() != 0) {
+        if (answerAna.size() != 0) {
             // setNumber(selectRadioBtn(radioGroup));
         } else {
 //            ld = new LoadingDialog(this);
@@ -116,12 +112,12 @@ public class Analysis extends AppCompatActivity {
 
         //////////////////////////////////RadioGroup//////////////////////////////////////
         //K && Unit
-//        RadioGroup.OnCheckedChangeListener listener = new RadioGroup.OnCheckedChangeListener() {
-//            public void onCheckedChanged(RadioGroup group, int checkedId) {
-//                setNumber(selectRadioBtn(radioGroup));
-//            }
-//        };
-//        radioGroup.setOnCheckedChangeListener(listener);
+        RadioGroup.OnCheckedChangeListener listener = new RadioGroup.OnCheckedChangeListener() {
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                setNumber(selectRadioBtn(radioGroup));
+            }
+        };
+        radioGroup.setOnCheckedChangeListener(listener);
 
 ///////////////////////////////////////***left side///////////////////////////////////////////
         Toolbar toolbar = findViewById(R.id.ana_toolbar);
@@ -231,7 +227,7 @@ public class Analysis extends AppCompatActivity {
 
         rsb = findViewById(R.id.rangeseek);
         rsb.setProgress(1f, 10f);
-        rsb.setRange(1f,13f,0f);
+        rsb.setRange(1f, 13f, 0f);
         rsb.setProgressHeight(4);
         rsb.setIndicatorTextDecimalFormat("0");
         rsb.setSteps(12);
@@ -241,30 +237,30 @@ public class Analysis extends AppCompatActivity {
             @Override
             public void onRangeChanged(RangeSeekBar view, float leftValue, float rightValue, boolean isFromUser) {
             }
+
             @Override
-            public void onStartTrackingTouch(RangeSeekBar view,  boolean isLeft) {
+            public void onStartTrackingTouch(RangeSeekBar view, boolean isLeft) {
             }
 
             @Override
-            public void onStopTrackingTouch(RangeSeekBar view,  boolean isLeft) {
+            public void onStopTrackingTouch(RangeSeekBar view, boolean isLeft) {
                 //stop tracking touch
-                Log.e("stop",rsb.getRightSeekBar().getProgress()+"");
+                Log.e("stop", rsb.getRightSeekBar().getProgress() + "");
             }
         });
 ///////////////////////////////Checkbox列表结束////////////////////////////////////
 
         Button refresh = findViewById(R.id.ana_refresh);
-       refresh.setOnClickListener(new View.OnClickListener() {//Refresh的动态监控
+        refresh.setOnClickListener(new View.OnClickListener() {//Refresh的动态监控
             @Override
-           public void onClick(View view) {
+            public void onClick(View view) {
+                toggleRightSliding();
+                ld.show();
+                finishAna = 0;
+                String sql = "EXEC SP_IDC_EOQ_SNI_CHANGE_ANALYSIS '" + "EoQ" + "','" + "FY20Q2WK12" + "','" + "FY20Q2WK11" + "','" + "Country" + "','" + "Invoice" + "','" + "Sales" + "'";
+                test(sql);
 
-                finishAna=0;
-                FragmentSystem fs=new FragmentSystem();
-                test("sql");
-                while(finishAna==0){}
-                Log.e("Analysis",maplist.size()+"");
-                fs.setMaplistInFragSys(maplist);
-                adapter.notifyDataSetChanged();
+
             }
         });
     }
@@ -324,15 +320,17 @@ public class Analysis extends AppCompatActivity {
             @Override
             public void run() {
                 //测试数据库的语句,在子线程操作
-                //answer = DBUtil.QuerySQL(sql);
-                 answer = DBUtil.sendRequestWithOkHttp();
+                answerAna = DBUtil.QuerySQL(sql);
+                //answerAna = DBUtil.sendRequestWithOkHttp();
                 setNumber(selectRadioBtn(radioGroup));
                 Message msg = new Message();
                 msg.what = 1001;
                 Bundle data = new Bundle();
                 msg.setData(data);
                 mHandler.sendMessage(msg);
-                finishAna=1;
+                updateAllTables();
+                //cdl.countDown();
+
             }
         };
         new Thread(run).start();
@@ -344,7 +342,7 @@ public class Analysis extends AppCompatActivity {
             switch (msg.what) {
                 case 1001:
                     String str = msg.getData().getString("result");
-                    //ld.loadSuccess();
+                    ld.loadSuccess();
                     break;
 
                 default:
@@ -418,7 +416,7 @@ public class Analysis extends AppCompatActivity {
                     rb.setChecked(true);
                     Button vt = findViewById(R.id.ana_vt_btn);
                     LinearLayout vtll = findViewById(R.id.ana_vt);
-                   if (title.equals("sources")) {
+                    if (title.equals("sources")) {
                         if (!(radioOld.get(title).get(i).getText() + "").equals("Sales")) {
                             vt.setVisibility(View.GONE);
                             vtll.setVisibility(View.GONE);
@@ -429,7 +427,6 @@ public class Analysis extends AppCompatActivity {
                 }
             } else {
                 if (items[i].equals(ini)) {
-                    Log.d("initial", items[i]);
                     rb.setChecked(true);
                 }
             }
@@ -440,23 +437,52 @@ public class Analysis extends AppCompatActivity {
 
     //将数字放进table里
     public void setNumber(String unit) {
-        for (LinkedHashMap<String, String> a : answer) {
-            LinkedHashMap<String, String> lhm = new LinkedHashMap<>();
-            if (unit.equals("K")) {
-                for (String b : a.keySet()) {
-                    if (!b.equals("COL_TYPE")) {
-                        double dou = Double.parseDouble(a.get(b));
-                        dou = dou / 1000;
-                        lhm.put(b, String.format("%.1f", dou));
-                    } else {
-                        lhm.put(b, a.get(b));
+        List<Object> maplist = new ArrayList<>();
+        maplistSum.clear();
+
+        Log.e("object", unit);
+        int cou = 0;
+        for (LinkedHashMap<String, String> a : answerAna) {
+            LinkedHashMap<String,String> b=a;
+            Log.e("a value",a.toString());
+
+            Log.e("a value", a.get("COUNTRY") + "");
+
+            if (a.get("COUNTRY").equals("ANZ")) {
+                cou++;
+                maplistSum.add(maplist);
+                maplist = new ArrayList<>();
+            }
+            maplist.add(b);
+        }
+        maplistSum.add(maplist);
+        maplistSum.remove(0);
+
+        for (int x = 0; x < maplistSum.size(); x++) {
+            for (int h = 0; h < maplistSum.get(x).size(); h++) {
+                for (String string : ((LinkedHashMap<String, String>) maplistSum.get(x).get(h)).keySet()) {
+                    String value = ((LinkedHashMap<String, String>) maplistSum.get(x).get(h)).get(string);
+                    value = value.replace("_", "");
+                    if (value.contains("N")&&!string.equals("COUNTRY")) {
+                        value = value.replace("N", "");
                     }
+                    value = value.replace("SI-Y", "");
+                    value = value.replace("MFG-Y", "");
+                    if (value.equals("0")) value = "-";
+                    if (unit.equals("K")) {
+                        if (!string.equals("COUNTRY") && !value.equals("-")) {
+                            double dou = Double.parseDouble(value);
+                            dou = dou / 1000;
+                            value = String.format("%.1f", dou);
+                        }
+                    }
+                    ((LinkedHashMap<String, String>) maplistSum.get(x).get(h)).put(string, value);
                 }
-                maplist.add(lhm);
-            } else {
-                maplist.add(a);
+                //Log.e("value",maplistSum.get(x).get(h).toString());
             }
         }
+
+        updateAllTables();
 
     }
 
@@ -464,7 +490,7 @@ public class Analysis extends AppCompatActivity {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putSerializable("initial", answer);
+        outState.putSerializable("initial", answerAna);
         outState.putSerializable("initial2", summary);
         outState.putSerializable("initial3", radioSummary);
     }
@@ -473,6 +499,47 @@ public class Analysis extends AppCompatActivity {
         RadioButton rb = Analysis.this.findViewById(rg.getCheckedRadioButtonId());
         return rb.getText() + "";
 
+    }
+
+    private void updateAllTables() {
+        FragmentSystem fs = new FragmentSystem();
+        FragmentClient fc = new FragmentClient();
+        FragmentClientLob fcl = new FragmentClientLob();
+        FragmentISG fisg = new FragmentISG();
+        FragmentISGLOB fil = new FragmentISGLOB();
+
+        ArrayList<List<Object>> ins = new ArrayList<>();
+        ins.add(maplistSum.get(0));
+        ins.add(maplistSum.get(1));
+        ins.add(maplistSum.get(2));
+        fs.setMaplistInFragSys(ins);
+
+        ArrayList<List<Object>> ins2 = new ArrayList<>();
+        for (int i = 3; i <= 12; i++) {
+            ins2.add(maplistSum.get(i));
+        }
+        fc.setMaplistInFragClient(ins2);
+
+        ArrayList<List<Object>> ins3 = new ArrayList<>();
+        for (int i = 12; i <= 26; i++) {
+            ins3.add(maplistSum.get(i));
+        }
+        fcl.setMaplistInFragcl(ins3);
+
+        ArrayList<List<Object>> ins4 = new ArrayList<>();
+        for (int i = 27; i <= 28; i++) {
+            ins4.add(maplistSum.get(i));
+        }
+        ins4.add(maplistSum.get(31));
+        fisg.setMaplistInFragIsg(ins4);
+
+        ArrayList<List<Object>> ins5 = new ArrayList<>();
+        ins5.add(maplistSum.get(29));
+        ins5.add(maplistSum.get(30));
+        for (int i = 32; i < maplistSum.size(); i++) {
+            ins5.add(maplistSum.get(i));
+        }
+        fil.setMaplistInFragIsg(ins5);
     }
 
 

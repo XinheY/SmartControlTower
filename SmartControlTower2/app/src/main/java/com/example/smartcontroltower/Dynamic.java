@@ -60,6 +60,7 @@ public class Dynamic extends AppCompatActivity {
     private LoadingDialog ld = null;
     public static SmartTable<Object> table;
     private ViewPagerAdapter adapter;
+    private String hour = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -219,28 +220,19 @@ public class Dynamic extends AppCompatActivity {
                     }
                 }
                 third = (third.split(":"))[0];
-
+                hour = third;
                 fourth = datepicker.getText() + "";
                 //////////////////////////////////////////////////////////////////
-                finish = 0;
                 String[] sql = new String[2];
                 sql[0] = "EXEC [P_DYNAMIC_BACKLOG_XMN_RESULTE] '" + first + "','" + second + "','" + fourth + "','" + third + "'";
                 sql[1] = "EXEC [P_DYNAMIC_BACKLOG_TRACK] '" + first + "','" + fourth + "','" + third + "'";
                 test(sql);
-                while (finish == 0) {
-                }
-                Fragment_Dynamic fd = (Fragment_Dynamic) adapter.getItem(0);
-                Fragment_goal fg = (Fragment_goal) adapter.getItem(1);
-                Log.e("refreshDate", maplist.size() + "");
-                fd.refreshDate(maplist, "APJ Dynamic CSR BL (" + datepicker.getText() + " " + third + ":00)");
-//                adapter.notifyDataSetChanged();
-                fg.refreshDate(maplist2);
-                adapter.notifyDataSetChanged();
+                toggleRightSliding();
             }
         });
 
         ////////////////////////////////Initialize Table//////////////////////////////////
-        if(answer.size()==0&&answer2.size()==0)  updateTable();
+        if (answer.size() == 0 && answer2.size() == 0) updateTable();
 
     }
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -272,7 +264,11 @@ public class Dynamic extends AppCompatActivity {
                 Bundle data = new Bundle();
                 msg.setData(data);
                 mHandler.sendMessage(msg);
-                finish = 1;
+                Fragment_Dynamic fd = (Fragment_Dynamic) adapter.getItem(0);
+                Fragment_goal fg = (Fragment_goal) adapter.getItem(1);
+                Log.e("refreshDate", maplist.size() + "");
+                fd.refreshDate(maplist, "APJ Dynamic CSR BL (" + datepicker.getText() + " " + hour + ":00)");
+                fg.refreshDate(maplist2);
             }
         };
         new Thread(run).start();
@@ -434,6 +430,7 @@ public class Dynamic extends AppCompatActivity {
     }
 
     public void updateTable() {
+        hour="";
         String first = "";
         String second = "";
         String third = "";
@@ -468,24 +465,13 @@ public class Dynamic extends AppCompatActivity {
             }
         }
         third = (third.split(":"))[0];
-
+hour=third;
         fourth = datepicker.getText() + "";
-
-        Log.e("!!!!!!", first + " " + second + " " + third + " " + fourth);
-        finish = 0;
         String[] sql = new String[2];
         sql[0] = "EXEC [P_DYNAMIC_BACKLOG_XMN_RESULTE] '" + first + "','" + second + "','" + fourth + "','" + third + "'";
         sql[1] = "EXEC [P_DYNAMIC_BACKLOG_TRACK] '" + first + "','" + fourth + "','" + third + "'";
         test(sql);
-        Log.e("Size",answer.size()+" "+answer2.size());
-        while (finish == 0) {
-        }
-        Fragment_Dynamic fd = (Fragment_Dynamic) adapter.getItem(0);
-        Fragment_goal fg = (Fragment_goal) adapter.getItem(1);
-        fd.initialFragment(maplist, "APJ Dynamic CSR BL (" + datepicker.getText() + " " + third + ":00)");
-//                adapter.notifyDataSetChanged();
-        fg.initialFragment(maplist2);
-        adapter.notifyDataSetChanged();
+        Log.e("Size", answer.size() + " " + answer2.size());
 
 
     }

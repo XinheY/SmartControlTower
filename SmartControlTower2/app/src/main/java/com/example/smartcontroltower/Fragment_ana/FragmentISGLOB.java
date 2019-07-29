@@ -1,6 +1,7 @@
 package com.example.smartcontroltower.Fragment_ana;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,23 +13,24 @@ import androidx.fragment.app.Fragment;
 
 import com.example.smartcontroltower.R;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 public class FragmentISGLOB extends Fragment {
 
     View view;
     private ExpandableListView expandableListView;
+    private ArrayList<List<Object>> maplistInDragIsgLob = new ArrayList<>();
+    private ISGLOB_ExpandableAdapter adapter = new ISGLOB_ExpandableAdapter();
 
-
-    public FragmentISGLOB() {
-
-    }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.isglob_fragment, container, false);
 
-        expandableListView = (ExpandableListView)view.findViewById(R.id.isglob_expand_list);
+        expandableListView = (ExpandableListView) view.findViewById(R.id.isglob_expand_list);
         expandableListView.setAdapter(new ISGLOB_ExpandableAdapter());
 //        //设置分组的监听
 //        expandableListView.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
@@ -52,8 +54,8 @@ public class FragmentISGLOB extends Fragment {
             @Override
             public void onGroupExpand(int groupPosition) {
                 int count = new system_ExpandableAdapter().getGroupCount();
-                for(int i = 0;i < count;i++){
-                    if (i!=groupPosition){
+                for (int i = 0; i < count; i++) {
+                    if (i != groupPosition) {
                         expandableListView.collapseGroup(i);
                     }
                 }
@@ -63,9 +65,17 @@ public class FragmentISGLOB extends Fragment {
         return view;
     }
 
-
-
-
+    public void setMaplistInFragIsg(ArrayList<List<Object>> m) {
+        maplistInDragIsgLob.clear();
+        maplistInDragIsgLob = m;
+        Log.e("FragSysSETMAP", maplistInDragIsgLob.size() + "");
+        adapter.getMaplist(maplistInDragIsgLob);
+        if (expandableListView != null) {
+            for (int i = 0; i < new ISG_ExpandableAdapter().getGroupCount(); i++) {
+                expandableListView.collapseGroup(i);
+            }
+        }
+    }
 
 
 }

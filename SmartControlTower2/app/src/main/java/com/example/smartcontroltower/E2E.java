@@ -15,6 +15,7 @@ import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -47,7 +48,7 @@ public class E2E extends AppCompatActivity {
     private HashMap<String, HashMap<String, CheckBox>> summaryOld = new HashMap<>();//之前所有checkbox的集合
     private ArrayList<String> allCondition = new ArrayList<>();
     private ArrayList<String[]> allContent = new ArrayList<>();
-    private ArrayList<LinkedHashMap<String, String>> answer;
+    private ArrayList<LinkedHashMap<String, String>> answerE2E;
     private LoadingDialog ld=null;
     private Button verbtn;
     private Button yqbtn;
@@ -70,10 +71,10 @@ public class E2E extends AppCompatActivity {
 
         if (savedInstanceState != null) {
             // Restore value of members from saved state
-            answer = (ArrayList<LinkedHashMap<String, String>>) savedInstanceState.getSerializable("initial");
+            answerE2E = (ArrayList<LinkedHashMap<String, String>>) savedInstanceState.getSerializable("initial");
             summaryOld = (HashMap<String, HashMap<String, CheckBox>>) savedInstanceState.getSerializable("initial2");
         } else {
-            answer = new ArrayList<>();
+            answerE2E = new ArrayList<>();
         }
 
         setContentView(R.layout.activity_e2_e);
@@ -86,13 +87,14 @@ public class E2E extends AppCompatActivity {
         table = findViewById(R.id.table);
         /////////////////Table//////////////////////////////////////////////////
         //设置初始值
-        if (answer.size() != 0) {
+        if (answerE2E.size() != 0) {
             setNumber(selectRadioBtn(radioGroup));
         } else {
             ld = new LoadingDialog(this);
             ld.setLoadingText("Loading...").setSuccessText("Success").setFailedText("Failed")
                     .closeSuccessAnim().show();
             test("EXEC [SP_IDC_EOQ_SUMMARY] '" + "EoQ" + "','" + "QuarView" + "','" + "FY20Q2" + "','" + "" + "','" + "overall" + "','" + "system" + "','" + "overall" + "','" + "overall" + "','" + "overall" + "','" + "overall" + "','" + "overall" + "'");
+            //Log.e("SQL","EXEC [SP_IDC_EOQ_SUMMARY] '" + "EoQ" + "','" + "QuarView" + "','" + "FY20Q2" + "','" + "" + "','" + "overall" + "','" + "system" + "','" + "overall" + "','" + "overall" + "','" + "overall" + "','" + "overall" + "','" + "overall" + "'");
         }
 
         //////////////////////////////////RadioGroup//////////////////////////////////////
@@ -245,7 +247,7 @@ public class E2E extends AppCompatActivity {
                 ld = new LoadingDialog(view.getContext());
                 ld.setLoadingText("Loading...").setSuccessText("Success").setFailedText("Failed")
                         .closeSuccessAnim().show();
-                answer.clear();
+                answerE2E.clear();
                 ArrayList<String> searchSum = new ArrayList<>();//被check的checkbox集合
                 RadioGroup radio = findViewById(R.id.e2e_rg);
                 RadioButton radioButton = findViewById(radio.getCheckedRadioButtonId());
@@ -363,8 +365,9 @@ public class E2E extends AppCompatActivity {
             @Override
             public void run() {
                 //测试数据库的语句,在子线程操作
-                answer = DBUtil.QuerySQL(sql);
-                // answer = DBUtil.sendRequestWithOkHttp();
+                answerE2E = DBUtil.QuerySQL(sql);
+                Log.e("SQL",sql);
+                // answerE2E = DBUtil.sendRequestWithOkHttp();
                 setNumber(selectRadioBtn(radioGroup));
                 Message msg = new Message();
                 msg.what = 1001;
@@ -424,7 +427,7 @@ public class E2E extends AppCompatActivity {
     //将数字放进table里
     public void setNumber(String unit) {
         List<Object> maplist = new ArrayList<>();
-        for (LinkedHashMap<String, String> a : answer) {
+        for (LinkedHashMap<String, String> a : answerE2E) {
             LinkedHashMap<String, String> lhm = new LinkedHashMap<>();
             if (unit.equals("K")) {
                 for (String b : a.keySet()) {
@@ -441,7 +444,8 @@ public class E2E extends AppCompatActivity {
                 maplist.add(a);
             }
         }
-
+        Log.e("E2E",maplist.size()+"");
+        if(maplist.size()!=0){
         MapTableData tableData = MapTableData.create("EOQ", maplist);
         //Column groupColumn = new Column("组合", tableData.getColumns().get(0), tableData.getColumns().get(1));
         table.getConfig().setFixedTitle(true);
@@ -454,14 +458,14 @@ public class E2E extends AppCompatActivity {
         table.getConfig().setTableTitleStyle(new FontStyle(50, getResources().getColor(R.color.table_gray)));
         table.getConfig().setColumnTitleBackground(new BaseBackgroundFormat(getResources().getColor(R.color.table_gray)));
         table.getConfig().setContentStyle(new FontStyle(40, getResources().getColor(R.color.table_gray)));
-        table.getConfig().setColumnTitleStyle(new FontStyle(40, getResources().getColor(R.color.white)));
+        table.getConfig().setColumnTitleStyle(new FontStyle(40, getResources().getColor(R.color.white)));}
     }
 
     //在界面刷新之前保存旧数据
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putSerializable("initial", answer);
+        outState.putSerializable("initial", answerE2E);
         outState.putSerializable("initial2",summary);
     }
 

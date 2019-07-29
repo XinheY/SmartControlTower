@@ -1,6 +1,7 @@
 package com.example.smartcontroltower.Fragment_ana;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,16 +13,18 @@ import androidx.fragment.app.Fragment;
 
 import com.example.smartcontroltower.R;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 public class FragmentClientLob extends Fragment {
 
     View view;
     private ExpandableListView expandableListView;
+    private ArrayList<List<Object>> maplistInFragcl = new ArrayList<>();
+    private clientlob_ExpandableAdapter adapter = new clientlob_ExpandableAdapter();
 
 
-    public FragmentClientLob() {
-
-    }
 
     @Nullable
     @Override
@@ -64,7 +67,17 @@ public class FragmentClientLob extends Fragment {
     }
 
 
-
+    public void setMaplistInFragcl(ArrayList<List<Object>> m){
+        maplistInFragcl.clear();
+        maplistInFragcl=m;
+        Log.e("FragSysSETMAP",maplistInFragcl.size()+"");
+        adapter.getMaplist(maplistInFragcl);
+        Log.e("FragSysSET",(expandableListView==null)+" "+new system_ExpandableAdapter().getGroupCount());
+        if(expandableListView!=null){
+            for(int i=0;i<new clientlob_ExpandableAdapter().getGroupCount();i++){
+                expandableListView.collapseGroup(i);}
+        }
+    }
 
 
 

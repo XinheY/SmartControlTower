@@ -1,6 +1,7 @@
 package com.example.smartcontroltower.Fragment_ana;
 
 import android.graphics.Color;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +13,7 @@ import com.bin.david.form.data.column.Column;
 import com.bin.david.form.data.format.bg.BaseBackgroundFormat;
 import com.bin.david.form.data.style.FontStyle;
 import com.bin.david.form.data.table.MapTableData;
+import com.example.smartcontroltower.MySmartTable;
 import com.example.smartcontroltower.R;
 
 import java.util.ArrayList;
@@ -22,7 +24,7 @@ import java.util.Map;
 public class ISGLOB_ExpandableAdapter extends BaseExpandableListAdapter {
     private static ArrayList<SmartTable<Object>> tables=new ArrayList<>();
     public String[] groupString = {"POWEREDGE", "CLOUD", "STORAGE","NETWORKING","Hyperconverged Infras Trans"};
-
+    private static ArrayList<List<Object>> maplistInIsgLob = new ArrayList<>();
 
     @Override
     // 获取分组的个数
@@ -106,48 +108,27 @@ public class ISGLOB_ExpandableAdapter extends BaseExpandableListAdapter {
     //取得显示给定分组给定子位置的数据用的视图
     @Override
     public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
-        ChildViewHolder childViewHolder;
-        convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.child_item,parent,false);
-        SmartTable<Object> table= convertView.findViewById(R.id.ana_table);
+        system_ExpandableAdapter.ChildViewHolder childViewHolder;
+        Log.e("mapSize1", maplistInIsgLob.size() + "");
+        Log.e("Expan", "getChildView");
+        convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.child_item, parent, false);
+        MySmartTable<Object> table = (MySmartTable<Object>) convertView.findViewById(R.id.ana_table);
         convertView.setTag(table);
+        if (maplistInIsgLob.size() != 0) {
+            MapTableData tableData = MapTableData.create("",maplistInIsgLob.get(groupPosition));
 
-        List<Object> maplist = new ArrayList<>();
-        for (int i = 0; i < 20; i++) {
-            Map<String, String> a = new LinkedHashMap<>();
-            a.put("city", "Shenyang");
-            a.put("name", "Peter");
-            a.put("no", "12");
-            a.put("count", "2");
-            a.put("no12", "1222");
-            a.put("count2", "2cc");
-            Map<String, String> b = new LinkedHashMap<>();
-            b.put("city", "Xiamen");
-            b.put("name", "Jason");
-            b.put("no", "12");
-            b.put("count", "2");
-            b.put("no12", "1233");
-            b.put("count2", "2ff");
-            maplist.add(a);
-            maplist.add(b);
+            table.getConfig().setFixedTitle(true);
+            tableData.getColumns().get(0).setFixed(true);
+            table.setZoom(true, 2, 1);
+            table.getConfig().setShowXSequence(false);
+            table.getConfig().setShowYSequence(false);
+            table.setTableData(tableData);
+            table.invalidate();
+            table.getConfig().setTableTitleStyle(new FontStyle(50, convertView.getResources().getColor(R.color.table_gray)));
+            table.getConfig().setColumnTitleBackground(new BaseBackgroundFormat(convertView.getResources().getColor(R.color.table_gray)));
+            table.getConfig().setContentStyle(new FontStyle(40, convertView.getResources().getColor(R.color.table_gray)));
+            table.getConfig().setColumnTitleStyle(new FontStyle(40, convertView.getResources().getColor(R.color.white)));
         }
-
-        MapTableData tableData = MapTableData.create("表格名", maplist);
-        Column groupColumn = new Column("组合", tableData.getColumns().get(0), tableData.getColumns().get(1));
-        table.getConfig().setFixedTitle(true);
-        tableData.getColumns().get(0).setFixed(true);
-        table.setZoom(true,2,1);
-        table.getConfig().setShowXSequence(false);
-        table.getConfig().setShowYSequence(false);
-//设置数据
-        table.setTableData(tableData);
-        table.getConfig().setTableTitleStyle(new FontStyle(50, convertView.getResources().getColor(R.color.table_gray)));
-        table.getConfig().setColumnTitleBackground(new BaseBackgroundFormat(convertView.getResources().getColor(R.color.table_gray)));
-        table.getConfig().setContentStyle(new FontStyle(40, convertView.getResources().getColor(R.color.table_gray)));
-        table.getConfig().setColumnTitleStyle(new FontStyle(40, convertView.getResources().getColor(R.color.white)));
-
-
-
-        tables.add(table);
         //childViewHolder.tvTitle.setText(childString[groupPosition][childPosition]);
         return convertView;
     }
@@ -165,5 +146,10 @@ public class ISGLOB_ExpandableAdapter extends BaseExpandableListAdapter {
     static class ChildViewHolder {
         TextView tvTitle;
 
+    }
+
+    public void getMaplist(ArrayList<List<Object>> m) {
+        maplistInIsgLob.clear();
+        maplistInIsgLob = m;
     }
 }

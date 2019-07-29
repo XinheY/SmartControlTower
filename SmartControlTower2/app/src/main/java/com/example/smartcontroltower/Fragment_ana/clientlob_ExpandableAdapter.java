@@ -1,6 +1,7 @@
 package com.example.smartcontroltower.Fragment_ana;
 
 import android.graphics.Color;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +13,7 @@ import com.bin.david.form.data.column.Column;
 import com.bin.david.form.data.format.bg.BaseBackgroundFormat;
 import com.bin.david.form.data.style.FontStyle;
 import com.bin.david.form.data.table.MapTableData;
+import com.example.smartcontroltower.MySmartTable;
 import com.example.smartcontroltower.R;
 
 import java.util.ArrayList;
@@ -20,11 +22,12 @@ import java.util.List;
 import java.util.Map;
 
 public class clientlob_ExpandableAdapter extends BaseExpandableListAdapter {
-    private static ArrayList<SmartTable<Object>> tables=new ArrayList<>();
-    public String[] groupString = {"Alienware Desktops", "Alienware Notebooks", "Personal Desktops",
-    "Personal Notebooks","Vostro Desktops","Vostro Notebooks","XPS Desktops","XPS Notebooks","Latitude",
-    "Optiplex Desktops","Fixed Workstations","Mobile Workstations","Chrome","Cloud Client","Internet of Things"};
-
+    private static ArrayList<SmartTable<Object>> tables = new ArrayList<>();
+    public String[] groupString = {"Chrome", "Alienware Notebooks", "Alienware Desktops", "Optiplex Desktops",
+            "Latitude", "Personal Desktops", "Personal Notebooks", "Vostro Desktops", "Vostro Notebooks",
+            "Fixed Workstations", "Mobile Workstations", "XPS Desktops", "XPS Notebooks", "Cloud Client",
+            "Internet of Things"};
+    private static ArrayList<List<Object>> maplistInClExp = new ArrayList<>();
 
     @Override
     // 获取分组的个数
@@ -67,89 +70,69 @@ public class clientlob_ExpandableAdapter extends BaseExpandableListAdapter {
     public boolean hasStableIds() {
         return true;
     }
+
     /**
-     *
      * 获取显示指定组的视图对象
      *
      * @param groupPosition 组位置
-     * @param isExpanded 该组是展开状态还是伸缩状态
-     * @param convertView 重用已有的视图对象
-     * @param parent 返回的视图对象始终依附于的视图组
+     * @param isExpanded    该组是展开状态还是伸缩状态
+     * @param convertView   重用已有的视图对象
+     * @param parent        返回的视图对象始终依附于的视图组
      */
 // 获取显示指定分组的视图
     @Override
     public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
         GroupViewHolder groupViewHolder;
-        if (convertView == null){
-            convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.parent_item,parent,false);
+        if (convertView == null) {
+            convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.parent_item, parent, false);
             groupViewHolder = new GroupViewHolder();
-            groupViewHolder.tvTitle = (TextView)convertView.findViewById(R.id.label_group_normal);
+            groupViewHolder.tvTitle = (TextView) convertView.findViewById(R.id.label_group_normal);
             convertView.setTag(groupViewHolder);
-        }else {
-            groupViewHolder = (GroupViewHolder)convertView.getTag();
+        } else {
+            groupViewHolder = (GroupViewHolder) convertView.getTag();
         }
         groupViewHolder.tvTitle.setText(groupString[groupPosition]);
         return convertView;
     }
+
     /**
-     *
      * 获取一个视图对象，显示指定组中的指定子元素数据。
      *
      * @param groupPosition 组位置
      * @param childPosition 子元素位置
-     * @param isLastChild 子元素是否处于组中的最后一个
-     * @param convertView 重用已有的视图(View)对象
-     * @param parent 返回的视图(View)对象始终依附于的视图组
+     * @param isLastChild   子元素是否处于组中的最后一个
+     * @param convertView   重用已有的视图(View)对象
+     * @param parent        返回的视图(View)对象始终依附于的视图组
      * @return
      * @see android.widget.ExpandableListAdapter#getChildView(int, int, boolean, android.view.View,
-     *      android.view.ViewGroup)
+     * android.view.ViewGroup)
      */
 
     //取得显示给定分组给定子位置的数据用的视图
     @Override
     public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
-        ChildViewHolder childViewHolder;
-        convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.child_item,parent,false);
-        SmartTable<Object> table= convertView.findViewById(R.id.ana_table);
+        system_ExpandableAdapter.ChildViewHolder childViewHolder;
+        Log.e("mapSize1", maplistInClExp.size() + "");
+        Log.e("Expan", "getChildView");
+        convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.child_item, parent, false);
+        MySmartTable<Object> table = (MySmartTable<Object>) convertView.findViewById(R.id.ana_table);
         convertView.setTag(table);
+        if (maplistInClExp.size() != 0) {
+            Log.e("SE", groupPosition + "::");
+            MapTableData tableData = MapTableData.create("", maplistInClExp.get(groupPosition));
 
-        List<Object> maplist = new ArrayList<>();
-        for (int i = 0; i < 20; i++) {
-            Map<String, String> a = new LinkedHashMap<>();
-            a.put("city", "Shenyang");
-            a.put("name", "Peter");
-            a.put("no", "12");
-            a.put("count", "2");
-            a.put("no12", "1222");
-            a.put("count2", "2cc");
-            Map<String, String> b = new LinkedHashMap<>();
-            b.put("city", "Xiamen");
-            b.put("name", "Jason");
-            b.put("no", "12");
-            b.put("count", "2");
-            b.put("no12", "1233");
-            b.put("count2", "2ff");
-            maplist.add(a);
-            maplist.add(b);
+            table.getConfig().setFixedTitle(true);
+            tableData.getColumns().get(0).setFixed(true);
+            table.setZoom(true, 2, 1);
+            table.getConfig().setShowXSequence(false);
+            table.getConfig().setShowYSequence(false);
+            table.setTableData(tableData);
+            table.invalidate();
+            table.getConfig().setTableTitleStyle(new FontStyle(50, convertView.getResources().getColor(R.color.table_gray)));
+            table.getConfig().setColumnTitleBackground(new BaseBackgroundFormat(convertView.getResources().getColor(R.color.table_gray)));
+            table.getConfig().setContentStyle(new FontStyle(40, convertView.getResources().getColor(R.color.table_gray)));
+            table.getConfig().setColumnTitleStyle(new FontStyle(40, convertView.getResources().getColor(R.color.white)));
         }
-
-        MapTableData tableData = MapTableData.create("表格名", maplist);
-        Column groupColumn = new Column("组合", tableData.getColumns().get(0), tableData.getColumns().get(1));
-        table.getConfig().setFixedTitle(true);
-        tableData.getColumns().get(0).setFixed(true);
-        table.setZoom(true,2,1);
-        table.getConfig().setShowXSequence(false);
-        table.getConfig().setShowYSequence(false);
-//设置数据
-        table.setTableData(tableData);
-        table.getConfig().setTableTitleStyle(new FontStyle(50, convertView.getResources().getColor(R.color.table_gray)));
-        table.getConfig().setColumnTitleBackground(new BaseBackgroundFormat(convertView.getResources().getColor(R.color.table_gray)));
-        table.getConfig().setContentStyle(new FontStyle(40, convertView.getResources().getColor(R.color.table_gray)));
-        table.getConfig().setColumnTitleStyle(new FontStyle(40, convertView.getResources().getColor(R.color.white)));
-
-
-
-        tables.add(table);
         //childViewHolder.tvTitle.setText(childString[groupPosition][childPosition]);
         return convertView;
     }
@@ -167,5 +150,10 @@ public class clientlob_ExpandableAdapter extends BaseExpandableListAdapter {
     static class ChildViewHolder {
         TextView tvTitle;
 
+    }
+
+    public void getMaplist(ArrayList<List<Object>> m) {
+        maplistInClExp.clear();
+        maplistInClExp = m;
     }
 }
