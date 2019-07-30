@@ -5,6 +5,7 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
@@ -12,6 +13,9 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.content.res.Resources;
+import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.Rect;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -26,7 +30,12 @@ import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import com.bin.david.form.core.SmartTable;
+import com.bin.david.form.core.TableConfig;
+import com.bin.david.form.data.CellInfo;
 import com.bin.david.form.data.format.bg.BaseBackgroundFormat;
+import com.bin.david.form.data.format.bg.BaseCellBackgroundFormat;
+import com.bin.david.form.data.format.bg.IBackgroundFormat;
+import com.bin.david.form.data.format.bg.ICellBackgroundFormat;
 import com.bin.david.form.data.style.FontStyle;
 import com.bin.david.form.data.table.MapTableData;
 import com.google.android.material.navigation.NavigationView;
@@ -431,7 +440,7 @@ public class E2E extends AppCompatActivity {
             LinkedHashMap<String, String> lhm = new LinkedHashMap<>();
             if (unit.equals("K")) {
                 for (String b : a.keySet()) {
-                    if (!b.equals("COL_TYPE")) {
+                    if (!b.equals("Item")) {
                         double dou = Double.parseDouble(a.get(b));
                         dou = dou / 1000;
                         lhm.put(b, String.format("%.1f", dou));
@@ -450,10 +459,42 @@ public class E2E extends AppCompatActivity {
         //Column groupColumn = new Column("组合", tableData.getColumns().get(0), tableData.getColumns().get(1));
         table.getConfig().setFixedTitle(true);
         tableData.getColumns().get(0).setFixed(true);
+        tableData.getColumns().get(0).setTextAlign(Paint.Align.LEFT);
         table.setZoom(true, 2, 1);
         table.getConfig().setShowXSequence(false);
         table.getConfig().setShowYSequence(false);
         table.setTableData(tableData);
+
+        table.getConfig().setContentCellBackgroundFormat(new ICellBackgroundFormat<CellInfo>() {
+            @Override
+            public void drawBackground(Canvas canvas, Rect rect, CellInfo cellInfo, Paint paint) {
+
+            }
+
+            @Override
+            public int getTextColor(CellInfo cellInfo) {
+                return 0;
+            }
+        });
+
+//            table.getConfig().setContentBackgroundFormat(new BaseCellBackgroundFormat() {
+//                @Override
+//                public int getBackGroundColor(Object o) {
+//                    return 0;
+//                }
+//            });
+//
+//            table.getConfig().setContentBackgroundFormat(new BaseBackgroundFormat<CellInfo>() {
+//                @Override
+//                public int getBackGroundColor() {
+//                    return ContextCompat.getColor(AnnotationModeActivity.this,R.color.lightgray);
+//                }
+//                @Override
+//                public boolean isDraw(CellInfo cellInfo) {
+//                    return cellInfo.row%2 ==0;
+//                }
+//            });
+
 
         table.getConfig().setTableTitleStyle(new FontStyle(50, getResources().getColor(R.color.table_gray)));
         table.getConfig().setColumnTitleBackground(new BaseBackgroundFormat(getResources().getColor(R.color.table_gray)));
@@ -474,6 +515,7 @@ public class E2E extends AppCompatActivity {
         return rb.getText() + "";
 
     }
+
 
 
 }

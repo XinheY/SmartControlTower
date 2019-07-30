@@ -6,6 +6,7 @@
     <color name="white">#FFFFFF</color>
     <color name="black">#000000</color>
     <color name="lightgray">#C4C4C4</color>
+    <color name="rowgray">#DAD6D6</color>
     <color name="table_gray">#73879c</color>
     <color name="table_back">#666666</color>
 </resources>

@@ -1,26 +1,27 @@
 package com.example.smartcontroltower.Fragment_dynamic;
 
 import android.content.Context;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Rect;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ExpandableListView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
-import com.bin.david.form.core.SmartTable;
 import com.bin.david.form.data.CellInfo;
 import com.bin.david.form.data.column.Column;
 import com.bin.david.form.data.format.bg.BaseBackgroundFormat;
-import com.bin.david.form.data.format.bg.BaseCellBackgroundFormat;
+import com.bin.david.form.data.format.bg.ICellBackgroundFormat;
 import com.bin.david.form.data.style.FontStyle;
 import com.bin.david.form.data.table.MapTableData;
+import com.example.smartcontroltower.MySmartTable;
 import com.example.smartcontroltower.R;
 
 import java.util.ArrayList;
@@ -48,8 +49,7 @@ public class Fragment_goal extends Fragment {
             maplistold = (ArrayList<Object>) savedInstanceState.getSerializable("map");
             Log.e("Change Screen", maplistold.size() + "");
             refreshDate(maplistold);
-        }
-        else if(maplistNew.size()!=0){
+        } else if (maplistNew.size() != 0) {
             refreshDate(maplistNew);
         }
         Log.e("Tag222", "on create view");
@@ -57,10 +57,10 @@ public class Fragment_goal extends Fragment {
     }
 
     public void refreshDate(ArrayList<Object> map) {
-        SmartTable<Object> table = view2.findViewById(R.id.goal_table);
+        MySmartTable<Object> table = view2.findViewById(R.id.goal_table);
         maplist22.clear();
+        MapTableData tableData;
         if (map.size() != 0) {
-            table.setVisibility(View.VISIBLE);
             for (int i = 0; i < map.size(); i++) {
                 LinkedHashMap<String, String> item = (LinkedHashMap<String, String>) map.get(i);
                 for (String key : item.keySet()) {
@@ -87,15 +87,16 @@ public class Fragment_goal extends Fragment {
             item2.put("ODM", "--Act.--");
             item2.put("PRE_SS", "--Goal--");
             item2.put("SS", "--Act.--");
-                for (int h = 0; h < map.size(); h++) {
-                    if (h == 2&&map.size()<5) {
-                        maplist22.add(item2);
-                    }
-                    maplist22.add(map.get(h));
-
+            for (int h = 0; h < map.size(); h++) {
+                if (h == 2 && map.size() < 5) {
+                    maplist22.add(item2);
                 }
+                maplist22.add(map.get(h));
 
-            MapTableData tableData = MapTableData.create("", maplist22);
+            }
+
+            tableData = MapTableData.create("", maplist22);
+
             List<Column> a = new LinkedList<>();
             a.add(new Column("Product Type", tableData.getColumns().get(0)));
             String[] ColumnTitle = {"APJ", "OPR", "APCC", "CCC", "ICC", "ODM-PP", "ODM", "SS"};
@@ -109,20 +110,40 @@ public class Fragment_goal extends Fragment {
             table.getConfig().setFixedTitle(true);
             tableData.getColumns().get(0).setFixed(true);
             tableData.getColumns().get(0).setWidth(190);
+            tableData.getColumns().get(0).setTextAlign(Paint.Align.LEFT);
             table.setZoom(true, 2, 1);
             table.getConfig().setShowXSequence(false);
             table.getConfig().setShowYSequence(false);
-//设置数据
-            table.setTableData(tableData);
 
+            table.getConfig().setContentCellBackgroundFormat(new ICellBackgroundFormat<CellInfo>() {
+                @Override
+                public void drawBackground(Canvas canvas, Rect rect, CellInfo cellInfo, Paint paint) {
+                    if (cellInfo.row % 4 == 2) {
+                        paint.setColor(getResources().getColor(R.color.table_gray));
+                        canvas.drawRect(rect, paint);
+                    }
+                }
+
+                @Override
+                public int getTextColor(CellInfo cellInfo) {
+                    if (cellInfo.row % 4 == 2) {
+                        return getResources().getColor(R.color.white);
+                    }
+                    return 0;
+                }
+            });
+        }
+        else{
+            tableData = MapTableData.create("", maplist22);
+        }
+
+            table.setTableData(tableData);
+            table.invalidate();
             table.getConfig().setTableTitleStyle(new FontStyle(50, R.color.table_gray));
             table.getConfig().setColumnTitleBackground(new BaseBackgroundFormat(Color.rgb(115, 135, 156)));
             table.getConfig().setContentStyle(new FontStyle(40, Color.rgb(115, 135, 156)));
             table.getConfig().setColumnTitleStyle(new FontStyle(40, Color.WHITE));
 
-        } else {
-            table.setVisibility(View.GONE);
-        }
     }
 
     @Override
@@ -192,7 +213,7 @@ public class Fragment_goal extends Fragment {
         Log.e("Tag222", "detach");
     }
 
-    public void initialFragment(ArrayList<Object> map){
+    public void initialFragment(ArrayList<Object> map) {
         maplistNew.clear();
         maplistNew = map;
     }

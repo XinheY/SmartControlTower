@@ -35,8 +35,8 @@ import okio.Timeout;
 
 public class DBUtil {
 
-    public static ArrayList<LinkedHashMap<String,String>> sendRequestWithOkHttp() {
-        ArrayList<LinkedHashMap<String, String>> anss=new ArrayList<>();
+    public static ArrayList<LinkedHashMap<String, String>> sendRequestWithOkHttp() {
+        ArrayList<LinkedHashMap<String, String>> anss = new ArrayList<>();
         try {
             OkHttpClient client = new OkHttpClient();
             Request request = new Request.Builder()
@@ -46,13 +46,13 @@ public class DBUtil {
             Response response = client.newCall(request).execute();
             Log.d("Content", response.toString());
             String responseData = response.body().string();
-            parseXMLWithPull(responseData,anss);
+            parseXMLWithPull(responseData, anss);
 
 
             for (int i = 0; i < anss.size(); i++) {
                 LinkedHashMap<String, String> count = anss.get(i);
                 for (String s : count.keySet()) {
-                   // Log.d("jieguo", s + ":" + count.get(s) + ":" + i);
+                    // Log.d("jieguo", s + ":" + count.get(s) + ":" + i);
                 }
             }
 
@@ -81,15 +81,15 @@ public class DBUtil {
 
     public static ArrayList<LinkedHashMap<String, String>> QuerySQL(String sql) {
         String result = "";
-        ArrayList<LinkedHashMap<String, String>> answer=new ArrayList<>();
+        ArrayList<LinkedHashMap<String, String>> answer = new ArrayList<>();
         try {
             Connection conn = getSQLConnection("10.82.244.53", "sa", "Dell@2008", "PCWebsite");
             Statement stmt = conn.createStatement();//
             ResultSet rs = stmt.executeQuery(sql);
             while (rs.next()) {
-                Log.e("rs",rs.getString(1));
+                Log.e("rs", rs.getString(1));
                 String after = strChangeXML(rs.getString(1));
-                answer=parseXMLWithPull(after,answer);
+                answer = parseXMLWithPull(after, answer);
             }
 
 
@@ -112,7 +112,7 @@ public class DBUtil {
     }
 
 
-    private static ArrayList<LinkedHashMap<String, String>>  parseXMLWithPull(String xmlData,ArrayList<LinkedHashMap<String, String>> answer) {
+    private static ArrayList<LinkedHashMap<String, String>> parseXMLWithPull(String xmlData, ArrayList<LinkedHashMap<String, String>> answer) {
         try {
             //ans.clear();
             XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
@@ -127,20 +127,25 @@ public class DBUtil {
 
                 switch (eventType) {
                     case XmlPullParser.START_TAG: {
-                        if ((!"Summary".equals(nodeName))&&(!"gva".equals(nodeName))&&(!"rawdata".equals(nodeName)) && (!"systemoverall".equals(nodeName)) && (!"row".equals(nodeName)) &&(!"systemclient".equals(nodeName))
-                                &&(!"systemisg".equals(nodeName))&&(!"client".equals(nodeName))&&(!"Consumer".equals(nodeName))&&(!"Commercial".equals(nodeName))&&(!"Workstation".equals(nodeName))&&(!"Alienware".equals(nodeName))&&(!"Lat_Opt".equals(nodeName))
-                                &&(!"ALIENWARE_DESKTOPS".equals(nodeName))&&(!"Personal_Vostro".equals(nodeName))&&(!"XPS_DT_NB".equals(nodeName))&&(!"CLOUD_CLIENT_IOT".equals(nodeName))&&(!"CHROME".equals(nodeName))&&(!"ALIENWARE_NOTEBOOKS".equals(nodeName))
-                                &&(!"OPTIPLEX_DESKTOPS".equals(nodeName))&&(!"LATITUDE".equals(nodeName))&&(!"PERSONAL_DESKTOPS".equals(nodeName))&&(!"PERSONAL_NOTEBOOKS".equals(nodeName))&&(!"VOSTRO_DESKTOPS".equals(nodeName))&&(!"VOSTRO_NOTEBOOKS".equals(nodeName))
-                                &&(!"FIXED_WORKSTATIONS".equals(nodeName))&&(!"MOBILE_WORKSTATIONS".equals(nodeName))&&(!"XPS_DESKTOPS".equals(nodeName))&&(!"XPS_NOTEBOOKS".equals(nodeName))&&(!"CLOUD_CLIENT".equals(nodeName))&&(!"INTERNET_OF_THINGS".equals(nodeName))
-                                &&(!"isg_overall".equals(nodeName))&&(!"isg_system".equals(nodeName))&&(!"isg_PowerEdge".equals(nodeName))&&(!"isg_Cloud".equals(nodeName))&&(!"isg_Non_Sys".equals(nodeName))&&(!"isg_storage".equals(nodeName))
-                                &&(!"isg_Networking".equals(nodeName))&&(!"isg_hit".equals(nodeName))) {
+                        if ((!"Summary".equals(nodeName)) && (!"gva".equals(nodeName)) && (!"rawdata".equals(nodeName)) && (!"systemoverall".equals(nodeName)) && (!"row".equals(nodeName)) && (!"systemclient".equals(nodeName))
+                                && (!"systemisg".equals(nodeName)) && (!"client".equals(nodeName)) && (!"Consumer".equals(nodeName)) && (!"Commercial".equals(nodeName)) && (!"Workstation".equals(nodeName)) && (!"Alienware".equals(nodeName)) && (!"Lat_Opt".equals(nodeName))
+                                && (!"ALIENWARE_DESKTOPS".equals(nodeName)) && (!"Personal_Vostro".equals(nodeName)) && (!"XPS_DT_NB".equals(nodeName)) && (!"CLOUD_CLIENT_IOT".equals(nodeName)) && (!"CHROME".equals(nodeName)) && (!"ALIENWARE_NOTEBOOKS".equals(nodeName))
+                                && (!"OPTIPLEX_DESKTOPS".equals(nodeName)) && (!"LATITUDE".equals(nodeName)) && (!"PERSONAL_DESKTOPS".equals(nodeName)) && (!"PERSONAL_NOTEBOOKS".equals(nodeName)) && (!"VOSTRO_DESKTOPS".equals(nodeName)) && (!"VOSTRO_NOTEBOOKS".equals(nodeName))
+                                && (!"FIXED_WORKSTATIONS".equals(nodeName)) && (!"MOBILE_WORKSTATIONS".equals(nodeName)) && (!"XPS_DESKTOPS".equals(nodeName)) && (!"XPS_NOTEBOOKS".equals(nodeName)) && (!"CLOUD_CLIENT".equals(nodeName)) && (!"INTERNET_OF_THINGS".equals(nodeName))
+                                && (!"isg_overall".equals(nodeName)) && (!"isg_system".equals(nodeName)) && (!"isg_PowerEdge".equals(nodeName)) && (!"isg_Cloud".equals(nodeName)) && (!"isg_Non_Sys".equals(nodeName)) && (!"isg_storage".equals(nodeName))
+                                && (!"isg_Networking".equals(nodeName)) && (!"isg_hit".equals(nodeName))) {
                             String id = xmlPullParser.nextText();
-                            map.put(nodeName, id);
+                            if (nodeName.equals("COL_TYPE")) {
+                                nodeName = "Item";
+                                map.put(nodeName,id);
+                            } else {
+                                map.put(nodeName, id);
+                            }
                         }
                         break;
                     }
                     case XmlPullParser.END_TAG: {
-                        if ("row".equals(nodeName) )  {
+                        if ("row".equals(nodeName)) {
                             answer.add(map);
                             map = new LinkedHashMap<>();
                         }

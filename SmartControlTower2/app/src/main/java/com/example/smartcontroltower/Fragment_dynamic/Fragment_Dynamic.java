@@ -2,8 +2,8 @@ package com.example.smartcontroltower.Fragment_dynamic;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,18 +15,17 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.bin.david.form.core.SmartTable;
-import com.bin.david.form.data.CellInfo;
+import com.bin.david.form.core.TableConfig;
 import com.bin.david.form.data.column.Column;
 import com.bin.david.form.data.format.bg.BaseBackgroundFormat;
 import com.bin.david.form.data.format.bg.BaseCellBackgroundFormat;
+import com.bin.david.form.data.format.bg.ICellBackgroundFormat;
 import com.bin.david.form.data.style.FontStyle;
 import com.bin.david.form.data.table.MapTableData;
-import com.example.smartcontroltower.Dynamic;
+import com.example.smartcontroltower.MySmartTable;
 import com.example.smartcontroltower.R;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -48,8 +47,7 @@ public class Fragment_Dynamic extends Fragment {
             maplist1old = (ArrayList<Object>) savedInstanceState.getSerializable("map");
             Log.e("Change Screen", maplist1.size() + "");
             refreshDate(maplist1old, savedInstanceState.getString("title"));
-        }
-        else if(maplist1.size()!=0){
+        } else if (maplist1.size() != 0) {
             refreshDate(maplist1, title);
         }
         Log.e("TAG", "oncreate view");
@@ -126,13 +124,13 @@ public class Fragment_Dynamic extends Fragment {
 
     public void refreshDate(ArrayList<Object> map, String title) {
         Log.e("Summary1", "map:" + map.size());
-        SmartTable<Object> table = view.findViewById(R.id.dyn_table);
+        MySmartTable<Object> table = view.findViewById(R.id.dyn_table);
         this.title = title;
+        MapTableData tableData;
         if (map.size() != 0) {
-            table.setVisibility(View.VISIBLE);
             Log.e("Summary2", "map:" + map.size() + " table:" + table.getVisibility());
             maplist1 = map;
-            MapTableData tableData = MapTableData.create(title, maplist1);
+            tableData = MapTableData.create(title, maplist1);
             Column groupColumn = new Column("Factory Backlog", tableData.getColumns().get(2), tableData.getColumns().get(3), tableData.getColumns().get(4), tableData.getColumns().get(5), tableData.getColumns().get(6));
             Column groupColumn1 = new Column("APJ", tableData.getColumns().get(1));
             List<Column> a = new LinkedList<>();
@@ -142,22 +140,46 @@ public class Fragment_Dynamic extends Fragment {
             for (int i = 7; i < tableData.getColumns().size(); i++) {
                 a.add(tableData.getColumns().get(i));
             }
+
             tableData.setColumns(a);
             table.getConfig().setFixedTitle(true);
             tableData.getColumns().get(0).setFixed(true);
             tableData.getColumns().get(0).setWidth(190);
+            tableData.getColumns().get(0).setTextAlign(Paint.Align.LEFT);
             table.setZoom(true, 2, 1);
             table.getConfig().setShowXSequence(false);
             table.getConfig().setShowYSequence(false);
-//设置数据
-            table.setTableData(tableData);
-            table.getConfig().setTableTitleStyle(new FontStyle(50, R.color.table_gray));
-            table.getConfig().setColumnTitleBackground(new BaseBackgroundFormat(Color.rgb(115, 135, 156)));
-            table.getConfig().setContentStyle(new FontStyle(40, Color.rgb(115, 135, 156)));
-            table.getConfig().setColumnTitleStyle(new FontStyle(40, Color.WHITE));
-        } else {
-            table.setVisibility(View.GONE);
+
+
+            ICellBackgroundFormat<Integer> backgroundFormat = new BaseCellBackgroundFormat<Integer>() {
+                @Override
+                public int getBackGroundColor(Integer position) {
+                    if (position % 2 == 0) {
+                        return ContextCompat.getColor(view.getContext(), R.color.lightgray);
+                    }
+                    return TableConfig.INVALID_COLOR;
+                }
+
+                @Override
+                public int getTextColor(Integer position) {
+                    if (position % 2 == 0) {
+                        return ContextCompat.getColor(view.getContext(), R.color.white);
+                    }
+                    return TableConfig.INVALID_COLOR;
+                }
+            };
         }
+        else{
+            tableData=MapTableData.create("",map);
+        }
+
+        table.setTableData(tableData);
+        table.invalidate();
+        table.getConfig().setTableTitleStyle(new FontStyle(50, R.color.table_gray));
+        table.getConfig().setColumnTitleBackground(new BaseBackgroundFormat(Color.rgb(115, 135, 156)));
+        table.getConfig().setContentStyle(new FontStyle(40, Color.rgb(115, 135, 156)));
+        table.getConfig().setColumnTitleStyle(new FontStyle(40, Color.WHITE));
+
     }
 
     public void initialFragment(ArrayList<Object> map, String title) {

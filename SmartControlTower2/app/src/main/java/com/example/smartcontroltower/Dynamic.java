@@ -430,7 +430,7 @@ public class Dynamic extends AppCompatActivity {
     }
 
     public void updateTable() {
-        hour="";
+        hour = "";
         String first = "";
         String second = "";
         String third = "";
@@ -465,7 +465,7 @@ public class Dynamic extends AppCompatActivity {
             }
         }
         third = (third.split(":"))[0];
-hour=third;
+        hour = third;
         fourth = datepicker.getText() + "";
         String[] sql = new String[2];
         sql[0] = "EXEC [P_DYNAMIC_BACKLOG_XMN_RESULTE] '" + first + "','" + second + "','" + fourth + "','" + third + "'";
