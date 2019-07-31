@@ -27,6 +27,7 @@
         android:background="@color/colorAccent"
         android:outlineSpotShadowColor="@color/light_gray" />
 
+
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -35,6 +36,14 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/e2e_isexpand"
+                android:layout_gravity="center"
+                android:background="@drawable/btn_inlist"
+                android:layout_marginTop="10dp"/>
 
             <RadioGroup
                 android:id="@+id/e2e_range"
@@ -66,14 +75,6 @@
 
 
             </RadioGroup>
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="3dp"
-                android:layout_marginLeft="20sp"
-                android:layout_marginTop="10dp"
-                android:layout_marginRight="20sp"
-                android:background="@color/colorAccent" />
 
             <TextView
                 style="@style/SearchTitle"

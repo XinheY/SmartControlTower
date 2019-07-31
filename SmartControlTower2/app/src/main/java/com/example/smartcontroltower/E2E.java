@@ -29,19 +29,16 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
-import com.bin.david.form.core.SmartTable;
 import com.bin.david.form.core.TableConfig;
 import com.bin.david.form.data.CellInfo;
 import com.bin.david.form.data.format.bg.BaseBackgroundFormat;
 import com.bin.david.form.data.format.bg.BaseCellBackgroundFormat;
-import com.bin.david.form.data.format.bg.IBackgroundFormat;
 import com.bin.david.form.data.format.bg.ICellBackgroundFormat;
 import com.bin.david.form.data.style.FontStyle;
 import com.bin.david.form.data.table.MapTableData;
 import com.google.android.material.navigation.NavigationView;
 import com.xiasuhuei321.loadingdialog.view.LoadingDialog;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -52,24 +49,26 @@ public class E2E extends AppCompatActivity {
 
     private DrawerLayout drawerl;
     private ActionBarDrawerToggle toggle;
-    public static SmartTable<Object> table;
+    public static MySmartTable<Object> table;
     private HashMap<String, HashMap<String, CheckBox>> summary = new HashMap<>();//所有checkbox的集合
     private HashMap<String, HashMap<String, CheckBox>> summaryOld = new HashMap<>();//之前所有checkbox的集合
     private ArrayList<String> allCondition = new ArrayList<>();
     private ArrayList<String[]> allContent = new ArrayList<>();
     private ArrayList<LinkedHashMap<String, String>> answerE2E;
-    private LoadingDialog ld=null;
+    private LoadingDialog ld = null;
     private Button verbtn;
     private Button yqbtn;
+    private Button expand;
     private LinearLayout yqll;
     private LinearLayout verll;
     private RadioGroup viewType;
     private RadioGroup radioGroup;
+    private String expandTitle = "Expand";
 
     @Override
     protected void onPause() {
         super.onPause();
-        if(ld!=null){
+        if (ld != null) {
             ld.close();
         }
     }
@@ -82,6 +81,7 @@ public class E2E extends AppCompatActivity {
             // Restore value of members from saved state
             answerE2E = (ArrayList<LinkedHashMap<String, String>>) savedInstanceState.getSerializable("initial");
             summaryOld = (HashMap<String, HashMap<String, CheckBox>>) savedInstanceState.getSerializable("initial2");
+            expandTitle = savedInstanceState.getString("initial3");
         } else {
             answerE2E = new ArrayList<>();
         }
@@ -97,7 +97,7 @@ public class E2E extends AppCompatActivity {
         /////////////////Table//////////////////////////////////////////////////
         //设置初始值
         if (answerE2E.size() != 0) {
-            setNumber(selectRadioBtn(radioGroup));
+            setNumber(selectRadioBtn(radioGroup), expandTitle);
         } else {
             ld = new LoadingDialog(this);
             ld.setLoadingText("Loading...").setSuccessText("Success").setFailedText("Failed")
@@ -105,11 +105,28 @@ public class E2E extends AppCompatActivity {
             test("EXEC [SP_IDC_EOQ_SUMMARY] '" + "EoQ" + "','" + "QuarView" + "','" + "FY20Q2" + "','" + "" + "','" + "overall" + "','" + "system" + "','" + "overall" + "','" + "overall" + "','" + "overall" + "','" + "overall" + "','" + "overall" + "'");
             //Log.e("SQL","EXEC [SP_IDC_EOQ_SUMMARY] '" + "EoQ" + "','" + "QuarView" + "','" + "FY20Q2" + "','" + "" + "','" + "overall" + "','" + "system" + "','" + "overall" + "','" + "overall" + "','" + "overall" + "','" + "overall" + "','" + "overall" + "'");
         }
+        ///////////////////////////////Expand Button//////////////////////////////////////////
+        expand = findViewById(R.id.e2e_isexpand);
+        expand.setText(expandTitle);
+        expand.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (expandTitle.equals("Expand")) {
+                    expandTitle = "Collapse";
+                }
+                else if(expandTitle.equals("Collapse")) {
+                    expandTitle = "Expand";
+                }
+                expand.setText(expandTitle);
+                Log.e("expand",expandTitle);
+                setNumber(selectRadioBtn(radioGroup), expandTitle);
+            }
+        });
 
         //////////////////////////////////RadioGroup//////////////////////////////////////
         RadioGroup.OnCheckedChangeListener listener = new RadioGroup.OnCheckedChangeListener() {
             public void onCheckedChanged(RadioGroup group, int checkedId) {
-                setNumber(selectRadioBtn(radioGroup));
+                setNumber(selectRadioBtn(radioGroup), expandTitle);
             }
         };
 
@@ -294,8 +311,7 @@ public class E2E extends AppCompatActivity {
                         String sql = "EXEC [SP_IDC_EOQ_SUMMARY] '" + searchSum.get(0) + "','" + searchSum.get(1) + "','" + searchSum.get(3) + "','" + searchSum.get(2) + "','" + searchSum.get(4) + "','" + searchSum.get(5) + "','" + searchSum.get(6) + "','" + searchSum.get(7) + "','" + searchSum.get(8) + "','" + searchSum.get(9) + "','" + searchSum.get(10) + "'";
                         toggleRightSliding();
                         test(sql);
-                    }
-                    else{
+                    } else {
                         Toast.makeText(E2E.this, "Blank Error", Toast.LENGTH_LONG).show();
                         ld.closeFailedAnim().loadFailed();
                     }
@@ -375,9 +391,9 @@ public class E2E extends AppCompatActivity {
             public void run() {
                 //测试数据库的语句,在子线程操作
                 answerE2E = DBUtil.QuerySQL(sql);
-                Log.e("SQL",sql);
-                // answerE2E = DBUtil.sendRequestWithOkHttp();
-                setNumber(selectRadioBtn(radioGroup));
+                //Log.e("SQL",sql);
+                //answerE2E = DBUtil.sendRequestWithOkHttp();
+                setNumber(selectRadioBtn(radioGroup), expandTitle);
                 Message msg = new Message();
                 msg.what = 1001;
                 Bundle data = new Bundle();
@@ -434,8 +450,9 @@ public class E2E extends AppCompatActivity {
     }
 
     //将数字放进table里
-    public void setNumber(String unit) {
+    public void setNumber(String unit, String title) {
         List<Object> maplist = new ArrayList<>();
+        List<Object> collapsemap = new ArrayList<>();
         for (LinkedHashMap<String, String> a : answerE2E) {
             LinkedHashMap<String, String> lhm = new LinkedHashMap<>();
             if (unit.equals("K")) {
@@ -448,58 +465,89 @@ public class E2E extends AppCompatActivity {
                         lhm.put(b, a.get(b));
                     }
                 }
+                if (lhm.get("Item").contains("Direct_")) {
+                    String temp = lhm.get("Item");
+                    temp = temp.replace("Direct_", "    ");
+                    lhm.put("Item", temp.replace("_", " "));
+                } else if (lhm.get("Item").contains("Scheduled_")) {
+                    String temp = lhm.get("Item");
+                    temp = temp.replace("Scheduled_", "    ");
+                    lhm.put("Item", temp.replace("_", " "));
+                } else {
+                    collapsemap.add(lhm);
+                }
                 maplist.add(lhm);
             } else {
+                if (a.get("Item").contains("Direct_")) {
+                    String temp = a.get("Item");
+                    temp = temp.replace("Direct_", "    ");
+                    a.put("Item", temp.replace("_", " "));
+                } else if (a.get("Item").contains("Scheduled_")) {
+                    String temp = a.get("Item");
+                    temp = temp.replace("Scheduled_", "    ");
+                    a.put("Item", temp.replace("_", " "));
+                } else {
+                    collapsemap.add(a);
+                }
                 maplist.add(a);
             }
         }
-        Log.e("E2E",maplist.size()+"");
-        if(maplist.size()!=0){
-        MapTableData tableData = MapTableData.create("EOQ", maplist);
-        //Column groupColumn = new Column("组合", tableData.getColumns().get(0), tableData.getColumns().get(1));
-        table.getConfig().setFixedTitle(true);
-        tableData.getColumns().get(0).setFixed(true);
-        tableData.getColumns().get(0).setTextAlign(Paint.Align.LEFT);
-        table.setZoom(true, 2, 1);
-        table.getConfig().setShowXSequence(false);
-        table.getConfig().setShowYSequence(false);
-        table.setTableData(tableData);
 
-        table.getConfig().setContentCellBackgroundFormat(new ICellBackgroundFormat<CellInfo>() {
-            @Override
-            public void drawBackground(Canvas canvas, Rect rect, CellInfo cellInfo, Paint paint) {
+        if (maplist.size() != 0 && collapsemap.size() != 0) {
+            MapTableData tableData;
+            if (title.equals("Expand")) {
+                tableData = MapTableData.create("EoQ && IDC", collapsemap);
+                table.getConfig().setContentCellBackgroundFormat(new ICellBackgroundFormat<CellInfo>() {
+                    @Override
+                    public void drawBackground(Canvas canvas, Rect rect, CellInfo cellInfo, Paint paint) {
+                        if (cellInfo.row==4||cellInfo.row==5) {
+                            paint.setColor(getResources().getColor(R.color.rowgray));
+                            canvas.drawRect(rect, paint);
+                        }
+                    }
+                    @Override
+                    public int getTextColor(CellInfo cellInfo) {
+                        return 0;
+                    }
 
+
+                });
+            } else {
+                tableData = MapTableData.create("EoQ && IDC", maplist);
+                table.getConfig().setContentCellBackgroundFormat(new ICellBackgroundFormat<CellInfo>() {
+                    @Override
+                    public void drawBackground(Canvas canvas, Rect rect, CellInfo cellInfo, Paint paint) {
+                        if (cellInfo.row==4||cellInfo.row==11) {
+                            paint.setColor(getResources().getColor(R.color.rowgray));
+                            canvas.drawRect(rect, paint);
+                        }
+                        else if((cellInfo.row>4&&cellInfo.row<11)||(cellInfo.row>11&&cellInfo.row<21)){
+                            paint.setColor(getResources().getColor(R.color.itemgray));
+                            canvas.drawRect(rect, paint);
+                        }
+                    }
+                    @Override
+                    public int getTextColor(CellInfo cellInfo) {
+                        return 0;
+                    }
+
+
+                });
             }
 
-            @Override
-            public int getTextColor(CellInfo cellInfo) {
-                return 0;
-            }
-        });
-
-//            table.getConfig().setContentBackgroundFormat(new BaseCellBackgroundFormat() {
-//                @Override
-//                public int getBackGroundColor(Object o) {
-//                    return 0;
-//                }
-//            });
-//
-//            table.getConfig().setContentBackgroundFormat(new BaseBackgroundFormat<CellInfo>() {
-//                @Override
-//                public int getBackGroundColor() {
-//                    return ContextCompat.getColor(AnnotationModeActivity.this,R.color.lightgray);
-//                }
-//                @Override
-//                public boolean isDraw(CellInfo cellInfo) {
-//                    return cellInfo.row%2 ==0;
-//                }
-//            });
-
-
-        table.getConfig().setTableTitleStyle(new FontStyle(50, getResources().getColor(R.color.table_gray)));
-        table.getConfig().setColumnTitleBackground(new BaseBackgroundFormat(getResources().getColor(R.color.table_gray)));
-        table.getConfig().setContentStyle(new FontStyle(40, getResources().getColor(R.color.table_gray)));
-        table.getConfig().setColumnTitleStyle(new FontStyle(40, getResources().getColor(R.color.white)));}
+            table.getConfig().setFixedTitle(true);
+            tableData.getColumns().get(0).setFixed(true);
+            tableData.getColumns().get(0).setTextAlign(Paint.Align.LEFT);
+            table.setZoom(true, 2, 1);
+            table.getConfig().setShowXSequence(false);
+            table.getConfig().setShowYSequence(false);
+            table.setTableData(tableData);
+            table.invalidate();
+            table.getConfig().setTableTitleStyle(new FontStyle(50, getResources().getColor(R.color.table_gray)));
+            table.getConfig().setColumnTitleBackground(new BaseBackgroundFormat(getResources().getColor(R.color.table_gray)));
+            table.getConfig().setContentStyle(new FontStyle(40, getResources().getColor(R.color.table_gray)));
+            table.getConfig().setColumnTitleStyle(new FontStyle(40, getResources().getColor(R.color.white)));
+        }
     }
 
     //在界面刷新之前保存旧数据
@@ -507,7 +555,8 @@ public class E2E extends AppCompatActivity {
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putSerializable("initial", answerE2E);
-        outState.putSerializable("initial2",summary);
+        outState.putSerializable("initial2", summary);
+        outState.putString("initial3", expandTitle);
     }
 
     private String selectRadioBtn(RadioGroup rg) {
@@ -515,7 +564,6 @@ public class E2E extends AppCompatActivity {
         return rb.getText() + "";
 
     }
-
 
 
 }

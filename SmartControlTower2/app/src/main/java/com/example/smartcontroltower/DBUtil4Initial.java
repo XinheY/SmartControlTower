@@ -15,25 +15,20 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.sql.Array;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.SQLTimeoutException;
 import java.sql.Statement;
-import java.sql.Time;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
-import java.util.List;
 
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
-import okio.Timeout;
 
 
-public class DBUtil {
+public class DBUtil4Initial {
 
     public static ArrayList<LinkedHashMap<String, String>> sendRequestWithOkHttp() {
         ArrayList<LinkedHashMap<String, String>> anss = new ArrayList<>();
