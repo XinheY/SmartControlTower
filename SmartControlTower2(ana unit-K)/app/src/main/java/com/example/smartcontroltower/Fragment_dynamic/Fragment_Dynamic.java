@@ -144,7 +144,7 @@ public class Fragment_Dynamic extends Fragment {
             tableData.setColumns(a);
             table.getConfig().setFixedTitle(true);
             tableData.getColumns().get(0).setFixed(true);
-            tableData.getColumns().get(0).setWidth(190);
+            tableData.getColumns().get(0).setWidth(300);
             tableData.getColumns().get(0).setTextAlign(Paint.Align.LEFT);
             table.setZoom(true, 2, 1);
             table.getConfig().setShowXSequence(false);
@@ -174,6 +174,7 @@ public class Fragment_Dynamic extends Fragment {
         }
 
         table.setTableData(tableData);
+        table.notifyDataChanged();
         table.invalidate();
         table.getConfig().setTableTitleStyle(new FontStyle(50, R.color.table_gray));
         table.getConfig().setColumnTitleBackground(new BaseBackgroundFormat(Color.rgb(115, 135, 156)));

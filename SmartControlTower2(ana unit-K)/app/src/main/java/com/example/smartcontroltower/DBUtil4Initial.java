@@ -41,13 +41,13 @@ public class DBUtil4Initial {
             Response response = client.newCall(request).execute();
             Log.d("Content", response.toString());
             String responseData = response.body().string();
-            parseXMLWithPull(responseData, anss);
+            anss=parseXMLWithPull(responseData, anss);
 
 
             for (int i = 0; i < anss.size(); i++) {
                 LinkedHashMap<String, String> count = anss.get(i);
                 for (String s : count.keySet()) {
-                    // Log.d("jieguo", s + ":" + count.get(s) + ":" + i);
+                     Log.e("jieguo", s + ":" + count.get(s) + ":" + i);
                 }
             }
 
@@ -82,7 +82,6 @@ public class DBUtil4Initial {
             Statement stmt = conn.createStatement();//
             ResultSet rs = stmt.executeQuery(sql);
             while (rs.next()) {
-                Log.e("rs", rs.getString(1));
                 String after = strChangeXML(rs.getString(1));
                 answer = parseXMLWithPull(after, answer);
             }
@@ -107,41 +106,38 @@ public class DBUtil4Initial {
     }
 
 
-    private static ArrayList<LinkedHashMap<String, String>> parseXMLWithPull(String xmlData, ArrayList<LinkedHashMap<String, String>> answer) {
+    private static ArrayList parseXMLWithPull(String xmlData,ArrayList<LinkedHashMap<String, String>> answer2) {
         try {
-            //ans.clear();
             XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
-            // System.out.println(xmlData);
+            //System.out.println(xmlData);
             XmlPullParser xmlPullParser = factory.newPullParser();
             xmlPullParser.setInput(new StringReader(xmlData));
             int eventType = xmlPullParser.getEventType();
 
             LinkedHashMap<String, String> map = new LinkedHashMap<>();
+
             while (eventType != XmlPullParser.END_DOCUMENT) {
                 String nodeName = xmlPullParser.getName();
 
                 switch (eventType) {
                     case XmlPullParser.START_TAG: {
-                        if ((!"Summary".equals(nodeName)) && (!"gva".equals(nodeName)) && (!"rawdata".equals(nodeName)) && (!"systemoverall".equals(nodeName)) && (!"row".equals(nodeName)) && (!"systemclient".equals(nodeName))
-                                && (!"systemisg".equals(nodeName)) && (!"client".equals(nodeName)) && (!"Consumer".equals(nodeName)) && (!"Commercial".equals(nodeName)) && (!"Workstation".equals(nodeName)) && (!"Alienware".equals(nodeName)) && (!"Lat_Opt".equals(nodeName))
-                                && (!"ALIENWARE_DESKTOPS".equals(nodeName)) && (!"Personal_Vostro".equals(nodeName)) && (!"XPS_DT_NB".equals(nodeName)) && (!"CLOUD_CLIENT_IOT".equals(nodeName)) && (!"CHROME".equals(nodeName)) && (!"ALIENWARE_NOTEBOOKS".equals(nodeName))
-                                && (!"OPTIPLEX_DESKTOPS".equals(nodeName)) && (!"LATITUDE".equals(nodeName)) && (!"PERSONAL_DESKTOPS".equals(nodeName)) && (!"PERSONAL_NOTEBOOKS".equals(nodeName)) && (!"VOSTRO_DESKTOPS".equals(nodeName)) && (!"VOSTRO_NOTEBOOKS".equals(nodeName))
-                                && (!"FIXED_WORKSTATIONS".equals(nodeName)) && (!"MOBILE_WORKSTATIONS".equals(nodeName)) && (!"XPS_DESKTOPS".equals(nodeName)) && (!"XPS_NOTEBOOKS".equals(nodeName)) && (!"CLOUD_CLIENT".equals(nodeName)) && (!"INTERNET_OF_THINGS".equals(nodeName))
-                                && (!"isg_overall".equals(nodeName)) && (!"isg_system".equals(nodeName)) && (!"isg_PowerEdge".equals(nodeName)) && (!"isg_Cloud".equals(nodeName)) && (!"isg_Non_Sys".equals(nodeName)) && (!"isg_storage".equals(nodeName))
-                                && (!"isg_Networking".equals(nodeName)) && (!"isg_hit".equals(nodeName))) {
+                        if ((!"rawdata".equals(nodeName)) && (!"row".equals(nodeName)) && (!"version".equals(nodeName))&& (!"version_addclosing".equals(nodeName))
+                                && !"version_year".equals(nodeName) && !"version_year_quar".equals(nodeName) && !"version_year_quar_week".equals(nodeName)) {
                             String id = xmlPullParser.nextText();
-                            if (nodeName.equals("COL_TYPE")) {
-                                nodeName = "Item";
-                                map.put(nodeName,id);
-                            } else {
-                                map.put(nodeName, id);
-                            }
+                            map.put(nodeName, id);
+                            answer2.add(map);
+                            map=new LinkedHashMap<>();
+                        }
+                        else if (!"row".equals(nodeName)&&!"rawdata".equals(nodeName)){
+                            map.put("title", nodeName);
+                            answer2.add(map);
+                            map=new LinkedHashMap<>();
                         }
                         break;
                     }
                     case XmlPullParser.END_TAG: {
-                        if ("row".equals(nodeName)) {
-                            answer.add(map);
+                        if ("option".equals(nodeName)) {
+                            answer2.add(map);
                             map = new LinkedHashMap<>();
                         }
                         break;
@@ -154,8 +150,7 @@ public class DBUtil4Initial {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-        return answer;
+        return answer2;
 
     }
 

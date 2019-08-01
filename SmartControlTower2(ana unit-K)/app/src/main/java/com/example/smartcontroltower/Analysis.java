@@ -36,9 +36,11 @@ import com.jaygoo.widget.OnRangeChangedListener;
 import com.jaygoo.widget.RangeSeekBar;
 import com.xiasuhuei321.loadingdialog.view.LoadingDialog;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
@@ -64,6 +66,7 @@ public class Analysis extends AppCompatActivity {
     private ViewPagerAdapter adapter;
     private int finishAna = 0;
     private static CountDownLatch cdl = null;
+    private InitializeInfo info;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,6 +80,7 @@ public class Analysis extends AppCompatActivity {
         } else {
             answerAna = new ArrayList<>();
         }
+        info=(InitializeInfo) getIntent().getSerializableExtra("InitializeInfo");
         setContentView(R.layout.activity_analysis);
         radioGroup = findViewById(R.id.ana_range);
         ld = new LoadingDialog(this);
@@ -328,8 +332,7 @@ public class Analysis extends AppCompatActivity {
                 Bundle data = new Bundle();
                 msg.setData(data);
                 mHandler.sendMessage(msg);
-                updateAllTables();
-                //cdl.countDown();
+                //updateAllTables(map);
 
             }
         };
@@ -458,8 +461,12 @@ public class Analysis extends AppCompatActivity {
         maplistSum.add(maplist);
         maplistSum.remove(0);
 
+        ArrayList<List<Object>> maplistSum2=new ArrayList<>();
+
         for (int x = 0; x < maplistSum.size(); x++) {
+            List<Object> templist=new ArrayList<>();
             for (int h = 0; h < maplistSum.get(x).size(); h++) {
+                LinkedHashMap<String,String> tempmap=new LinkedHashMap<>();
                 for (String string : ((LinkedHashMap<String, String>) maplistSum.get(x).get(h)).keySet()) {
                     String value = ((LinkedHashMap<String, String>) maplistSum.get(x).get(h)).get(string);
                     value = value.replace("_", "");
@@ -476,13 +483,16 @@ public class Analysis extends AppCompatActivity {
                             value = String.format("%.1f", dou);
                         }
                     }
-                    ((LinkedHashMap<String, String>) maplistSum.get(x).get(h)).put(string, value);
+                    Log.e("value",value);
+                    ((LinkedHashMap<String, String>) tempmap).put(string, value);
                 }
+                templist.add(tempmap);
                 //Log.e("value",maplistSum.get(x).get(h).toString());
             }
+            maplistSum2.add(templist);
         }
 
-        updateAllTables();
+        updateAllTables(maplistSum2);
 
     }
 
@@ -501,7 +511,7 @@ public class Analysis extends AppCompatActivity {
 
     }
 
-    private void updateAllTables() {
+    private void updateAllTables(ArrayList<List<Object>> map2) {
         FragmentSystem fs = new FragmentSystem();
         FragmentClient fc = new FragmentClient();
         FragmentClientLob fcl = new FragmentClientLob();
@@ -509,35 +519,35 @@ public class Analysis extends AppCompatActivity {
         FragmentISGLOB fil = new FragmentISGLOB();
 
         ArrayList<List<Object>> ins = new ArrayList<>();
-        ins.add(maplistSum.get(0));
-        ins.add(maplistSum.get(1));
-        ins.add(maplistSum.get(2));
+        ins.add(map2.get(0));
+        ins.add(map2.get(1));
+        ins.add(map2.get(2));
         fs.setMaplistInFragSys(ins);
 
         ArrayList<List<Object>> ins2 = new ArrayList<>();
         for (int i = 3; i <= 12; i++) {
-            ins2.add(maplistSum.get(i));
+            ins2.add(map2.get(i));
         }
         fc.setMaplistInFragClient(ins2);
 
         ArrayList<List<Object>> ins3 = new ArrayList<>();
         for (int i = 12; i <= 26; i++) {
-            ins3.add(maplistSum.get(i));
+            ins3.add(map2.get(i));
         }
         fcl.setMaplistInFragcl(ins3);
 
         ArrayList<List<Object>> ins4 = new ArrayList<>();
         for (int i = 27; i <= 28; i++) {
-            ins4.add(maplistSum.get(i));
+            ins4.add(map2.get(i));
         }
-        ins4.add(maplistSum.get(31));
+        ins4.add(map2.get(31));
         fisg.setMaplistInFragIsg(ins4);
 
         ArrayList<List<Object>> ins5 = new ArrayList<>();
-        ins5.add(maplistSum.get(29));
-        ins5.add(maplistSum.get(30));
-        for (int i = 32; i < maplistSum.size(); i++) {
-            ins5.add(maplistSum.get(i));
+        ins5.add(map2.get(29));
+        ins5.add(map2.get(30));
+        for (int i = 32; i < map2.size(); i++) {
+            ins5.add(map2.get(i));
         }
         fil.setMaplistInFragIsg(ins5);
     }

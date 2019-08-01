@@ -5,7 +5,6 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
@@ -29,10 +28,8 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
-import com.bin.david.form.core.TableConfig;
 import com.bin.david.form.data.CellInfo;
 import com.bin.david.form.data.format.bg.BaseBackgroundFormat;
-import com.bin.david.form.data.format.bg.BaseCellBackgroundFormat;
 import com.bin.david.form.data.format.bg.ICellBackgroundFormat;
 import com.bin.david.form.data.style.FontStyle;
 import com.bin.david.form.data.table.MapTableData;
@@ -64,6 +61,7 @@ public class E2E extends AppCompatActivity {
     private RadioGroup viewType;
     private RadioGroup radioGroup;
     private String expandTitle = "Expand";
+    private InitializeInfo info=null;
 
     @Override
     protected void onPause() {
@@ -94,6 +92,9 @@ public class E2E extends AppCompatActivity {
         yqll = findViewById(R.id.e2e_yq);
         verll = findViewById(R.id.e2e_ver);
         table = findViewById(R.id.table);
+
+        info  = (InitializeInfo) getIntent().getSerializableExtra("InitializeInfo");
+        Log.e("info",info.getVersion().toString());
         /////////////////Table//////////////////////////////////////////////////
         //设置初始值
         if (answerE2E.size() != 0) {
@@ -180,16 +181,25 @@ public class E2E extends AppCompatActivity {
                         break;
                     case R.id.nav_Dynamic:
                         Intent intent2 = new Intent(E2E.this, Dynamic.class);
+                        Bundle bundle2=new Bundle();
+                        bundle2.putSerializable("InitializeInfo",info);
+                        intent2.putExtras(bundle2);
                         startActivity(intent2);
                         finish();
                         break;
                     case R.id.nav_DirectBL:
                         Intent intent4 = new Intent(E2E.this, DirectBL.class);
+                        Bundle bundle4=new Bundle();
+                        bundle4.putSerializable("InitializeInfo",info);
+                        intent4.putExtras(bundle4);
                         startActivity(intent4);
                         finish();
                         break;
                     case R.id.nav_analysis:
                         Intent intent3 = new Intent(E2E.this, Analysis.class);
+                        Bundle bundle3=new Bundle();
+                        bundle3.putSerializable("InitializeInfo",info);
+                        intent3.putExtras(bundle3);
                         startActivity(intent3);
                         finish();
                         break;
@@ -227,11 +237,11 @@ public class E2E extends AppCompatActivity {
         ///////////////////////CheckBox列表/////////////////////////////////////////
 
         LinearLayout e2ever = findViewById(R.id.e2e_ver);
-        String[] ver = getResources().getStringArray(R.array.Version);
+        String[] ver = ((String[])info.getVersion().toArray(new String[info.getVersion().size()]));
         ConstructCheck("version", ver, e2ever, "");
 
         LinearLayout e2eyq = findViewById(R.id.e2e_yq);
-        String[] yq = getResources().getStringArray(R.array.Year_quar);
+        String[] yq = ((String[])info.getVersion_year_quar().toArray(new String[info.getVersion_year_quar().size()]));
         ConstructCheck("yq", yq, e2eyq, "FY20Q2");
 
         LinearLayout e2elob = findViewById(R.id.e2e_lob);
@@ -455,6 +465,7 @@ public class E2E extends AppCompatActivity {
         List<Object> collapsemap = new ArrayList<>();
         for (LinkedHashMap<String, String> a : answerE2E) {
             LinkedHashMap<String, String> lhm = new LinkedHashMap<>();
+            LinkedHashMap<String,String> lhm2=new LinkedHashMap<>();
             if (unit.equals("K")) {
                 for (String b : a.keySet()) {
                     if (!b.equals("Item")) {
@@ -478,22 +489,29 @@ public class E2E extends AppCompatActivity {
                 }
                 maplist.add(lhm);
             } else {
+                for (String b : a.keySet()) {
+                        lhm2.put(b, a.get(b));
+                }
+                Log.e("a",a.toString());
                 if (a.get("Item").contains("Direct_")) {
                     String temp = a.get("Item");
                     temp = temp.replace("Direct_", "    ");
-                    a.put("Item", temp.replace("_", " "));
+                    lhm2.put("Item", temp.replace("_", " "));
                 } else if (a.get("Item").contains("Scheduled_")) {
                     String temp = a.get("Item");
                     temp = temp.replace("Scheduled_", "    ");
-                    a.put("Item", temp.replace("_", " "));
+                    lhm2.put("Item", temp.replace("_", " "));
                 } else {
-                    collapsemap.add(a);
+                    collapsemap.add(lhm2);
                 }
-                maplist.add(a);
+                Log.e("a-after",a.toString());
+                maplist.add(lhm2);
             }
+
         }
 
         if (maplist.size() != 0 && collapsemap.size() != 0) {
+            Log.e("size",maplist.size()+" "+collapsemap.size());
             MapTableData tableData;
             if (title.equals("Expand")) {
                 tableData = MapTableData.create("EoQ && IDC", collapsemap);

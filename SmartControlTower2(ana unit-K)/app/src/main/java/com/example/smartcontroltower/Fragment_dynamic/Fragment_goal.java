@@ -119,7 +119,7 @@ public class Fragment_goal extends Fragment {
                 @Override
                 public void drawBackground(Canvas canvas, Rect rect, CellInfo cellInfo, Paint paint) {
                     if (cellInfo.row % 4 == 2) {
-                        paint.setColor(getResources().getColor(R.color.table_gray));
+                        paint.setColor(Color.rgb(115, 135, 156));
                         canvas.drawRect(rect, paint);
                     }
                 }
@@ -127,7 +127,7 @@ public class Fragment_goal extends Fragment {
                 @Override
                 public int getTextColor(CellInfo cellInfo) {
                     if (cellInfo.row % 4 == 2) {
-                        return getResources().getColor(R.color.white);
+                        return Color.WHITE;
                     }
                     return 0;
                 }
