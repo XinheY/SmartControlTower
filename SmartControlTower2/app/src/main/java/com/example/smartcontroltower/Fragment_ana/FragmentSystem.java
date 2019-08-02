@@ -6,7 +6,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ExpandableListView;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -18,20 +17,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class FragmentClient extends Fragment {
+public class FragmentSystem extends Fragment {
 
     View view;
     private static ExpandableListView expandableListView;
-    private ArrayList<List<Object>> maplistInFragClient = new ArrayList<>();
-    private client_ExpandableAdapter adapter = new client_ExpandableAdapter();
+    private ArrayList<List<Object>> maplistInFragSys = new ArrayList<>();
+    private system_ExpandableAdapter adapter = new system_ExpandableAdapter();
 
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.client_fragment, container, false);
-
-        expandableListView = (ExpandableListView) view.findViewById(R.id.client_expand_list);
+        view = inflater.inflate(R.layout.system_fragment, container, false);
+        Log.e("FragSys", "onCreateView");
+        expandableListView = (ExpandableListView) view.findViewById(R.id.system_expand_list);
         expandableListView.setAdapter(adapter);
 
         //控制他只能打开一个组
@@ -47,19 +46,24 @@ public class FragmentClient extends Fragment {
             }
         });
 
-
         return view;
     }
 
+    public void setMaplistInFragSys(ArrayList<List<Object>> m) {
+        maplistInFragSys.clear();
+        maplistInFragSys = m;
+        Log.e("FragSysSETMAP", maplistInFragSys.size() + "");
+        adapter.getMaplist(maplistInFragSys);
+        Log.e("setMapFragSys", (expandableListView == null) + " " + new system_ExpandableAdapter().getGroupCount());
+    }
 
-    public void setMaplistInFragClient(ArrayList<List<Object>> m){
-        maplistInFragClient.clear();
-        maplistInFragClient=m;
-        Log.e("FragClient",maplistInFragClient.size()+"");
-        adapter.inputdata(maplistInFragClient);
-        if(expandableListView!=null){
-            for(int i=0;i<new system_ExpandableAdapter().getGroupCount();i++){
-                expandableListView.collapseGroup(i);}
+    public void collapse(Fragment frag) {
+        if(expandableListView!=null) {
+            for (int i = 0; i < new system_ExpandableAdapter().getGroupCount(); i++) {
+                expandableListView.collapseGroup(i);
+            }
         }
     }
+
+
 }

@@ -25,13 +25,12 @@ public class FragmentClientLob extends Fragment {
     private clientlob_ExpandableAdapter adapter = new clientlob_ExpandableAdapter();
 
 
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.clientlob_fragment, container, false);
 
-        expandableListView = (ExpandableListView)view.findViewById(R.id.clientlob_expand_list);
+        expandableListView = (ExpandableListView) view.findViewById(R.id.clientlob_expand_list);
         expandableListView.setAdapter(new clientlob_ExpandableAdapter());
 //        //设置分组的监听
 //        expandableListView.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
@@ -54,9 +53,9 @@ public class FragmentClientLob extends Fragment {
         expandableListView.setOnGroupExpandListener(new ExpandableListView.OnGroupExpandListener() {
             @Override
             public void onGroupExpand(int groupPosition) {
-                int count = new system_ExpandableAdapter().getGroupCount();
-                for(int i = 0;i < count;i++){
-                    if (i!=groupPosition){
+                int count = new clientlob_ExpandableAdapter().getGroupCount();
+                for (int i = 0; i < count; i++) {
+                    if (i != groupPosition) {
                         expandableListView.collapseGroup(i);
                     }
                 }
@@ -67,18 +66,26 @@ public class FragmentClientLob extends Fragment {
     }
 
 
-    public void setMaplistInFragcl(ArrayList<List<Object>> m){
+    public void setMaplistInFragcl(ArrayList<List<Object>> m) {
         maplistInFragcl.clear();
-        maplistInFragcl=m;
-        Log.e("FragSysSETMAP",maplistInFragcl.size()+"");
+        maplistInFragcl = m;
+        Log.e("FragSysSETMAP", maplistInFragcl.size() + "");
         adapter.getMaplist(maplistInFragcl);
-        Log.e("FragSysSET",(expandableListView==null)+" "+new system_ExpandableAdapter().getGroupCount());
-        if(expandableListView!=null){
-            for(int i=0;i<new clientlob_ExpandableAdapter().getGroupCount();i++){
-                expandableListView.collapseGroup(i);}
+        Log.e("FragSysSET", (expandableListView == null) + " " + new system_ExpandableAdapter().getGroupCount());
+        if (expandableListView != null) {
+            for (int i = 0; i < new clientlob_ExpandableAdapter().getGroupCount(); i++) {
+                expandableListView.collapseGroup(i);
+            }
         }
     }
 
+    public void collapse(Fragment frag) {
+        if (expandableListView != null) {
+            for (int i = 0; i < new clientlob_ExpandableAdapter().getGroupCount(); i++) {
+                this.expandableListView.collapseGroup(i);
+            }
+        }
 
+    }
 
 }

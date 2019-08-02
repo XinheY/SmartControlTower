@@ -80,7 +80,7 @@ public class Analysis extends AppCompatActivity {
         } else {
             answerAna = new ArrayList<>();
         }
-        info=(InitializeInfo) getIntent().getSerializableExtra("InitializeInfo");
+        info = (InitializeInfo) getIntent().getSerializableExtra("InitializeInfo");
         setContentView(R.layout.activity_analysis);
         radioGroup = findViewById(R.id.ana_range);
         ld = new LoadingDialog(this);
@@ -99,25 +99,29 @@ public class Analysis extends AppCompatActivity {
         adapter.addFragment(new FragmentISG(), "ISG");
         adapter.addFragment(new FragmentISGLOB(), "ISG(LOB)");
 
+
         vp.setAdapter(adapter);
         tl.setupWithViewPager(vp);
-
 
         /////////////////Table//////////////////////////////////////////////////
         //设置初始值
         if (answerAna.size() != 0) {
-            // setNumber(selectRadioBtn(radioGroup));
+             setNumber(selectRadioBtn(radioGroup));
         } else {
-//            ld = new LoadingDialog(this);
-//            ld.setLoadingText("Loading...").setSuccessText("Success").setFailedText("Failed")
-//                    .closeSuccessAnim().show();
-//            test("EXEC [SP_IDC_EOQ_SUMMARY1] '" + "EoQ" + "','" + "QuarView" + "','" + "FY20Q2" + "','" + "" + "','" + "overall" + "','" + "system" + "','" + "overall" + "','" + "overall" + "','" + "overall" + "','" + "overall" + "','" + "overall" + "'");
-        }
+            ld.show();
+            String sql = "EXEC SP_IDC_EOQ_SNI_CHANGE_ANALYSIS '" + "EoQ" + "','" + "FY20Q2WK12" + "','" + "FY20Q2WK11" + "','" + "Country" + "','" + "Invoice" + "','" + "Sales" + "'";
+            test(sql);
+            }
 
         //////////////////////////////////RadioGroup//////////////////////////////////////
         //K && Unit
         RadioGroup.OnCheckedChangeListener listener = new RadioGroup.OnCheckedChangeListener() {
             public void onCheckedChanged(RadioGroup group, int checkedId) {
+                ((FragmentSystem)adapter.getItem(0)).collapse(adapter.getItem(0));
+                ((FragmentClient)adapter.getItem(1)).collapse(adapter.getItem(1));
+                ((FragmentClientLob)adapter.getItem(2)).collapse(adapter.getItem(2));
+                ((FragmentISG)adapter.getItem(3)).collapse(adapter.getItem(3));
+                ((FragmentISGLOB)adapter.getItem(4)).collapse(adapter.getItem(4));
                 setNumber(selectRadioBtn(radioGroup));
             }
         };
@@ -198,12 +202,12 @@ public class Analysis extends AppCompatActivity {
         ConstructRadio("sources", sources, anaSources, "Sales");
 
         RadioGroup anasv = findViewById(R.id.ana_rg_sv);
-        String[] submitVersion = getResources().getStringArray(R.array.ana_sv);
-        ConstructRadio("sv", submitVersion, anasv, "FY20Q2WK10");
+        String[] submitVersion = ((String[])info.getVersion_addclosing().toArray(new String[info.getVersion().size()]));
+        ConstructRadio("sv", submitVersion, anasv, submitVersion[0]);
 
         RadioGroup anacv = findViewById(R.id.ana_rg_cv);
-        String[] compareVersion = getResources().getStringArray(R.array.ana_cv);
-        ConstructRadio("cv", compareVersion, anacv, "FY20Q2WK9");
+        String[] compareVersion = ((String[])info.getVersion_addclosing().toArray(new String[info.getVersion().size()]));
+        ConstructRadio("cv", compareVersion, anacv, submitVersion[1]);
 
         LinearLayout anagroupby = findViewById(R.id.ana_gb);
         String[] groupby = getResources().getStringArray(R.array.ana_groupby);
@@ -258,9 +262,10 @@ public class Analysis extends AppCompatActivity {
         refresh.setOnClickListener(new View.OnClickListener() {//Refresh的动态监控
             @Override
             public void onClick(View view) {
+                ld = new LoadingDialog(view.getContext());
+                ld.setLoadingText("Loading...").setSuccessText("Success").setFailedText("Failed")
+                        .closeSuccessAnim().show();
                 toggleRightSliding();
-                ld.show();
-                finishAna = 0;
                 String sql = "EXEC SP_IDC_EOQ_SNI_CHANGE_ANALYSIS '" + "EoQ" + "','" + "FY20Q2WK12" + "','" + "FY20Q2WK11" + "','" + "Country" + "','" + "Invoice" + "','" + "Sales" + "'";
                 test(sql);
 
@@ -446,8 +451,8 @@ public class Analysis extends AppCompatActivity {
         Log.e("object", unit);
         int cou = 0;
         for (LinkedHashMap<String, String> a : answerAna) {
-            LinkedHashMap<String,String> b=a;
-            Log.e("a value",a.toString());
+            LinkedHashMap<String, String> b = a;
+            Log.e("a value", a.toString());
 
             Log.e("a value", a.get("COUNTRY") + "");
 
@@ -461,16 +466,16 @@ public class Analysis extends AppCompatActivity {
         maplistSum.add(maplist);
         maplistSum.remove(0);
 
-        ArrayList<List<Object>> maplistSum2=new ArrayList<>();
+        ArrayList<List<Object>> maplistSum2 = new ArrayList<>();
 
         for (int x = 0; x < maplistSum.size(); x++) {
-            List<Object> templist=new ArrayList<>();
+            List<Object> templist = new ArrayList<>();
             for (int h = 0; h < maplistSum.get(x).size(); h++) {
-                LinkedHashMap<String,String> tempmap=new LinkedHashMap<>();
+                LinkedHashMap<String, String> tempmap = new LinkedHashMap<>();
                 for (String string : ((LinkedHashMap<String, String>) maplistSum.get(x).get(h)).keySet()) {
                     String value = ((LinkedHashMap<String, String>) maplistSum.get(x).get(h)).get(string);
                     value = value.replace("_", "");
-                    if (value.contains("N")&&!string.equals("COUNTRY")) {
+                    if (value.contains("N") && !string.equals("COUNTRY")) {
                         value = value.replace("N", "");
                     }
                     value = value.replace("SI-Y", "");
@@ -483,7 +488,6 @@ public class Analysis extends AppCompatActivity {
                             value = String.format("%.1f", dou);
                         }
                     }
-                    Log.e("value",value);
                     ((LinkedHashMap<String, String>) tempmap).put(string, value);
                 }
                 templist.add(tempmap);

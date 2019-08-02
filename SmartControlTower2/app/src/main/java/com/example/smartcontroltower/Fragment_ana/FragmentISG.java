@@ -25,13 +25,12 @@ public class FragmentISG extends Fragment {
     private ISG_ExpandableAdapter adapter = new ISG_ExpandableAdapter();
 
 
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.isg_fragment, container, false);
 
-        expandableListView = (ExpandableListView)view.findViewById(R.id.isg_expand_list);
+        expandableListView = (ExpandableListView) view.findViewById(R.id.isg_expand_list);
         expandableListView.setAdapter(new ISG_ExpandableAdapter());
 //        //设置分组的监听
 //        expandableListView.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
@@ -54,9 +53,9 @@ public class FragmentISG extends Fragment {
         expandableListView.setOnGroupExpandListener(new ExpandableListView.OnGroupExpandListener() {
             @Override
             public void onGroupExpand(int groupPosition) {
-                int count = new system_ExpandableAdapter().getGroupCount();
-                for(int i = 0;i < count;i++){
-                    if (i!=groupPosition){
+                int count = new ISG_ExpandableAdapter().getGroupCount();
+                for (int i = 0; i < count; i++) {
+                    if (i != groupPosition) {
                         expandableListView.collapseGroup(i);
                     }
                 }
@@ -67,17 +66,23 @@ public class FragmentISG extends Fragment {
     }
 
 
-
-    public void setMaplistInFragIsg(ArrayList<List<Object>> m){
+    public void setMaplistInFragIsg(ArrayList<List<Object>> m) {
         maplistInFragIsg.clear();
-        maplistInFragIsg=m;
-        Log.e("FragSysSETMAP",maplistInFragIsg.size()+"");
+        maplistInFragIsg = m;
+        Log.e("FragSysSETMAP", maplistInFragIsg.size() + "");
         adapter.getMaplist(maplistInFragIsg);
-        if(expandableListView!=null){
-            for(int i=0;i<new ISG_ExpandableAdapter().getGroupCount();i++){
-                expandableListView.collapseGroup(i);}
+        if (expandableListView != null) {
+            for (int i = 0; i < new ISG_ExpandableAdapter().getGroupCount(); i++) {
+                expandableListView.collapseGroup(i);
+            }
         }
     }
 
-
+    public void collapse(Fragment frag) {
+        if(expandableListView!=null){
+            for (int i = 0; i < new ISG_ExpandableAdapter().getGroupCount(); i++) {
+                expandableListView.collapseGroup(i);
+            }
+        }
+    }
 }

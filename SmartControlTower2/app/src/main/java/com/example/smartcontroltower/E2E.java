@@ -242,7 +242,7 @@ public class E2E extends AppCompatActivity {
 
         LinearLayout e2eyq = findViewById(R.id.e2e_yq);
         String[] yq = ((String[])info.getVersion_year_quar().toArray(new String[info.getVersion_year_quar().size()]));
-        ConstructCheck("yq", yq, e2eyq, "FY20Q2");
+        ConstructCheck("yq", yq, e2eyq, yq[0]);
 
         LinearLayout e2elob = findViewById(R.id.e2e_lob);
         String[] lob = getResources().getStringArray(R.array.Lob);
