@@ -331,4 +331,36 @@
         <item>CLIENT</item>
         <item>ISG</item>
     </string-array>
+
+    <string-array name="year">
+        <item>---</item>
+        <item>FY19</item>
+        <item>FY20</item>
+        <item>FY21</item>
+    </string-array>
+
+    <string-array name="quar">
+        <item>---</item>
+        <item>Q1</item>
+        <item>Q2</item>
+        <item>Q3</item>
+        <item>Q4</item>
+    </string-array>
+
+    <string-array name="week">
+        <item>---</item>
+        <item>WK1</item>
+        <item>WK2</item>
+        <item>WK3</item>
+        <item>WK4</item>
+        <item>WK5</item>
+        <item>WK6</item>
+        <item>WK7</item>
+        <item>WK8</item>
+        <item>WK9</item>
+        <item>WK10</item>
+        <item>WK11</item>
+        <item>WK12</item>
+        <item>WK13</item>
+    </string-array>
 </resources>

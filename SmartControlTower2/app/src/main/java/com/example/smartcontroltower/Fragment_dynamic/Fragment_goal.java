@@ -132,17 +132,17 @@ public class Fragment_goal extends Fragment {
                     return 0;
                 }
             });
-        }
-        else{
+        } else {
             tableData = MapTableData.create("", maplist22);
         }
 
-            table.setTableData(tableData);
-            table.invalidate();
-            table.getConfig().setTableTitleStyle(new FontStyle(50, R.color.table_gray));
-            table.getConfig().setColumnTitleBackground(new BaseBackgroundFormat(Color.rgb(115, 135, 156)));
-            table.getConfig().setContentStyle(new FontStyle(40, Color.rgb(115, 135, 156)));
-            table.getConfig().setColumnTitleStyle(new FontStyle(40, Color.WHITE));
+        table.getConfig().setTableTitleStyle(new FontStyle(50, R.color.table_gray));
+        table.getConfig().setColumnTitleBackground(new BaseBackgroundFormat(Color.rgb(115, 135, 156)));
+        table.getConfig().setContentStyle(new FontStyle(45, Color.rgb(115, 135, 156)));
+        table.getConfig().setColumnTitleStyle(new FontStyle(45, Color.WHITE));
+        table.getConfig().setVerticalPadding(10);
+        table.setTableData(tableData);
+        table.invalidate();
 
     }
 

@@ -52,11 +52,11 @@ public class FragmentClient extends Fragment {
     }
 
 
-    public void setMaplistInFragClient(ArrayList<List<Object>> m){
+    public void setMaplistInFragClient(ArrayList<List<Object>> m,int left,int right){
         maplistInFragClient.clear();
         maplistInFragClient=m;
         Log.e("FragClient",maplistInFragClient.size()+"");
-        adapter.inputdata(maplistInFragClient);
+        adapter.inputdata(maplistInFragClient,left,right);
         if(expandableListView!=null){
             for(int i=0;i<new client_ExpandableAdapter().getGroupCount();i++){
                 expandableListView.collapseGroup(i);}

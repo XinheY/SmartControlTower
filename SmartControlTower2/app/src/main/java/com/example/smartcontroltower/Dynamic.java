@@ -60,6 +60,7 @@ public class Dynamic extends AppCompatActivity {
     private LoadingDialog ld = null;
     public static SmartTable<Object> table;
     private ViewPagerAdapter adapter;
+    private InitializeInfo info = null;
     private String hour = "";
 
     @Override
@@ -90,6 +91,7 @@ public class Dynamic extends AppCompatActivity {
         tl.setupWithViewPager(vp);
         adapter.notifyDataSetChanged();
 
+        info = (InitializeInfo) getIntent().getSerializableExtra("InitializeInfo");
 ////////////////////////////////////////////left side///////////////////////////////////////////
         drawerl = findViewById(R.id.dyn_drawer);
         ActionBar actionb = getSupportActionBar();
@@ -111,6 +113,9 @@ public class Dynamic extends AppCompatActivity {
                 switch (menuItem.getItemId()) {
                     case R.id.nav_E2E:
                         Intent intent2 = new Intent(Dynamic.this, E2E.class);
+                        Bundle bundle2 = new Bundle();
+                        bundle2.putSerializable("InitializeInfo", info);
+                        intent2.putExtras(bundle2);
                         startActivity(intent2);
                         finish();
                         break;
@@ -118,11 +123,17 @@ public class Dynamic extends AppCompatActivity {
                         break;
                     case R.id.nav_DirectBL:
                         Intent intent4 = new Intent(Dynamic.this, DirectBL.class);
+                        Bundle bundle4 = new Bundle();
+                        bundle4.putSerializable("InitializeInfo", info);
+                        intent4.putExtras(bundle4);
                         startActivity(intent4);
                         finish();
                         break;
                     case R.id.nav_analysis:
                         Intent intent3 = new Intent(Dynamic.this, Analysis.class);
+                        Bundle bundle3 = new Bundle();
+                        bundle3.putSerializable("InitializeInfo", info);
+                        intent3.putExtras(bundle3);
                         startActivity(intent3);
                         finish();
                         break;

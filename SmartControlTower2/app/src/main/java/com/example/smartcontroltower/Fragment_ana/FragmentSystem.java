@@ -49,13 +49,11 @@ public class FragmentSystem extends Fragment {
         return view;
     }
 
-    public void setMaplistInFragSys(ArrayList<List<Object>> m) {
+    public void setMaplistInFragSys(ArrayList<List<Object>> m,int left,int right) {
         maplistInFragSys.clear();
         maplistInFragSys = m;
-        Log.e("FragSysSETMAP", maplistInFragSys.size() + "");
-        adapter.getMaplist(maplistInFragSys);
-        Log.e("setMapFragSys", (expandableListView == null) + " " + new system_ExpandableAdapter().getGroupCount());
-    }
+        adapter.getMaplist(maplistInFragSys,left,right);
+        }
 
     public void collapse(Fragment frag) {
         if(expandableListView!=null) {

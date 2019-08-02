@@ -46,22 +46,22 @@
                 android:orientation="horizontal">
 
                 <RadioButton
-                    android:id="@+id/ana_k"
+                    android:id="@+id/ana_unit"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginRight="10dp"
                     android:drawablePadding="8dp"
-                    android:text="K"
+                    android:text="Unit"
                     android:textColor="@color/white"
                     android:textSize="18sp" />
 
                 <RadioButton
-                    android:id="@+id/ana_unit"
+                    android:id="@+id/ana_k"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="10dp"
                     android:checked="true"
-                    android:text="Unit"
+                    android:text="K"
                     android:textColor="@color/white"
                     android:textSize="18sp" />
 

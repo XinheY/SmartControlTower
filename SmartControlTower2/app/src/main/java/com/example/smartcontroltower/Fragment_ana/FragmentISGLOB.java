@@ -48,11 +48,11 @@ public class FragmentISGLOB extends Fragment {
         return view;
     }
 
-    public void setMaplistInFragIsg(ArrayList<List<Object>> m) {
+    public void setMaplistInFragIsg(ArrayList<List<Object>> m,int left,int right) {
         maplistInDragIsgLob.clear();
         maplistInDragIsgLob = m;
         Log.e("FragSysSETMAP", maplistInDragIsgLob.size() + "");
-        adapter.getMaplist(maplistInDragIsgLob);
+        adapter.getMaplist(maplistInDragIsgLob,left,right);
         if (expandableListView != null) {
             for (int i = 0; i < new ISGLOB_ExpandableAdapter().getGroupCount(); i++) {
                 expandableListView.collapseGroup(i);

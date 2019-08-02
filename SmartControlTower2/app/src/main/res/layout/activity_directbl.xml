@@ -2,72 +2,129 @@
 <androidx.drawerlayout.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/sni_drawer"
+    android:id="@+id/dir_drawer"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/welcome_bg"
+    android:background="@color/table_back"
     tools:context=".E2E">
 
-    <RelativeLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
         <androidx.appcompat.widget.Toolbar
-            android:id="@+id/sni_toolbar"
+            android:id="@+id/dir_toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:layout_alignParentStart="true"
-            android:background="@null"
-            app:title="@string/app_name"
             android:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+            app:title="@string/app_name">
 
             <Button
-                android:id="@+id/sni_search"
+                android:id="@+id/dir_search"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
-                android:background="@drawable/control"
-
                 android:layout_gravity="end"
-                android:layout_marginRight="10dp"/>
+                android:layout_marginRight="10dp"
+                android:background="@drawable/control" />
 
         </androidx.appcompat.widget.Toolbar>
 
-        <TextView
-            android:id="@+id/sni_welcome"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_centerInParent="true"
-            android:layout_marginLeft="10dp"
-            android:layout_marginBottom="10dp"
-            android:fontFamily="sans-serif"
-            android:text="SNI,"
-            android:textColor="@color/white"
-            android:textSize="50sp"
-            android:textStyle="italic|bold" />
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/sni_welcome"
-            android:layout_alignParentRight="true"
-            android:layout_marginRight="10dp"
-            android:text="ASIA-PACIFIC/Xinhe_Yang"
-            android:textColor="@color/white"
-            android:textSize="25sp" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
 
-    </RelativeLayout>
+                <Button
+                    android:id="@+id/dir_b1"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:layout_margin="2dp"
+                    android:background="@drawable/btn_inlist"
+                    android:onClick="showMutilAlertDialog"
+                    android:text="Overall"
+                    android:textColor="@color/white"
+                    android:textSize="17dp" />
+
+                <com.example.smartcontroltower.MySmartTable
+                    android:id="@+id/dir_table1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/white" />
+
+                <Button
+                    android:id="@+id/dir_b2"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:layout_margin="2dp"
+                    android:background="@drawable/btn_inlist"
+                    android:onClick="showMutilAlertDialog"
+                    android:text="ISG Backlog Break down"
+                    android:textColor="@color/white"
+                    android:textSize="17dp" />
+
+                <com.example.smartcontroltower.MySmartTable
+                    android:id="@+id/dir_table2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/white"
+                    android:visibility="gone" />
+
+                <Button
+                    android:id="@+id/dir_b3"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:layout_margin="2dp"
+                    android:background="@drawable/btn_inlist"
+                    android:onClick="showMutilAlertDialog"
+                    android:text="Client Backlog Break down"
+                    android:textColor="@color/white"
+                    android:textSize="17dp" />
+
+                <com.example.smartcontroltower.MySmartTable
+                    android:id="@+id/dir_table3"
+                    android:layout_width="match_parent"
+                    android:layout_height="350dp"
+                    android:background="@color/white"
+                    android:visibility="gone" />
+
+                <Button
+                    android:id="@+id/dir_b4"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:layout_margin="2dp"
+                    android:background="@drawable/btn_inlist"
+                    android:onClick="showMutilAlertDialog"
+                    android:text="Direct backlog break down"
+                    android:textColor="@color/white"
+                    android:textSize="17dp" />
+
+                <com.example.smartcontroltower.MySmartTable
+                    android:id="@+id/dir_table4"
+                    android:layout_width="match_parent"
+                    android:layout_height="500dp"
+                    android:background="@color/white"
+                    android:visibility="gone" />
+
+            </LinearLayout>
+        </ScrollView>
+    </LinearLayout>
 
     <com.google.android.material.navigation.NavigationView
-        android:id="@+id/sni_view"
+        android:id="@+id/dir_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="start"
-        app:theme="@style/NavigationDrawerStyle"
-        app:headerLayout="@layout/nav_header"
         android:background="@color/table_back"
-        app:menu="@menu/nav_menu" />
+        app:headerLayout="@layout/nav_header"
+        app:menu="@menu/nav_menu"
+        app:theme="@style/NavigationDrawerStyle" />
 
     <include
         android:id="@+id/right_drawer"

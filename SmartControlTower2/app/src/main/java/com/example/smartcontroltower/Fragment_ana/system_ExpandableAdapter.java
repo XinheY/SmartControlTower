@@ -1,6 +1,7 @@
 package com.example.smartcontroltower.Fragment_ana;
 
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,21 +14,18 @@ import com.bin.david.form.data.column.Column;
 import com.bin.david.form.data.format.bg.BaseBackgroundFormat;
 import com.bin.david.form.data.style.FontStyle;
 import com.bin.david.form.data.table.MapTableData;
-import com.bin.david.form.data.table.TableData;
 import com.example.smartcontroltower.MySmartTable;
 import com.example.smartcontroltower.R;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 public class system_ExpandableAdapter extends BaseExpandableListAdapter {
     private static ArrayList<SmartTable<Object>> tables = new ArrayList<>();
     public String[] groupString = {"OVERALL", "CLIENT", "ISG"};
     private static ArrayList<List<Object>> maplistInSysExp = new ArrayList<>();
+    private static int left = 0;
+    private static int right = 0;
 
 
     @Override
@@ -113,35 +111,57 @@ public class system_ExpandableAdapter extends BaseExpandableListAdapter {
     @Override
     public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
         ChildViewHolder childViewHolder;
-        Log.e("mapSize1", maplistInSysExp.size() + "");
-        Log.e("Expan", "getChildView");
         convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.child_item, parent, false);
         MySmartTable<Object> table = (MySmartTable<Object>) convertView.findViewById(R.id.ana_table);
         convertView.setTag(table);
         if (maplistInSysExp.size() != 0) {
-            Log.e("SE",groupPosition+"::");
             MapTableData tableData = null;
             if (groupPosition == 0) {
+                //List<Object> temp1 = maplistInSysExp.get(0).subList(left - 1, right - 1);
+                //List<Object> temp2 = maplistInSysExp.get(0).subList()
                 tableData = MapTableData.create("", maplistInSysExp.get(0));
+                List<Column> list4one=new ArrayList<>();
+                list4one.add(tableData.getColumns().get(0));
+                list4one.addAll(tableData.getColumns().subList(left,right+1));
+                list4one.addAll(tableData.getColumns().subList(15+left,16+right));
+                list4one.addAll(tableData.getColumns().subList(30+left,31+right));
+                tableData.setColumns(list4one);
+
+
             } else if (groupPosition == 1) {
                 tableData = MapTableData.create("", maplistInSysExp.get(1));
+                List<Column> list4two=new ArrayList<>();
+                list4two.add(tableData.getColumns().get(1));
+                list4two.addAll(tableData.getColumns().subList(left,right+1));
+                list4two.addAll(tableData.getColumns().subList(15+left,16+right));
+                list4two.addAll(tableData.getColumns().subList(30+left,31+right));
+                tableData.setColumns(list4two);
             } else {
                 tableData = MapTableData.create("", maplistInSysExp.get(2));
+                List<Column> list4third=new ArrayList<>();
+                list4third.add(tableData.getColumns().get(1));
+                list4third.addAll(tableData.getColumns().subList(left,right+1));
+                list4third.addAll(tableData.getColumns().subList(15+left,16+right));
+                list4third.addAll(tableData.getColumns().subList(30+left,31+right));
+                tableData.setColumns(list4third);
             }
 
 
             table.getConfig().setFixedTitle(true);
             tableData.getColumns().get(0).setFixed(true);
+            tableData.getColumns().get(0).setTextAlign(Paint.Align.LEFT);
             table.setZoom(true, 2, 1);
             table.getConfig().setShowXSequence(false);
             table.getConfig().setShowYSequence(false);
 //设置数据
-            table.setTableData(tableData);
-            table.invalidate();
+
             table.getConfig().setTableTitleStyle(new FontStyle(50, convertView.getResources().getColor(R.color.table_gray)));
             table.getConfig().setColumnTitleBackground(new BaseBackgroundFormat(convertView.getResources().getColor(R.color.table_gray)));
             table.getConfig().setContentStyle(new FontStyle(40, convertView.getResources().getColor(R.color.table_gray)));
             table.getConfig().setColumnTitleStyle(new FontStyle(40, convertView.getResources().getColor(R.color.white)));
+            table.getConfig().setVerticalPadding(10);
+            table.setTableData(tableData);
+            table.invalidate();
         }
 
 
@@ -164,9 +184,11 @@ public class system_ExpandableAdapter extends BaseExpandableListAdapter {
 
     }
 
-    public void getMaplist(ArrayList<List<Object>> m) {
+    public void getMaplist(ArrayList<List<Object>> m, int left, int right) {
         maplistInSysExp.clear();
         maplistInSysExp = m;
-        Log.e("SEgetmap", maplistInSysExp.size() + "");
+        this.left = left;
+        this.right = right;
+        Log.e("sysExpand", left + " " + right);
     }
 }

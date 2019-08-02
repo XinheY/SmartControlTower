@@ -1,6 +1,119 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/table_back"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/dyn_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:fontFamily="sans-serif"
+        android:gravity="center"
+        android:text="Citical Search"
+        android:textColor="@color/white"
+        android:textSize="30sp"
+        android:textStyle="italic|bold" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <Button
+                android:id="@+id/dir_year_btn"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_margin="10dp"
+                android:background="@drawable/btn_inlist"
+                android:onClick="showMutilAlertDialog"
+                android:text="Year"
+                android:textColor="@color/white"
+                android:textSize="17dp" />
+
+            <LinearLayout
+                android:id="@+id/dir_year"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <RadioGroup
+                    android:id="@+id/dir_rg_year"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                </RadioGroup>
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/dir_qr_btn"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_margin="10dp"
+                android:background="@drawable/btn_inlist"
+                android:onClick="showMutilAlertDialog"
+                android:text="Quar"
+                android:textColor="@color/white"
+                android:textSize="17dp" />
+
+            <LinearLayout
+                android:id="@+id/dir_qr"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <RadioGroup
+                    android:id="@+id/dir_rg_qr"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"></RadioGroup>
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/dir_wk_btn"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_margin="10dp"
+                android:background="@drawable/btn_inlist"
+                android:onClick="showMutilAlertDialog"
+                android:text="Week"
+                android:textColor="@color/white"
+                android:textSize="17dp" />
+
+            <LinearLayout
+                android:id="@+id/dir_wk"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <RadioGroup
+                    android:id="@+id/dir_rg_wk"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"></RadioGroup>
+
+            </LinearLayout>
+
+    <Button
+        android:id="@+id/dir_refresh"
+        android:layout_width="120dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="7sp"
+        android:layout_marginBottom="15dp"
+        android:background="@drawable/btn_shape"
+        android:padding="3dp"
+        android:text="Refresh"
+        android:textColor="@color/white"
+        android:textSize="18sp" />
+        </LinearLayout>
+    </ScrollView>
 
 </LinearLayout>

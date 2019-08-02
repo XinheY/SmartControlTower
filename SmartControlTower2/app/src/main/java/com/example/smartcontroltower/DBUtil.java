@@ -83,7 +83,7 @@ public class DBUtil {
         String result = "";
         ArrayList<LinkedHashMap<String, String>> answer = new ArrayList<>();
         try {
-            Connection conn = getSQLConnection("10.82.244.53", "sa", "Dell@2008", "PCWebsite");
+            Connection conn = getSQLConnection("地址，账号，密码，文件夹");
             Statement stmt = conn.createStatement();//
             ResultSet rs = stmt.executeQuery(sql);
             while (rs.next()) {
@@ -133,7 +133,7 @@ public class DBUtil {
                                 && (!"OPTIPLEX_DESKTOPS".equals(nodeName)) && (!"LATITUDE".equals(nodeName)) && (!"PERSONAL_DESKTOPS".equals(nodeName)) && (!"PERSONAL_NOTEBOOKS".equals(nodeName)) && (!"VOSTRO_DESKTOPS".equals(nodeName)) && (!"VOSTRO_NOTEBOOKS".equals(nodeName))
                                 && (!"FIXED_WORKSTATIONS".equals(nodeName)) && (!"MOBILE_WORKSTATIONS".equals(nodeName)) && (!"XPS_DESKTOPS".equals(nodeName)) && (!"XPS_NOTEBOOKS".equals(nodeName)) && (!"CLOUD_CLIENT".equals(nodeName)) && (!"INTERNET_OF_THINGS".equals(nodeName))
                                 && (!"isg_overall".equals(nodeName)) && (!"isg_system".equals(nodeName)) && (!"isg_PowerEdge".equals(nodeName)) && (!"isg_Cloud".equals(nodeName)) && (!"isg_Non_Sys".equals(nodeName)) && (!"isg_storage".equals(nodeName))
-                                && (!"isg_Networking".equals(nodeName)) && (!"isg_hit".equals(nodeName))) {
+                                && (!"isg_Networking".equals(nodeName)) && (!"isg_hit".equals(nodeName))&&(!"result".equals(nodeName))) {
                             String id = xmlPullParser.nextText();
                             if (nodeName.equals("COL_TYPE")) {
                                 nodeName = "Item";

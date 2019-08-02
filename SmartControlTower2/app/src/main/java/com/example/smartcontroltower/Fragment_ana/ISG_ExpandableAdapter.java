@@ -1,6 +1,7 @@
 package com.example.smartcontroltower.Fragment_ana;
 
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,6 +26,7 @@ public class ISG_ExpandableAdapter extends BaseExpandableListAdapter {
     private static ArrayList<SmartTable<Object>> tables=new ArrayList<>();
     public String[] groupString = {"OVERALL", "SYSTEM", "NON-SYS"};
     private static ArrayList<List<Object>> maplistInFragIsg = new ArrayList<>();
+    private static int left,right;
 
     @Override
     // 获取分组的个数
@@ -118,17 +120,27 @@ public class ISG_ExpandableAdapter extends BaseExpandableListAdapter {
             Log.e("SE", groupPosition + "::");
             MapTableData tableData = MapTableData.create("",maplistInFragIsg.get(groupPosition));
 
+            List<Column> list4one=new ArrayList<>();
+            list4one.add(tableData.getColumns().get(0));
+            list4one.addAll(tableData.getColumns().subList(left,right+1));
+            list4one.addAll(tableData.getColumns().subList(15+left,16+right));
+            list4one.addAll(tableData.getColumns().subList(30+left,31+right));
+            tableData.setColumns(list4one);
+
             table.getConfig().setFixedTitle(true);
             tableData.getColumns().get(0).setFixed(true);
+            tableData.getColumns().get(0).setTextAlign(Paint.Align.LEFT);
             table.setZoom(true, 2, 1);
             table.getConfig().setShowXSequence(false);
             table.getConfig().setShowYSequence(false);
-            table.setTableData(tableData);
-            table.invalidate();
+
             table.getConfig().setTableTitleStyle(new FontStyle(50, convertView.getResources().getColor(R.color.table_gray)));
             table.getConfig().setColumnTitleBackground(new BaseBackgroundFormat(convertView.getResources().getColor(R.color.table_gray)));
-            table.getConfig().setContentStyle(new FontStyle(40, convertView.getResources().getColor(R.color.table_gray)));
-            table.getConfig().setColumnTitleStyle(new FontStyle(40, convertView.getResources().getColor(R.color.white)));
+            table.getConfig().setContentStyle(new FontStyle(45, convertView.getResources().getColor(R.color.table_gray)));
+            table.getConfig().setColumnTitleStyle(new FontStyle(45, convertView.getResources().getColor(R.color.white)));
+            table.getConfig().setVerticalPadding(10);
+            table.setTableData(tableData);
+            table.invalidate();
         }
         return convertView;
     }
@@ -148,9 +160,11 @@ public class ISG_ExpandableAdapter extends BaseExpandableListAdapter {
 
     }
 
-    public void getMaplist(ArrayList<List<Object>> m) {
+    public void getMaplist(ArrayList<List<Object>> m,int left,int right) {
         maplistInFragIsg.clear();
         maplistInFragIsg = m;
+        this.left=left;
+        this.right=right;
         Log.e("SEgetmap", maplistInFragIsg.size() + "");
     }
 }

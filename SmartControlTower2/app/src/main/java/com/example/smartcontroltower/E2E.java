@@ -559,12 +559,13 @@ public class E2E extends AppCompatActivity {
             table.setZoom(true, 2, 1);
             table.getConfig().setShowXSequence(false);
             table.getConfig().setShowYSequence(false);
-            table.setTableData(tableData);
-            table.invalidate();
             table.getConfig().setTableTitleStyle(new FontStyle(50, getResources().getColor(R.color.table_gray)));
             table.getConfig().setColumnTitleBackground(new BaseBackgroundFormat(getResources().getColor(R.color.table_gray)));
-            table.getConfig().setContentStyle(new FontStyle(40, getResources().getColor(R.color.table_gray)));
-            table.getConfig().setColumnTitleStyle(new FontStyle(40, getResources().getColor(R.color.white)));
+            table.getConfig().setContentStyle(new FontStyle(45, getResources().getColor(R.color.table_gray)));
+            table.getConfig().setColumnTitleStyle(new FontStyle(45, getResources().getColor(R.color.white)));
+            table.getConfig().setVerticalPadding(10);
+            table.setTableData(tableData);
+            table.invalidate();
         }
     }
 

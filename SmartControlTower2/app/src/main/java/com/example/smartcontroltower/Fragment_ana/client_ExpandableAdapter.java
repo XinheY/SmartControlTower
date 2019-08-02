@@ -1,6 +1,7 @@
 package com.example.smartcontroltower.Fragment_ana;
 
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,6 +28,7 @@ public class client_ExpandableAdapter extends BaseExpandableListAdapter {
     private static ArrayList<List<Object>> maplistInCliExp=new ArrayList<>();
     public String[] groupString = {"OVERALL", "CONSUMER", "COMMERCIAL","WORKSTATION","ALIENWARE",
             "LAT/OPT","PERSONAL VOSTRO","XPS_DT_NB","CLOUD CLIENT","CHROME"};
+    private static int left,right;
 
 
     @Override
@@ -121,19 +123,28 @@ public class client_ExpandableAdapter extends BaseExpandableListAdapter {
 
             MapTableData tableData=MapTableData.create("",maplistInCliExp.get(groupPosition));
 
+            List<Column> list4one=new ArrayList<>();
+            list4one.add(tableData.getColumns().get(0));
+            list4one.addAll(tableData.getColumns().subList(left,right+1));
+            list4one.addAll(tableData.getColumns().subList(15+left,16+right));
+            list4one.addAll(tableData.getColumns().subList(30+left,31+right));
+            tableData.setColumns(list4one);
 
             table.getConfig().setFixedTitle(true);
             tableData.getColumns().get(0).setFixed(true);
+            tableData.getColumns().get(0).setTextAlign(Paint.Align.LEFT);
             table.setZoom(true, 2, 1);
             table.getConfig().setShowXSequence(false);
             table.getConfig().setShowYSequence(false);
 //设置数据
-            table.setTableData(tableData);
-            table.invalidate();
+
             table.getConfig().setTableTitleStyle(new FontStyle(50, convertView.getResources().getColor(R.color.table_gray)));
             table.getConfig().setColumnTitleBackground(new BaseBackgroundFormat(convertView.getResources().getColor(R.color.table_gray)));
-            table.getConfig().setContentStyle(new FontStyle(40, convertView.getResources().getColor(R.color.table_gray)));
-            table.getConfig().setColumnTitleStyle(new FontStyle(40, convertView.getResources().getColor(R.color.white)));
+            table.getConfig().setContentStyle(new FontStyle(45, convertView.getResources().getColor(R.color.table_gray)));
+            table.getConfig().setColumnTitleStyle(new FontStyle(45, convertView.getResources().getColor(R.color.white)));
+            table.getConfig().setVerticalPadding(10);
+            table.setTableData(tableData);
+            table.invalidate();
         }
         return convertView;
     }
@@ -153,8 +164,10 @@ public class client_ExpandableAdapter extends BaseExpandableListAdapter {
 
     }
 
-    public void inputdata(ArrayList<List<Object>> maplist){
+    public void inputdata(ArrayList<List<Object>> maplist,int left,int right){
         this.maplistInCliExp=null;
         this.maplistInCliExp=maplist;
+        this.left=left;
+        this.right=right;
     }
 }

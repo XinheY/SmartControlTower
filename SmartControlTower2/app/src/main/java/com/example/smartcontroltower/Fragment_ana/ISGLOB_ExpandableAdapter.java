@@ -1,6 +1,7 @@
 package com.example.smartcontroltower.Fragment_ana;
 
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,9 +23,10 @@ import java.util.List;
 import java.util.Map;
 
 public class ISGLOB_ExpandableAdapter extends BaseExpandableListAdapter {
-    private static ArrayList<SmartTable<Object>> tables=new ArrayList<>();
-    public String[] groupString = {"POWEREDGE", "CLOUD", "STORAGE","NETWORKING","Hyperconverged Infras Trans"};
+    private static ArrayList<SmartTable<Object>> tables = new ArrayList<>();
+    public String[] groupString = {"POWEREDGE", "CLOUD", "STORAGE", "NETWORKING", "Hyperconverged Infras Trans"};
     private static ArrayList<List<Object>> maplistInIsgLob = new ArrayList<>();
+    private static int left, right;
 
     @Override
     // 获取分组的个数
@@ -67,42 +69,42 @@ public class ISGLOB_ExpandableAdapter extends BaseExpandableListAdapter {
     public boolean hasStableIds() {
         return true;
     }
+
     /**
-     *
      * 获取显示指定组的视图对象
      *
      * @param groupPosition 组位置
-     * @param isExpanded 该组是展开状态还是伸缩状态
-     * @param convertView 重用已有的视图对象
-     * @param parent 返回的视图对象始终依附于的视图组
+     * @param isExpanded    该组是展开状态还是伸缩状态
+     * @param convertView   重用已有的视图对象
+     * @param parent        返回的视图对象始终依附于的视图组
      */
 // 获取显示指定分组的视图
     @Override
     public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
         GroupViewHolder groupViewHolder;
-        if (convertView == null){
-            convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.parent_item,parent,false);
+        if (convertView == null) {
+            convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.parent_item, parent, false);
             groupViewHolder = new GroupViewHolder();
-            groupViewHolder.tvTitle = (TextView)convertView.findViewById(R.id.label_group_normal);
+            groupViewHolder.tvTitle = (TextView) convertView.findViewById(R.id.label_group_normal);
             convertView.setTag(groupViewHolder);
-        }else {
-            groupViewHolder = (GroupViewHolder)convertView.getTag();
+        } else {
+            groupViewHolder = (GroupViewHolder) convertView.getTag();
         }
         groupViewHolder.tvTitle.setText(groupString[groupPosition]);
         return convertView;
     }
+
     /**
-     *
      * 获取一个视图对象，显示指定组中的指定子元素数据。
      *
      * @param groupPosition 组位置
      * @param childPosition 子元素位置
-     * @param isLastChild 子元素是否处于组中的最后一个
-     * @param convertView 重用已有的视图(View)对象
-     * @param parent 返回的视图(View)对象始终依附于的视图组
+     * @param isLastChild   子元素是否处于组中的最后一个
+     * @param convertView   重用已有的视图(View)对象
+     * @param parent        返回的视图(View)对象始终依附于的视图组
      * @return
      * @see android.widget.ExpandableListAdapter#getChildView(int, int, boolean, android.view.View,
-     *      android.view.ViewGroup)
+     * android.view.ViewGroup)
      */
 
     //取得显示给定分组给定子位置的数据用的视图
@@ -115,21 +117,30 @@ public class ISGLOB_ExpandableAdapter extends BaseExpandableListAdapter {
         MySmartTable<Object> table = (MySmartTable<Object>) convertView.findViewById(R.id.ana_table);
         convertView.setTag(table);
         if (maplistInIsgLob.size() != 0) {
-            MapTableData tableData = MapTableData.create("",maplistInIsgLob.get(groupPosition));
+            MapTableData tableData = MapTableData.create("", maplistInIsgLob.get(groupPosition));
+
+            List<Column> list4one = new ArrayList<>();
+            list4one.add(tableData.getColumns().get(0));
+            list4one.addAll(tableData.getColumns().subList(left, right + 1));
+            list4one.addAll(tableData.getColumns().subList(15 + left, 16 + right));
+            list4one.addAll(tableData.getColumns().subList(30 + left, 31 + right));
+            tableData.setColumns(list4one);
 
             table.getConfig().setFixedTitle(true);
             tableData.getColumns().get(0).setFixed(true);
+            tableData.getColumns().get(0).setTextAlign(Paint.Align.LEFT);
             table.setZoom(true, 2, 1);
             table.getConfig().setShowXSequence(false);
             table.getConfig().setShowYSequence(false);
-            table.setTableData(tableData);
-            table.invalidate();
+
             table.getConfig().setTableTitleStyle(new FontStyle(50, convertView.getResources().getColor(R.color.table_gray)));
             table.getConfig().setColumnTitleBackground(new BaseBackgroundFormat(convertView.getResources().getColor(R.color.table_gray)));
-            table.getConfig().setContentStyle(new FontStyle(40, convertView.getResources().getColor(R.color.table_gray)));
-            table.getConfig().setColumnTitleStyle(new FontStyle(40, convertView.getResources().getColor(R.color.white)));
+            table.getConfig().setContentStyle(new FontStyle(45, convertView.getResources().getColor(R.color.table_gray)));
+            table.getConfig().setColumnTitleStyle(new FontStyle(45, convertView.getResources().getColor(R.color.white)));
+            table.getConfig().setVerticalPadding(10);
+            table.setTableData(tableData);
+            table.invalidate();
         }
-        //childViewHolder.tvTitle.setText(childString[groupPosition][childPosition]);
         return convertView;
     }
 
@@ -148,8 +159,10 @@ public class ISGLOB_ExpandableAdapter extends BaseExpandableListAdapter {
 
     }
 
-    public void getMaplist(ArrayList<List<Object>> m) {
+    public void getMaplist(ArrayList<List<Object>> m, int left, int right) {
         maplistInIsgLob.clear();
         maplistInIsgLob = m;
+        this.left = left;
+        this.right = right;
     }
 }
