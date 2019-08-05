@@ -108,7 +108,7 @@
                 <com.example.smartcontroltower.MySmartTable
                     android:id="@+id/dir_table4"
                     android:layout_width="match_parent"
-                    android:layout_height="500dp"
+                    android:layout_height="420dp"
                     android:background="@color/white"
                     android:visibility="gone" />
 

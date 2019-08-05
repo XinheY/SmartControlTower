@@ -78,7 +78,7 @@ public class DBUtil4Initial {
         String result = "";
         ArrayList<LinkedHashMap<String, String>> answer = new ArrayList<>();
         try {
-            Connection conn = getSQLConnection("地址，账号，密码，文件夹");
+            Connection conn = getSQLConnection("10.82.244.53", "sa", "Dell@2008", "PCWebsite");
             Statement stmt = conn.createStatement();//
             ResultSet rs = stmt.executeQuery(sql);
             while (rs.next()) {

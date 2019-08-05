@@ -222,13 +222,11 @@ public class DirectBL extends AppCompatActivity {
                 RadioButton w = findViewById(dirweek.getCheckedRadioButtonId());
                 Log.e("y/q/w", y.getText() + "/" + q.getText() + "/" + w.getText());
                 if (!y.getText().toString().equals("---") && !q.getText().toString().equals("---") && !w.getText().toString().equals("---")) {
-                    ld.show();
                     test("EXEC [SP_CTO_DAILY_REPORT] '" + y.getText().toString().replace("FY", "") +
                             "','" + q.getText().toString() + "','" + w.getText().toString().replace("WK", "") + "'");
                     Log.e("Notice", y.getText().toString().replace("FY", "") +
                             " " + q.getText().toString() + " " + w.getText().toString().replace("WK", ""));
                 } else if (y.getText().toString().equals("---") && q.getText().toString().equals("---") && w.getText().toString().equals("---")) {
-                    ld.show();
                     test("EXEC [SP_CTO_DAILY_REPORT] '','',''");
                 } else {
                     Toast.makeText(view.getContext(), "Filter Condition Wrong", Toast.LENGTH_SHORT).show();
@@ -369,7 +367,7 @@ public class DirectBL extends AppCompatActivity {
             switch (msg.what) {
                 case 1001:
                     String str = msg.getData().getString("result");
-                    ld.loadSuccess();
+                    // ld.loadSuccess();
                     break;
                 default:
                     break;
@@ -419,9 +417,9 @@ public class DirectBL extends AppCompatActivity {
 
         //表格数据 datas 是需要填充的数据
         List<Object> list = new ArrayList<>();
-        final int[][] ColorGrid = new int[5][24];
+        final int[][] ColorGrid = new int[5][25];
         for (int x = 0; x < 5; x++) {
-            for (int y = 0; y < 24; y++) {
+            for (int y = 0; y < 25; y++) {
                 ColorGrid[x][y] = 0;
             }
         }
@@ -517,12 +515,12 @@ public class DirectBL extends AppCompatActivity {
                 }
             }
         }
-        for(int xx=0;xx<5;xx++){
-            for(int yy=0;yy<24;yy++){
-                System.out.print(ColorGrid[xx][yy]+" ");
-            }
-            System.out.println();
-        }
+//        for(int xx=0;xx<5;xx++){
+//            for(int yy=0;yy<24;yy++){
+//                System.out.print(ColorGrid[xx][yy]+" ");
+//            }
+//            System.out.println();
+//        }
 
         TableData tableData = new TableData<>("ISG Backlog Break down", list, TitleC, group1, group2, group3, group4, group5, group6, group7, group8);
         table1.getConfig().setFixedTitle(true);
@@ -532,22 +530,22 @@ public class DirectBL extends AppCompatActivity {
         table1.getConfig().setShowYSequence(false);
         table1.getConfig().setTableTitleStyle(new FontStyle(50, Color.rgb(115, 135, 156)));
         table1.getConfig().setColumnTitleBackground(new BaseBackgroundFormat(Color.rgb(115, 135, 156)));
-        table1.getConfig().setContentStyle(new FontStyle(45, Color.rgb(115, 135, 156)));
+        table1.getConfig().setContentStyle(new FontStyle(45, Color.BLACK));
         table1.getConfig().setVerticalPadding(40);
         table1.getConfig().setColumnTitleStyle(new FontStyle(45, Color.WHITE));
 
         table1.getConfig().setContentCellBackgroundFormat(new ICellBackgroundFormat<CellInfo>() {
             @Override
             public void drawBackground(Canvas canvas, Rect rect, CellInfo cellInfo, Paint paint) {
+                Log.e("位置", cellInfo.row + "," + cellInfo.col);
                 if ((cellInfo.col % 3 == 2 || cellInfo.col % 3 == 0) && cellInfo.col != 0) {
                     paint.setColor(Color.GREEN);
                     canvas.drawRect(rect, paint);
                 }
-                if(ColorGrid[cellInfo.row][cellInfo.col]==2){
+                if (ColorGrid[cellInfo.row][cellInfo.col] == 2) {
                     paint.setColor(Color.RED);
                     canvas.drawRect(rect, paint);
-                }
-                else if(ColorGrid[cellInfo.row][cellInfo.col]==1){
+                } else if (ColorGrid[cellInfo.row][cellInfo.col] == 1) {
                     paint.setColor(Color.YELLOW);
                     canvas.drawRect(rect, paint);
                 }
@@ -571,6 +569,13 @@ public class DirectBL extends AppCompatActivity {
 
         //表格数据 datas 是需要填充的数据
         List<Object> list = new ArrayList<>();
+        final int[][] ColorGrid2 = new int[12][26];
+        for (int x = 0; x < 12; x++) {
+            for (int y = 0; y < 26; y++) {
+                ColorGrid2[x][y] = 0;
+            }
+        }
+
         String[] title1 = {"OPR", "STBL", "E-Mgt/EOL", "Invalid", "APCC", "CCC", "ICC", "APCC", "CCC", "ICC", "APCC", "CCC", "ICC"};
         String[] title2 = {"Un-\nShippable BL", "MFG BL(Overall)", "MFG BL(System)", "MFG BL(Non - System)"};
         for (int i = 5; i < 17; i++) {
@@ -607,6 +612,33 @@ public class DirectBL extends AppCompatActivity {
             list.add(secondInfo);
         }
         table2.setData(list);
+
+        for (int j = 5; j < 17; j++) {
+            for (int h = 0; h < 8; h++) {
+                if (!answerDir.get(j).get("EBL" + h).equals("-") && !answerDir.get(j).get("EBL_GOAL" + h).equals("-")) {
+                    double ebl = Double.parseDouble(answerDir.get(j).get("EBL" + h));
+                    double eblgoal = Double.parseDouble(answerDir.get(j).get("EBL_GOAL" + h));
+                    if (ebl > eblgoal) {
+                        if (ebl > eblgoal * 1.1) {
+                            ColorGrid2[j - 5][h * 3 + 3] = 2;
+                        } else {
+                            ColorGrid2[j - 5][h * 3 + 3] = 1;
+                        }
+                    }
+                }
+                if (!answerDir.get(j).get("UNIT" + h).equals("-") && !answerDir.get(j).get("UNIT_GOAL" + h).equals("-")) {
+                    double unit = Double.parseDouble(answerDir.get(j).get("UNIT" + h));
+                    double unitgoal = Double.parseDouble(answerDir.get(j).get("UNIT_GOAL" + h));
+                    if (unit > unitgoal) {
+                        if (unit > unitgoal * 1.1) {
+                            ColorGrid2[j - 5][h * 3 + 4] = 2;
+                        } else {
+                            ColorGrid2[j - 5][h * 3 + 4] = 1;
+                        }
+                    }
+                }
+            }
+        }
 
         final Column<String> TitleC = new Column<>("", "Title");
         TitleC.setAutoMerge(true);
@@ -654,9 +686,32 @@ public class DirectBL extends AppCompatActivity {
         table2.getConfig().setShowYSequence(false);
         table2.getConfig().setTableTitleStyle(new FontStyle(50, Color.rgb(115, 135, 156)));
         table2.getConfig().setColumnTitleBackground(new BaseBackgroundFormat(Color.rgb(115, 135, 156)));
-        table2.getConfig().setContentStyle(new FontStyle(45, Color.rgb(115, 135, 156)));
+        table2.getConfig().setContentStyle(new FontStyle(45, Color.BLACK));
         table2.getConfig().setVerticalPadding(40);
         table2.getConfig().setColumnTitleStyle(new FontStyle(45, Color.WHITE));
+
+        table2.getConfig().setContentCellBackgroundFormat(new ICellBackgroundFormat<CellInfo>() {
+            @Override
+            public void drawBackground(Canvas canvas, Rect rect, CellInfo cellInfo, Paint paint) {
+                if ((cellInfo.col % 3 == 0 || cellInfo.col % 3 == 1) && cellInfo.col != 1 && cellInfo.col != 0) {
+                    paint.setColor(Color.GREEN);
+                    canvas.drawRect(rect, paint);
+                }
+                if (ColorGrid2[cellInfo.row][cellInfo.col] == 2) {
+                    paint.setColor(Color.RED);
+                    canvas.drawRect(rect, paint);
+                } else if (ColorGrid2[cellInfo.row][cellInfo.col] == 1) {
+                    paint.setColor(Color.YELLOW);
+                    canvas.drawRect(rect, paint);
+                }
+            }
+
+            @Override
+            public int getTextColor(CellInfo cellInfo) {
+                return 0;
+            }
+        });
+
         table2.setTableData(tableData);
         table2.invalidate();
     }
@@ -666,6 +721,13 @@ public class DirectBL extends AppCompatActivity {
 
         //表格数据 datas 是需要填充的数据
         List<Object> list = new ArrayList<>();
+        final int[][] ColorGrid3 = new int[12][26];
+        for (int x = 0; x < 7; x++) {
+            for (int y = 0; y < 26; y++) {
+                ColorGrid3[x][y] = 0;
+            }
+        }
+
         String[] title1 = {"OPR", "STBL", "E-Mgt/EOL", "Invalid", "APCC", "CCC", "ICC"};
         String[] title2 = {"Un-\nShippable BL", "MFG BL"};
         for (int i = 18; i < 25; i++) {
@@ -700,6 +762,34 @@ public class DirectBL extends AppCompatActivity {
             list.add(firstInfo);
         }
         table3.setData(list);
+
+        for (int j = 18; j <25 ; j++) {
+            Log.e("数据",answerDir.get(j).toString());
+            for (int h = 0; h < 8; h++) {
+                if (!answerDir.get(j).get("EBL" + h).equals("-") && !answerDir.get(j).get("EBL_GOAL" + h).equals("-")) {
+                    double ebl = Double.parseDouble(answerDir.get(j).get("EBL" + h));
+                    double eblgoal = Double.parseDouble(answerDir.get(j).get("EBL_GOAL" + h));
+                    if (ebl > eblgoal) {
+                        if (ebl > eblgoal * 1.1) {
+                            ColorGrid3[j - 18][h * 3 + 3] = 2;
+                        } else {
+                            ColorGrid3[j - 18][h * 3 + 3] = 1;
+                        }
+                    }
+                }
+                if (!answerDir.get(j).get("UNIT" + h).equals("-") && !answerDir.get(j).get("UNIT_GOAL" + h).equals("-")) {
+                    double unit = Double.parseDouble(answerDir.get(j).get("UNIT" + h));
+                    double unitgoal = Double.parseDouble(answerDir.get(j).get("UNIT_GOAL" + h));
+                    if (unit > unitgoal) {
+                        if (unit > unitgoal * 1.1) {
+                            ColorGrid3[j - 18][h * 3 + 4] = 2;
+                        } else {
+                            ColorGrid3[j - 18][h * 3 + 4] = 1;
+                        }
+                    }
+                }
+            }
+        }
 
         final Column<String> TitleC = new Column<>("", "Title");
         TitleC.setAutoMerge(true);
@@ -747,9 +837,32 @@ public class DirectBL extends AppCompatActivity {
         table3.getConfig().setShowYSequence(false);
         table3.getConfig().setTableTitleStyle(new FontStyle(50, Color.rgb(115, 135, 156)));
         table3.getConfig().setColumnTitleBackground(new BaseBackgroundFormat(Color.rgb(115, 135, 156)));
-        table3.getConfig().setContentStyle(new FontStyle(45, Color.rgb(115, 135, 156)));
+        table3.getConfig().setContentStyle(new FontStyle(45, Color.BLACK));
         table3.getConfig().setVerticalPadding(40);
         table3.getConfig().setColumnTitleStyle(new FontStyle(45, Color.WHITE));
+
+        table3.getConfig().setContentCellBackgroundFormat(new ICellBackgroundFormat<CellInfo>() {
+            @Override
+            public void drawBackground(Canvas canvas, Rect rect, CellInfo cellInfo, Paint paint) {
+                if ((cellInfo.col % 3 == 0 || cellInfo.col % 3 == 1) && cellInfo.col != 1 && cellInfo.col != 0) {
+                    paint.setColor(Color.GREEN);
+                    canvas.drawRect(rect, paint);
+                }
+                if (ColorGrid3[cellInfo.row][cellInfo.col] == 2) {
+                    paint.setColor(Color.RED);
+                    canvas.drawRect(rect, paint);
+                } else if (ColorGrid3[cellInfo.row][cellInfo.col] == 1) {
+                    paint.setColor(Color.YELLOW);
+                    canvas.drawRect(rect, paint);
+                }
+            }
+
+            @Override
+            public int getTextColor(CellInfo cellInfo) {
+                return 0;
+            }
+        });
+
         table3.setTableData(tableData);
         table3.invalidate();
     }
@@ -759,6 +872,13 @@ public class DirectBL extends AppCompatActivity {
 
 //        //表格数据 datas 是需要填充的数据
         List<Object> list = new ArrayList<>();
+        final int[][] ColorGrid4 = new int[12][26];
+        for (int x = 0; x < 7; x++) {
+            for (int y = 0; y < 26; y++) {
+                ColorGrid4[x][y] = 0;
+            }
+        }
+
         String[] title1 = {"OPR", "STBL", "E-Mgt/EOL", "GPT", "Illegal", "IT issue", "CL/Re-cut", "EGH", "APCC", "CCC", "ICC", "ODM"};
         String[] title2 = {"Un-\nShippable BL", "MFG BL"};
         for (int i = 25; i < answerDir.size(); i++) {
@@ -793,6 +913,34 @@ public class DirectBL extends AppCompatActivity {
             list.add(firstInfo);
         }
         table4.setData(list);
+
+        for (int j = 25; j <37 ; j++) {
+            Log.e("数据",answerDir.get(j).toString());
+            for (int h = 0; h < 8; h++) {
+                if (!answerDir.get(j).get("EBL" + h).equals("-") && !answerDir.get(j).get("EBL_GOAL" + h).equals("-")) {
+                    double ebl = Double.parseDouble(answerDir.get(j).get("EBL" + h));
+                    double eblgoal = Double.parseDouble(answerDir.get(j).get("EBL_GOAL" + h));
+                    if (ebl > eblgoal) {
+                        if (ebl > eblgoal * 1.1) {
+                            ColorGrid4[j - 25][h * 3 + 3] = 2;
+                        } else {
+                            ColorGrid4[j - 25][h * 3 + 3] = 1;
+                        }
+                    }
+                }
+                if (!answerDir.get(j).get("UNIT" + h).equals("-") && !answerDir.get(j).get("UNIT_GOAL" + h).equals("-")) {
+                    double unit = Double.parseDouble(answerDir.get(j).get("UNIT" + h));
+                    double unitgoal = Double.parseDouble(answerDir.get(j).get("UNIT_GOAL" + h));
+                    if (unit > unitgoal) {
+                        if (unit > unitgoal * 1.1) {
+                            ColorGrid4[j - 25][h * 3 + 4] = 2;
+                        } else {
+                            ColorGrid4[j - 25][h * 3 + 4] = 1;
+                        }
+                    }
+                }
+            }
+        }
 
         final Column<String> TitleC = new Column<>("", "Title");
         TitleC.setAutoMerge(true);
@@ -840,9 +988,32 @@ public class DirectBL extends AppCompatActivity {
         table4.getConfig().setShowYSequence(false);
         table4.getConfig().setTableTitleStyle(new FontStyle(50, Color.rgb(115, 135, 156)));
         table4.getConfig().setColumnTitleBackground(new BaseBackgroundFormat(Color.rgb(115, 135, 156)));
-        table4.getConfig().setContentStyle(new FontStyle(45, Color.rgb(115, 135, 156)));
+        table4.getConfig().setContentStyle(new FontStyle(45, Color.BLACK));
         table4.getConfig().setVerticalPadding(40);
         table4.getConfig().setColumnTitleStyle(new FontStyle(45, Color.WHITE));
+
+        table4.getConfig().setContentCellBackgroundFormat(new ICellBackgroundFormat<CellInfo>() {
+            @Override
+            public void drawBackground(Canvas canvas, Rect rect, CellInfo cellInfo, Paint paint) {
+                if ((cellInfo.col % 3 == 0 || cellInfo.col % 3 == 1) && cellInfo.col != 1 && cellInfo.col != 0) {
+                    paint.setColor(Color.GREEN);
+                    canvas.drawRect(rect, paint);
+                }
+                if (ColorGrid4[cellInfo.row][cellInfo.col] == 2) {
+                    paint.setColor(Color.RED);
+                    canvas.drawRect(rect, paint);
+                } else if (ColorGrid4[cellInfo.row][cellInfo.col] == 1) {
+                    paint.setColor(Color.YELLOW);
+                    canvas.drawRect(rect, paint);
+                }
+            }
+
+            @Override
+            public int getTextColor(CellInfo cellInfo) {
+                return 0;
+            }
+        });
+
         table4.setTableData(tableData);
         table4.invalidate();
     }
