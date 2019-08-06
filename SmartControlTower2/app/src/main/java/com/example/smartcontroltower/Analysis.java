@@ -56,7 +56,7 @@ public class Analysis extends AppCompatActivity {
     private HashMap<String, ArrayList<RadioButton>> radioOld = new LinkedHashMap<>();
     private ArrayList<String> allCondition = new ArrayList<>();
     private ArrayList<String[]> allContent = new ArrayList<>();
-    private ArrayList<LinkedHashMap<String, String>> answerAna;
+    private ArrayList<LinkedHashMap<String,String>> answerAna;
     private LoadingDialog ld;
     private RadioGroup radioGroup;
     private RadioGroup IdcEoq;
@@ -247,6 +247,7 @@ public class Analysis extends AppCompatActivity {
             }
         });
 
+        //范围选择器初始化和监听器
         rsb = findViewById(R.id.rangeseek);
         rsb.setProgress(62f, 92f);
         rsb.setRange(1f, 14f, 0f);
@@ -278,6 +279,7 @@ public class Analysis extends AppCompatActivity {
             }
         });
 ///////////////////////////////Checkbox列表结束////////////////////////////////////
+        //刷新表格（按钮监听器）
         IdcEoq = findViewById(R.id.ana_rg);
         final RadioButton IErb = findViewById(IdcEoq.getCheckedRadioButtonId());
         final RadioButton SVrb = findViewById(anasv.getCheckedRadioButtonId());
@@ -296,11 +298,11 @@ public class Analysis extends AppCompatActivity {
                 boolean canrun = true;
                 for (int i = 0; i < summary.size(); i++) {
                     String oneCondition = "";
-                    HashMap<String, CheckBox> innerMap = summary.get(allCondition.get(i+3));
+                    HashMap<String, CheckBox> innerMap = summary.get(allCondition.get(i + 3));
                     //Log.e("cool",allCondition.toString());
                     int count = 0;
                     for (int j = 0; j < innerMap.size(); j++) {
-                        CheckBox cbc = innerMap.get((allContent.get(i+3))[j]);
+                        CheckBox cbc = innerMap.get((allContent.get(i + 3))[j]);
                         if (cbc.isChecked()) {
                             count++;
                             if (oneCondition.equals("")) {
@@ -312,8 +314,7 @@ public class Analysis extends AppCompatActivity {
                     }
                     if (count == 0 && i > 1) {
                         canrun = false;
-                        //Toast.makeText(Analysis.this, "Blank " + allCondition.get(i), Toast.LENGTH_LONG).show();
-                        ld.closeFailedAnim().loadFailed();
+                       ld.closeFailedAnim().loadFailed();
                         break;
                     }
                     searchSum.add(oneCondition);
@@ -328,8 +329,8 @@ public class Analysis extends AppCompatActivity {
 //                        ld.closeFailedAnim().loadFailed();
 //                    }
 //                }
-                String sql = "EXEC SP_IDC_EOQ_SNI_CHANGE_ANALYSIS '" + IErb.getText() + "','" + SVrb.getText() + "','" + CVrb.getText() + "','" + searchSum.get(0) + "','" + searchSum.get(1) + "','" +Sourb.getText() +"'";
-                Log.e("answer",sql);
+                String sql = "EXEC SP_IDC_EOQ_SNI_CHANGE_ANALYSIS '" + IErb.getText() + "','" + SVrb.getText() + "','" + CVrb.getText() + "','" + searchSum.get(0) + "','" + searchSum.get(1) + "','" + Sourb.getText() + "'";
+                Log.e("answer", sql);
                 test(sql);
 
 
@@ -516,10 +517,14 @@ public class Analysis extends AppCompatActivity {
         int cou = 0;
         for (LinkedHashMap<String, String> a : answerAna) {
             LinkedHashMap<String, String> b = a;
-            if (a.get("COUNTRY").equals("ANZ")) {
+            if ((a.containsKey("COUNTRY") && a.get("COUNTRY").equals("ANZ")) ||
+                    (a.containsKey("SITE") && a.get("SITE").equals("APCC")) ||
+                    (a.containsKey("FACILITY") && a.get("FACILITY").equals("Factory")) ||
+                    (a.containsKey("ORDERTYPE") && a.get("ORDERTYPE").equals("Direct"))) {
                 cou++;
                 maplistSum.add(maplist);
                 maplist = new ArrayList<>();
+
             }
             maplist.add(b);
         }
@@ -535,19 +540,21 @@ public class Analysis extends AppCompatActivity {
                 for (String string : ((LinkedHashMap<String, String>) maplistSum.get(x).get(h)).keySet()) {
                     String value = ((LinkedHashMap<String, String>) maplistSum.get(x).get(h)).get(string);
                     value = value.replace("_", "");
-                    if (value.contains("N") && !string.equals("COUNTRY")) {
+                    if (value.contains("N") && !string.equals("COUNTRY")&& !value.equals("-")&&!string.equals("SITE")&&
+                            !string.equals("FACILITY")&&!string.equals("ORDERTYPE")) {
                         value = value.replace("N", "");
                     }
                     value = value.replace("SI-Y", "");
                     value = value.replace("MFG-Y", "");
                     if (value.equals("0")) value = "-";
-//                    if (unit.equals("K")) {
-//                        if (!string.equals("COUNTRY") && !value.equals("-")) {
-//                            double dou = Double.parseDouble(value);
-//                            dou = dou / 1000;
-//                            value = String.format("%.1f", dou);
-//                        }
-//                    }
+                    if (unit.equals("K")) {
+                        if (!string.equals("COUNTRY") && !value.equals("-")&&!string.equals("SITE")&&
+                        !string.equals("FACILITY")&&!string.equals("ORDERTYPE")) {
+                            double dou = Double.parseDouble(value);
+                            dou = dou / 1000;
+                            value = String.format("%.1f", dou);
+                        }
+                    }
                     ((LinkedHashMap<String, String>) tempmap).put(string, value);
                 }
                 templist.add(tempmap);

@@ -114,6 +114,7 @@ public class system_ExpandableAdapter extends BaseExpandableListAdapter {
         convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.child_item, parent, false);
         MySmartTable<Object> table = (MySmartTable<Object>) convertView.findViewById(R.id.ana_table);
         convertView.setTag(table);
+        Log.e("测试",maplistInSysExp.get(0).toString());
         if (maplistInSysExp.size() != 0) {
             MapTableData tableData = null;
             if (groupPosition == 0) {
@@ -131,7 +132,7 @@ public class system_ExpandableAdapter extends BaseExpandableListAdapter {
             } else if (groupPosition == 1) {
                 tableData = MapTableData.create("", maplistInSysExp.get(1));
                 List<Column> list4two=new ArrayList<>();
-                list4two.add(tableData.getColumns().get(1));
+                list4two.add(tableData.getColumns().get(0));
                 list4two.addAll(tableData.getColumns().subList(left,right+1));
                 list4two.addAll(tableData.getColumns().subList(15+left,16+right));
                 list4two.addAll(tableData.getColumns().subList(30+left,31+right));
@@ -139,7 +140,7 @@ public class system_ExpandableAdapter extends BaseExpandableListAdapter {
             } else {
                 tableData = MapTableData.create("", maplistInSysExp.get(2));
                 List<Column> list4third=new ArrayList<>();
-                list4third.add(tableData.getColumns().get(1));
+                list4third.add(tableData.getColumns().get(0));
                 list4third.addAll(tableData.getColumns().subList(left,right+1));
                 list4third.addAll(tableData.getColumns().subList(15+left,16+right));
                 list4third.addAll(tableData.getColumns().subList(30+left,31+right));
@@ -157,8 +158,8 @@ public class system_ExpandableAdapter extends BaseExpandableListAdapter {
 
             table.getConfig().setTableTitleStyle(new FontStyle(50, convertView.getResources().getColor(R.color.table_gray)));
             table.getConfig().setColumnTitleBackground(new BaseBackgroundFormat(convertView.getResources().getColor(R.color.table_gray)));
-            table.getConfig().setContentStyle(new FontStyle(40, convertView.getResources().getColor(R.color.table_gray)));
-            table.getConfig().setColumnTitleStyle(new FontStyle(40, convertView.getResources().getColor(R.color.white)));
+            table.getConfig().setContentStyle(new FontStyle(45, convertView.getResources().getColor(R.color.table_gray)));
+            table.getConfig().setColumnTitleStyle(new FontStyle(45, convertView.getResources().getColor(R.color.white)));
             table.getConfig().setVerticalPadding(10);
             table.setTableData(tableData);
             table.invalidate();

@@ -489,24 +489,25 @@ public class DirectBL extends AppCompatActivity {
         final Column<String> Unit7 = new Column<>("Unit Act", "UNIT7");
         Column group8 = new Column("Sat", Egoal7, E7, Unit7);
 
-        for (int j = 0; j < 5; j++) {
+        for (int j = 0; j <5 ; j++) {
+            Log.e("数据",answerDir.get(j).toString());
             for (int h = 0; h < 8; h++) {
-                if (!answerDir.get(j).get("EBL" + h).equals("-") && !answerDir.get(j).get("EBL_GOAL" + h).equals("-")
-                        && !answerDir.get(j).get("UNIT" + h).equals("-") && !answerDir.get(j).get("UNIT_GOAL" + h).equals("-")) {
+                if (!answerDir.get(j).get("EBL" + h).equals("-") && !answerDir.get(j).get("EBL_GOAL" + h).equals("-")) {
                     double ebl = Double.parseDouble(answerDir.get(j).get("EBL" + h));
                     double eblgoal = Double.parseDouble(answerDir.get(j).get("EBL_GOAL" + h));
-                    double unit = Double.parseDouble(answerDir.get(j).get("UNIT" + h));
-                    double unitgoal = Double.parseDouble(answerDir.get(j).get("UNIT_GOAL" + h));
-
                     if (ebl > eblgoal) {
-                        if (ebl > eblgoal * 1.1) {
+                        if (ebl > eblgoal * 1.05) {
                             ColorGrid[j][h * 3 + 2] = 2;
                         } else {
                             ColorGrid[j][h * 3 + 2] = 1;
                         }
                     }
+                }
+                if (!answerDir.get(j).get("UNIT" + h).equals("-") && !answerDir.get(j).get("UNIT_GOAL" + h).equals("-")) {
+                    double unit = Double.parseDouble(answerDir.get(j).get("UNIT" + h));
+                    double unitgoal = Double.parseDouble(answerDir.get(j).get("UNIT_GOAL" + h));
                     if (unit > unitgoal) {
-                        if (unit > unitgoal * 1.1) {
+                        if (unit > unitgoal * 1.05) {
                             ColorGrid[j][h * 3 + 3] = 2;
                         } else {
                             ColorGrid[j][h * 3 + 3] = 1;
@@ -515,12 +516,6 @@ public class DirectBL extends AppCompatActivity {
                 }
             }
         }
-//        for(int xx=0;xx<5;xx++){
-//            for(int yy=0;yy<24;yy++){
-//                System.out.print(ColorGrid[xx][yy]+" ");
-//            }
-//            System.out.println();
-//        }
 
         TableData tableData = new TableData<>("ISG Backlog Break down", list, TitleC, group1, group2, group3, group4, group5, group6, group7, group8);
         table1.getConfig().setFixedTitle(true);
@@ -530,8 +525,9 @@ public class DirectBL extends AppCompatActivity {
         table1.getConfig().setShowYSequence(false);
         table1.getConfig().setTableTitleStyle(new FontStyle(50, Color.rgb(115, 135, 156)));
         table1.getConfig().setColumnTitleBackground(new BaseBackgroundFormat(Color.rgb(115, 135, 156)));
-        table1.getConfig().setContentStyle(new FontStyle(45, Color.BLACK));
+        table1.getConfig().setContentStyle(new FontStyle(40, Color.BLACK));
         table1.getConfig().setVerticalPadding(40);
+        table1.getConfig().setHorizontalPadding(2);
         table1.getConfig().setColumnTitleStyle(new FontStyle(45, Color.WHITE));
 
         table1.getConfig().setContentCellBackgroundFormat(new ICellBackgroundFormat<CellInfo>() {
@@ -553,9 +549,6 @@ public class DirectBL extends AppCompatActivity {
 
             @Override
             public int getTextColor(CellInfo cellInfo) {
-//                if (cellInfo.row % 4 == 2) {
-//                    return Color.WHITE;
-//                }
                 return 0;
             }
         });
@@ -619,7 +612,7 @@ public class DirectBL extends AppCompatActivity {
                     double ebl = Double.parseDouble(answerDir.get(j).get("EBL" + h));
                     double eblgoal = Double.parseDouble(answerDir.get(j).get("EBL_GOAL" + h));
                     if (ebl > eblgoal) {
-                        if (ebl > eblgoal * 1.1) {
+                        if (ebl > eblgoal * 1.05) {
                             ColorGrid2[j - 5][h * 3 + 3] = 2;
                         } else {
                             ColorGrid2[j - 5][h * 3 + 3] = 1;
@@ -630,7 +623,7 @@ public class DirectBL extends AppCompatActivity {
                     double unit = Double.parseDouble(answerDir.get(j).get("UNIT" + h));
                     double unitgoal = Double.parseDouble(answerDir.get(j).get("UNIT_GOAL" + h));
                     if (unit > unitgoal) {
-                        if (unit > unitgoal * 1.1) {
+                        if (unit > unitgoal * 1.05) {
                             ColorGrid2[j - 5][h * 3 + 4] = 2;
                         } else {
                             ColorGrid2[j - 5][h * 3 + 4] = 1;
@@ -656,25 +649,25 @@ public class DirectBL extends AppCompatActivity {
         final Column<String> E2 = new Column<>("Days\nAct", "EBL2");
         final Column<String> Unit2 = new Column<>("Unit\nAct", "UNIT2");
         Column group3 = new Column("Mon", Egoal2, E2, Unit2);
-        final Column<String> Egoal3 = new Column<>("Days Goal", "EBL_GOAL3");
-        final Column<String> E3 = new Column<>("Days Act", "EBL3");
-        final Column<String> Unit3 = new Column<>("Unit Act", "UNIT3");
+        final Column<String> Egoal3 = new Column<>("Days\nGoal", "EBL_GOAL3");
+        final Column<String> E3 = new Column<>("Days\nAct", "EBL3");
+        final Column<String> Unit3 = new Column<>("Unit\nAct", "UNIT3");
         Column group4 = new Column("Tue", Egoal3, E3, Unit3);
-        final Column<String> Egoal4 = new Column<>("Days Goal", "EBL_GOAL4");
+        final Column<String> Egoal4 = new Column<>("Days\nGoal", "EBL_GOAL4");
         final Column<String> E4 = new Column<>("Days Act", "EBL4");
-        final Column<String> Unit4 = new Column<>("Unit Act", "UNIT4");
+        final Column<String> Unit4 = new Column<>("Unit\nAct", "UNIT4");
         Column group5 = new Column("Wed", Egoal4, E4, Unit4);
-        final Column<String> Egoal5 = new Column<>("Days Goal", "EBL_GOAL5");
-        final Column<String> E5 = new Column<>("Days Act", "EBL5");
-        final Column<String> Unit5 = new Column<>("Unit Act", "UNIT5");
+        final Column<String> Egoal5 = new Column<>("Days\nGoal", "EBL_GOAL5");
+        final Column<String> E5 = new Column<>("Days\nAct", "EBL5");
+        final Column<String> Unit5 = new Column<>("Unit\nAct", "UNIT5");
         Column group6 = new Column("Thur", Egoal5, E5, Unit5);
-        final Column<String> Egoal6 = new Column<>("Days Goal", "EBL_GOAL6");
-        final Column<String> E6 = new Column<>("Days Act", "EBL6");
-        final Column<String> Unit6 = new Column<>("Unit Act", "UNIT6");
+        final Column<String> Egoal6 = new Column<>("Days\nGoal", "EBL_GOAL6");
+        final Column<String> E6 = new Column<>("Days\nAct", "EBL6");
+        final Column<String> Unit6 = new Column<>("Unit\nAct", "UNIT6");
         Column group7 = new Column("Fri", Egoal6, E6, Unit6);
-        final Column<String> Egoal7 = new Column<>("Days Goal", "EBL_GOAL7");
-        final Column<String> E7 = new Column<>("Days Act", "EBL7");
-        final Column<String> Unit7 = new Column<>("Unit Act", "UNIT7");
+        final Column<String> Egoal7 = new Column<>("Days\nGoal", "EBL_GOAL7");
+        final Column<String> E7 = new Column<>("Days\nAct", "EBL7");
+        final Column<String> Unit7 = new Column<>("Unit\nAct", "UNIT7");
         Column group8 = new Column("Sat", Egoal7, E7, Unit7);
 
         TableData tableData = new TableData<>("Direct backlog break down", list, TitleC, Fac, group1, group2, group3, group4, group5, group6, group7, group8);
@@ -686,8 +679,9 @@ public class DirectBL extends AppCompatActivity {
         table2.getConfig().setShowYSequence(false);
         table2.getConfig().setTableTitleStyle(new FontStyle(50, Color.rgb(115, 135, 156)));
         table2.getConfig().setColumnTitleBackground(new BaseBackgroundFormat(Color.rgb(115, 135, 156)));
-        table2.getConfig().setContentStyle(new FontStyle(45, Color.BLACK));
+        table2.getConfig().setContentStyle(new FontStyle(40, Color.BLACK));
         table2.getConfig().setVerticalPadding(40);
+        table2.getConfig().setHorizontalPadding(2);
         table2.getConfig().setColumnTitleStyle(new FontStyle(45, Color.WHITE));
 
         table2.getConfig().setContentCellBackgroundFormat(new ICellBackgroundFormat<CellInfo>() {
@@ -770,7 +764,7 @@ public class DirectBL extends AppCompatActivity {
                     double ebl = Double.parseDouble(answerDir.get(j).get("EBL" + h));
                     double eblgoal = Double.parseDouble(answerDir.get(j).get("EBL_GOAL" + h));
                     if (ebl > eblgoal) {
-                        if (ebl > eblgoal * 1.1) {
+                        if (ebl > eblgoal * 1.05) {
                             ColorGrid3[j - 18][h * 3 + 3] = 2;
                         } else {
                             ColorGrid3[j - 18][h * 3 + 3] = 1;
@@ -781,7 +775,7 @@ public class DirectBL extends AppCompatActivity {
                     double unit = Double.parseDouble(answerDir.get(j).get("UNIT" + h));
                     double unitgoal = Double.parseDouble(answerDir.get(j).get("UNIT_GOAL" + h));
                     if (unit > unitgoal) {
-                        if (unit > unitgoal * 1.1) {
+                        if (unit > unitgoal * 1.05) {
                             ColorGrid3[j - 18][h * 3 + 4] = 2;
                         } else {
                             ColorGrid3[j - 18][h * 3 + 4] = 1;
@@ -837,8 +831,9 @@ public class DirectBL extends AppCompatActivity {
         table3.getConfig().setShowYSequence(false);
         table3.getConfig().setTableTitleStyle(new FontStyle(50, Color.rgb(115, 135, 156)));
         table3.getConfig().setColumnTitleBackground(new BaseBackgroundFormat(Color.rgb(115, 135, 156)));
-        table3.getConfig().setContentStyle(new FontStyle(45, Color.BLACK));
+        table3.getConfig().setContentStyle(new FontStyle(40, Color.BLACK));
         table3.getConfig().setVerticalPadding(40);
+        table3.getConfig().setHorizontalPadding(2);
         table3.getConfig().setColumnTitleStyle(new FontStyle(45, Color.WHITE));
 
         table3.getConfig().setContentCellBackgroundFormat(new ICellBackgroundFormat<CellInfo>() {
@@ -921,7 +916,7 @@ public class DirectBL extends AppCompatActivity {
                     double ebl = Double.parseDouble(answerDir.get(j).get("EBL" + h));
                     double eblgoal = Double.parseDouble(answerDir.get(j).get("EBL_GOAL" + h));
                     if (ebl > eblgoal) {
-                        if (ebl > eblgoal * 1.1) {
+                        if (ebl > eblgoal * 1.05) {
                             ColorGrid4[j - 25][h * 3 + 3] = 2;
                         } else {
                             ColorGrid4[j - 25][h * 3 + 3] = 1;
@@ -932,7 +927,7 @@ public class DirectBL extends AppCompatActivity {
                     double unit = Double.parseDouble(answerDir.get(j).get("UNIT" + h));
                     double unitgoal = Double.parseDouble(answerDir.get(j).get("UNIT_GOAL" + h));
                     if (unit > unitgoal) {
-                        if (unit > unitgoal * 1.1) {
+                        if (unit > unitgoal * 1.05) {
                             ColorGrid4[j - 25][h * 3 + 4] = 2;
                         } else {
                             ColorGrid4[j - 25][h * 3 + 4] = 1;
@@ -979,7 +974,7 @@ public class DirectBL extends AppCompatActivity {
         final Column<String> Unit7 = new Column<>("Unit Act", "UNIT7");
         Column group8 = new Column("Sat", Egoal7, E7, Unit7);
 
-        TableData tableData = new TableData<>("", list, TitleC, Fac, group1, group2, group3, group4, group5, group6, group7, group8);
+        TableData tableData = new TableData<>("Direct backlog break down", list, TitleC, Fac, group1, group2, group3, group4, group5, group6, group7, group8);
         table4.getConfig().setFixedTitle(true);
         TitleC.setFixed(true);
         Fac.setFixed(true);
@@ -988,8 +983,9 @@ public class DirectBL extends AppCompatActivity {
         table4.getConfig().setShowYSequence(false);
         table4.getConfig().setTableTitleStyle(new FontStyle(50, Color.rgb(115, 135, 156)));
         table4.getConfig().setColumnTitleBackground(new BaseBackgroundFormat(Color.rgb(115, 135, 156)));
-        table4.getConfig().setContentStyle(new FontStyle(45, Color.BLACK));
+        table4.getConfig().setContentStyle(new FontStyle(40, Color.BLACK));
         table4.getConfig().setVerticalPadding(40);
+        table4.getConfig().setHorizontalPadding(2);
         table4.getConfig().setColumnTitleStyle(new FontStyle(45, Color.WHITE));
 
         table4.getConfig().setContentCellBackgroundFormat(new ICellBackgroundFormat<CellInfo>() {
