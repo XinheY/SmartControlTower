@@ -266,8 +266,8 @@ public class Dynamic extends AppCompatActivity {
                 //测试数据库的语句,在子线程操作
                 answer.clear();
                 answer2.clear();
-                answer = DBUtil.QuerySQL(sql[0]);
-                answer2 = DBUtil.QuerySQL(sql[1]);
+                answer = DBUtil.QuerySQL(sql[0],3);
+                answer2 = DBUtil.QuerySQL(sql[1],3);
                 //answer = DBUtil.sendRequestWithOkHttp();
                 setNumber();
                 Message msg = new Message();

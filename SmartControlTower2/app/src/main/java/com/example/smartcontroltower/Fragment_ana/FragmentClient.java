@@ -21,7 +21,7 @@ import java.util.List;
 public class FragmentClient extends Fragment {
 
     View view;
-    private static ExpandableListView expandableListView;
+    private ExpandableListView expandableListView=null;
     private ArrayList<List<Object>> maplistInFragClient = new ArrayList<>();
     private client_ExpandableAdapter adapter = new client_ExpandableAdapter();
 
@@ -52,15 +52,15 @@ public class FragmentClient extends Fragment {
     }
 
 
-    public void setMaplistInFragClient(ArrayList<List<Object>> m,int left,int right){
+    public void setMaplistInFragClient(ArrayList<List<Object>> m,int left,int right,int count){
         maplistInFragClient.clear();
         maplistInFragClient=m;
-        Log.e("FragClient",maplistInFragClient.size()+"");
-        adapter.inputdata(maplistInFragClient,left,right);
         if(expandableListView!=null){
             for(int i=0;i<new client_ExpandableAdapter().getGroupCount();i++){
                 expandableListView.collapseGroup(i);}
         }
+        adapter.inputdata(maplistInFragClient,left,right,count);
+
     }
 
     public void collapse(Fragment frag) {

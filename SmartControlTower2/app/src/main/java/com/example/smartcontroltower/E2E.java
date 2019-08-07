@@ -400,7 +400,7 @@ public class E2E extends AppCompatActivity {
             @Override
             public void run() {
                 //测试数据库的语句,在子线程操作
-                answerE2E = DBUtil.QuerySQL(sql);
+                answerE2E = DBUtil.QuerySQL(sql,1);
                 //Log.e("SQL",sql);
                 //answerE2E = DBUtil.sendRequestWithOkHttp();
                 setNumber(selectRadioBtn(radioGroup), expandTitle);

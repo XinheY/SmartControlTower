@@ -20,7 +20,7 @@ import java.util.List;
 public class FragmentSystem extends Fragment {
 
     View view;
-    private static ExpandableListView expandableListView;
+    private static ExpandableListView expandableListView=null;
     private ArrayList<List<Object>> maplistInFragSys = new ArrayList<>();
     private system_ExpandableAdapter adapter = new system_ExpandableAdapter();
 
@@ -49,10 +49,15 @@ public class FragmentSystem extends Fragment {
         return view;
     }
 
-    public void setMaplistInFragSys(ArrayList<List<Object>> m,int left,int right) {
+    public void setMaplistInFragSys(ArrayList<List<Object>> m,int left,int right,int count) {
         maplistInFragSys.clear();
         maplistInFragSys = m;
-        adapter.getMaplist(maplistInFragSys,left,right);
+        adapter.getMaplist(maplistInFragSys,left,right,count);
+        if(expandableListView!=null) {
+            for (int i = 0; i < new system_ExpandableAdapter().getGroupCount(); i++) {
+                expandableListView.collapseGroup(i);
+            }
+        }
         }
 
     public void collapse(Fragment frag) {

@@ -342,7 +342,7 @@ public class DirectBL extends AppCompatActivity {
             @Override
             public void run() {
                 //测试数据库的语句,在子线程操作
-                answerDir = DBUtil.QuerySQL(sql);
+                answerDir = DBUtil.QuerySQL(sql,4);
                 //Log.e("SQL",sql);
                 //answerDirDir = DBUtil.sendRequestWithOkHttp();
                 if (answerDir.size() != 0) {

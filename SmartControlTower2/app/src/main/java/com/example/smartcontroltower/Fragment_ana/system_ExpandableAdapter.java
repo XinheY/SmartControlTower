@@ -26,6 +26,7 @@ public class system_ExpandableAdapter extends BaseExpandableListAdapter {
     private static ArrayList<List<Object>> maplistInSysExp = new ArrayList<>();
     private static int left = 0;
     private static int right = 0;
+    private static int count=1;
 
 
     @Override
@@ -114,18 +115,27 @@ public class system_ExpandableAdapter extends BaseExpandableListAdapter {
         convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.child_item, parent, false);
         MySmartTable<Object> table = (MySmartTable<Object>) convertView.findViewById(R.id.ana_table);
         convertView.setTag(table);
-        Log.e("测试",maplistInSysExp.get(0).toString());
+        int more=15;
         if (maplistInSysExp.size() != 0) {
             MapTableData tableData = null;
             if (groupPosition == 0) {
-                //List<Object> temp1 = maplistInSysExp.get(0).subList(left - 1, right - 1);
-                //List<Object> temp2 = maplistInSysExp.get(0).subList()
                 tableData = MapTableData.create("", maplistInSysExp.get(0));
                 List<Column> list4one=new ArrayList<>();
                 list4one.add(tableData.getColumns().get(0));
-                list4one.addAll(tableData.getColumns().subList(left,right+1));
-                list4one.addAll(tableData.getColumns().subList(15+left,16+right));
-                list4one.addAll(tableData.getColumns().subList(30+left,31+right));
+                if(count==2){
+                    list4one.add(tableData.getColumns().get(1));
+                }
+                else if(count==3){
+                    list4one.add(tableData.getColumns().get(1));
+                    list4one.add(tableData.getColumns().get(2));
+                }
+                list4one.addAll(tableData.getColumns().subList(left+count-1,right+count));
+                list4one.add(tableData.getColumns().get(more+count-1));
+                list4one.addAll(tableData.getColumns().subList(more+left+count-1,more+count+right));
+                list4one.add(tableData.getColumns().get(2*more+count-1));
+                list4one.addAll(tableData.getColumns().subList(2*more+left+count-1,2*more+count+right));
+                list4one.add(tableData.getColumns().get(3*more+count-1));
+                //Log.e("open first",left+1+" "+(right+count)+" "+(more+left)+" "+(more+1+right)+" "+(2*more+left-1)+" "+(2*more+right));
                 tableData.setColumns(list4one);
 
 
@@ -133,35 +143,70 @@ public class system_ExpandableAdapter extends BaseExpandableListAdapter {
                 tableData = MapTableData.create("", maplistInSysExp.get(1));
                 List<Column> list4two=new ArrayList<>();
                 list4two.add(tableData.getColumns().get(0));
-                list4two.addAll(tableData.getColumns().subList(left,right+1));
-                list4two.addAll(tableData.getColumns().subList(15+left,16+right));
-                list4two.addAll(tableData.getColumns().subList(30+left,31+right));
+                if(count==2){
+                    list4two.add(tableData.getColumns().get(1));
+                }
+                else if(count==3){
+                    list4two.add(tableData.getColumns().get(1));
+                    list4two.add(tableData.getColumns().get(2));
+                }
+                list4two.addAll(tableData.getColumns().subList(left+count-1,right+count));
+                list4two.add(tableData.getColumns().get(more+count-1));
+                list4two.addAll(tableData.getColumns().subList(more+count+left-1,more+right+count));
+                list4two.add(tableData.getColumns().get(2*more+count-1));
+                list4two.addAll(tableData.getColumns().subList(2*more+left+count-1,2*more+count+right));
+                list4two.add(tableData.getColumns().get(3*more+count-1));
                 tableData.setColumns(list4two);
             } else {
                 tableData = MapTableData.create("", maplistInSysExp.get(2));
                 List<Column> list4third=new ArrayList<>();
                 list4third.add(tableData.getColumns().get(0));
-                list4third.addAll(tableData.getColumns().subList(left,right+1));
-                list4third.addAll(tableData.getColumns().subList(15+left,16+right));
-                list4third.addAll(tableData.getColumns().subList(30+left,31+right));
+                if(count==2){
+                    list4third.add(tableData.getColumns().get(1));
+                }
+                else if(count==3){
+                    list4third.add(tableData.getColumns().get(1));
+                    list4third.add(tableData.getColumns().get(2));
+                }
+                list4third.addAll(tableData.getColumns().subList(left+count-1,right+count));
+                list4third.add(tableData.getColumns().get(more+count-1));
+                list4third.addAll(tableData.getColumns().subList(more+left,more+1+right));
+                list4third.add(tableData.getColumns().get(more+count-1));
+                list4third.addAll(tableData.getColumns().subList(2*more+left-1,2*more+right));
+                list4third.add(tableData.getColumns().get(2*more+count-1));
                 tableData.setColumns(list4third);
             }
 
 
             table.getConfig().setFixedTitle(true);
             tableData.getColumns().get(0).setFixed(true);
-            tableData.getColumns().get(0).setTextAlign(Paint.Align.LEFT);
+            if(count==2){
+                tableData.getColumns().get(1).setFixed(true);
+            }
+            else if(count==3){
+                tableData.getColumns().get(1).setFixed(true);
+                tableData.getColumns().get(2).setFixed(true);
+            }
+            //tableData.getColumns().get(0).setTextAlign(Paint.Align.LEFT);
             table.setZoom(true, 2, 1);
             table.getConfig().setShowXSequence(false);
             table.getConfig().setShowYSequence(false);
 //设置数据
-
             table.getConfig().setTableTitleStyle(new FontStyle(50, convertView.getResources().getColor(R.color.table_gray)));
             table.getConfig().setColumnTitleBackground(new BaseBackgroundFormat(convertView.getResources().getColor(R.color.table_gray)));
-            table.getConfig().setContentStyle(new FontStyle(45, convertView.getResources().getColor(R.color.table_gray)));
-            table.getConfig().setColumnTitleStyle(new FontStyle(45, convertView.getResources().getColor(R.color.white)));
+            table.getConfig().setContentStyle(new FontStyle(40, convertView.getResources().getColor(R.color.table_gray)));
+            table.getConfig().setColumnTitleStyle(new FontStyle(40, convertView.getResources().getColor(R.color.white)));
             table.getConfig().setVerticalPadding(10);
             table.setTableData(tableData);
+            tableData.getColumns().get(0).setAutoMerge(true);
+            if(count==2){
+                tableData.getColumns().get(1).setAutoMerge(true);
+            }
+            else if(count==3){
+                tableData.getColumns().get(1).setAutoMerge(true);
+                tableData.getColumns().get(2).setAutoMerge(true);
+            }
+            table.notifyDataChanged();
             table.invalidate();
         }
 
@@ -185,11 +230,12 @@ public class system_ExpandableAdapter extends BaseExpandableListAdapter {
 
     }
 
-    public void getMaplist(ArrayList<List<Object>> m, int left, int right) {
+    public void getMaplist(ArrayList<List<Object>> m, int left, int right,int count) {
         maplistInSysExp.clear();
         maplistInSysExp = m;
         this.left = left;
         this.right = right;
-        Log.e("sysExpand", left + " " + right);
+        this.count=count;
+        Log.e("sysExpand", left + " " + right+" "+count);
     }
 }

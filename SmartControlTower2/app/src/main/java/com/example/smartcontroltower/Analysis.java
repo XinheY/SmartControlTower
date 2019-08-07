@@ -21,6 +21,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.ExpandableListView;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -31,6 +32,11 @@ import com.example.smartcontroltower.Fragment_ana.FragmentClientLob;
 import com.example.smartcontroltower.Fragment_ana.FragmentISG;
 import com.example.smartcontroltower.Fragment_ana.FragmentISGLOB;
 import com.example.smartcontroltower.Fragment_ana.FragmentSystem;
+import com.example.smartcontroltower.Fragment_ana.ISGLOB_ExpandableAdapter;
+import com.example.smartcontroltower.Fragment_ana.ISG_ExpandableAdapter;
+import com.example.smartcontroltower.Fragment_ana.client_ExpandableAdapter;
+import com.example.smartcontroltower.Fragment_ana.clientlob_ExpandableAdapter;
+import com.example.smartcontroltower.Fragment_ana.system_ExpandableAdapter;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.tabs.TabLayout;
 import com.jaygoo.widget.OnRangeChangedListener;
@@ -49,14 +55,14 @@ public class Analysis extends AppCompatActivity {
     private int radioid = 0;//给每个radiobutton设立唯一的id
     private ActionBarDrawerToggle toggle;
     public static MySmartTable<Object> table;
-    private ArrayList<List<Object>> maplistSum = new ArrayList<>();
+    private LinkedHashMap<String, List<Object>> maplistSum = new LinkedHashMap<>();
     private HashMap<String, HashMap<String, CheckBox>> summary = new LinkedHashMap<>();//所有checkbox的集合
     private HashMap<String, ArrayList<RadioButton>> radioSummary = new LinkedHashMap<>();
     private HashMap<String, HashMap<String, CheckBox>> summaryOld = new LinkedHashMap<>();//之前所有checkbox的集合
     private HashMap<String, ArrayList<RadioButton>> radioOld = new LinkedHashMap<>();
     private ArrayList<String> allCondition = new ArrayList<>();
     private ArrayList<String[]> allContent = new ArrayList<>();
-    private ArrayList<LinkedHashMap<String,String>> answerAna;
+    private ArrayList<LinkedHashMap<String, String>> answerAna;
     private LoadingDialog ld;
     private RadioGroup radioGroup;
     private RadioGroup IdcEoq;
@@ -69,6 +75,7 @@ public class Analysis extends AppCompatActivity {
     private InitializeInfo info;
     private int left = 9;
     private int right = 13;
+    private static int gbChoseCount = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,6 +84,7 @@ public class Analysis extends AppCompatActivity {
         if (savedInstanceState != null) {
             // Restore value of members from saved state
             answerAna = (ArrayList<LinkedHashMap<String, String>>) savedInstanceState.getSerializable("initial");
+            Log.e("初始化", answerAna.size() + "" + answerAna.toString());
             summaryOld = (HashMap<String, HashMap<String, CheckBox>>) savedInstanceState.getSerializable("initial2");
             radioOld = (LinkedHashMap<String, ArrayList<RadioButton>>) savedInstanceState.getSerializable("initial3");
             left = savedInstanceState.getInt("left");
@@ -294,16 +302,26 @@ public class Analysis extends AppCompatActivity {
                 ld.setLoadingText("Loading...").setSuccessText("Success").setFailedText("Failed")
                         .closeSuccessAnim().show();
                 toggleRightSliding();
+
+                ((FragmentSystem) adapter.getItem(0)).collapse(adapter.getItem(0));
+                ((FragmentClient) adapter.getItem(1)).collapse(adapter.getItem(1));
+                ((FragmentClientLob) adapter.getItem(2)).collapse(adapter.getItem(2));
+                ((FragmentISG) adapter.getItem(3)).collapse(adapter.getItem(3));
+                ((FragmentISGLOB) adapter.getItem(4)).collapse(adapter.getItem(4));
+
                 ArrayList<String> searchSum = new ArrayList<>();
                 boolean canrun = true;
+                gbChoseCount = 0;
                 for (int i = 0; i < summary.size(); i++) {
                     String oneCondition = "";
                     HashMap<String, CheckBox> innerMap = summary.get(allCondition.get(i + 3));
-                    //Log.e("cool",allCondition.toString());
                     int count = 0;
                     for (int j = 0; j < innerMap.size(); j++) {
                         CheckBox cbc = innerMap.get((allContent.get(i + 3))[j]);
                         if (cbc.isChecked()) {
+                            if (i == 0) {
+                                gbChoseCount++;
+                            }
                             count++;
                             if (oneCondition.equals("")) {
                                 oneCondition += cbc.getText();
@@ -312,26 +330,25 @@ public class Analysis extends AppCompatActivity {
                             }
                         }
                     }
-                    if (count == 0 && i > 1) {
+                    if (count == 0 && i == 1) {
                         canrun = false;
-                       ld.closeFailedAnim().loadFailed();
-                        break;
+                        ld.closeFailedAnim().loadFailed();
                     }
                     searchSum.add(oneCondition);
                 }
-//                if (canrun) {
-//                    if (searchSum.get(2) != "" || searchSum.get(3) != "") {
-//                        String sql = "EXEC [SP_IDC_EOQ_SUMMARY] '" + searchSum.get(0) + "','" + searchSum.get(1) + "','" + searchSum.get(3) + "','" + searchSum.get(2) + "','" + searchSum.get(4) + "','" + searchSum.get(5) + "','" + searchSum.get(6) + "','" + searchSum.get(7) + "','" + searchSum.get(8) + "','" + searchSum.get(9) + "','" + searchSum.get(10) + "'";
-//                        toggleRightSliding();
-//                        //test(sql);
-//                    } else {
-//                        //Toast.makeText(E2E.this, "Blank Error", Toast.LENGTH_LONG).show();
-//                        ld.closeFailedAnim().loadFailed();
-//                    }
-//                }
-                String sql = "EXEC SP_IDC_EOQ_SNI_CHANGE_ANALYSIS '" + IErb.getText() + "','" + SVrb.getText() + "','" + CVrb.getText() + "','" + searchSum.get(0) + "','" + searchSum.get(1) + "','" + Sourb.getText() + "'";
-                Log.e("answer", sql);
-                test(sql);
+                if (canrun == false) {
+                    Toast.makeText(view.getContext(), "View Type can't be blank", Toast.LENGTH_SHORT).show();
+                }
+                else if (gbChoseCount > 3) {
+                    ld.closeFailedAnim().loadFailed();
+                    Toast.makeText(view.getContext(), "Group By more than 3 level", Toast.LENGTH_SHORT).show();
+                } else if (gbChoseCount == 0) {
+                    ld.closeFailedAnim().loadFailed();
+                    Toast.makeText(view.getContext(), "Group by can't be blank", Toast.LENGTH_SHORT).show();
+                } else {
+                    String sql = "EXEC SP_IDC_EOQ_SNI_CHANGE_ANALYSIS '" + IErb.getText() + "','" + SVrb.getText() + "','" + CVrb.getText() + "','" + searchSum.get(0) + "','" + searchSum.get(1) + "','" + Sourb.getText() + "'";
+                    test(sql);
+                }
 
 
             }
@@ -393,7 +410,7 @@ public class Analysis extends AppCompatActivity {
             @Override
             public void run() {
                 //测试数据库的语句,在子线程操作
-                answerAna = DBUtil.QuerySQL(sql);
+                answerAna = DBUtil.QuerySQL(sql, 2);
                 //answerAna = DBUtil.sendRequestWithOkHttp();
                 setNumber(selectRadioBtn(radioGroup));
                 Message msg = new Message();
@@ -512,57 +529,57 @@ public class Analysis extends AppCompatActivity {
     public void setNumber(String unit) {
         List<Object> maplist = new ArrayList<>();
         maplistSum.clear();
-
+        String title = "Empty";
         Log.e("object", unit);
-        int cou = 0;
         for (LinkedHashMap<String, String> a : answerAna) {
             LinkedHashMap<String, String> b = a;
-            if ((a.containsKey("COUNTRY") && a.get("COUNTRY").equals("ANZ")) ||
-                    (a.containsKey("SITE") && a.get("SITE").equals("APCC")) ||
-                    (a.containsKey("FACILITY") && a.get("FACILITY").equals("Factory")) ||
-                    (a.containsKey("ORDERTYPE") && a.get("ORDERTYPE").equals("Direct"))) {
-                cou++;
-                maplistSum.add(maplist);
+            if (b.containsKey("Title")) {
+                maplistSum.put(title, maplist);
                 maplist = new ArrayList<>();
+                title = b.get("Title");
 
             }
             maplist.add(b);
         }
-        maplistSum.add(maplist);
-        maplistSum.remove(0);
+        maplistSum.put(title, maplist);
+        maplistSum.remove("Empty");
 
-        ArrayList<List<Object>> maplistSum2 = new ArrayList<>();
+//        for(String s:maplistSum.keySet()){
+//            Log.e("数组",maplistSum.get(s).toString());
+//        }
 
-        for (int x = 0; x < maplistSum.size(); x++) {
+        LinkedHashMap<String, List<Object>> maplistSum2 = new LinkedHashMap<>();
+
+        for (String typeTitle : maplistSum.keySet()) {
             List<Object> templist = new ArrayList<>();
-            for (int h = 0; h < maplistSum.get(x).size(); h++) {
+            for (int h = 0; h < maplistSum.get(typeTitle).size(); h++) {
                 LinkedHashMap<String, String> tempmap = new LinkedHashMap<>();
-                for (String string : ((LinkedHashMap<String, String>) maplistSum.get(x).get(h)).keySet()) {
-                    String value = ((LinkedHashMap<String, String>) maplistSum.get(x).get(h)).get(string);
-                    value = value.replace("_", "");
-                    if (value.contains("N") && !string.equals("COUNTRY")&& !value.equals("-")&&!string.equals("SITE")&&
-                            !string.equals("FACILITY")&&!string.equals("ORDERTYPE")) {
-                        value = value.replace("N", "");
-                    }
-                    value = value.replace("SI-Y", "");
-                    value = value.replace("MFG-Y", "");
-                    if (value.equals("0")) value = "-";
-                    if (unit.equals("K")) {
-                        if (!string.equals("COUNTRY") && !value.equals("-")&&!string.equals("SITE")&&
-                        !string.equals("FACILITY")&&!string.equals("ORDERTYPE")) {
-                            double dou = Double.parseDouble(value);
-                            dou = dou / 1000;
-                            value = String.format("%.1f", dou);
+                for (String string : ((LinkedHashMap<String, String>) maplistSum.get(typeTitle).get(h)).keySet()) {
+                    if (!string.equals("Title")) {
+                        String value = ((LinkedHashMap<String, String>) maplistSum.get(typeTitle).get(h)).get(string);
+                        value = value.replace("_", "");
+                        if (value.contains("N") && !string.equals("COUNTRY") && !value.equals("-") && !string.equals("SITE") &&
+                                !string.equals("FACILITY") && !string.equals("ORDERTYPE")) {
+                            value = value.replace("N", "");
                         }
+                        value = value.replace("SI-Y", "");
+                        value = value.replace("MFG-Y", "");
+                        if (value.equals("0")) value = "-";
+                        if (unit.equals("K")) {
+                            if (!string.equals("COUNTRY") && !value.equals("-") && !string.equals("SITE") &&
+                                    !string.equals("FACILITY") && !string.equals("ORDERTYPE")) {
+                                double dou = Double.parseDouble(value);
+                                dou = dou / 1000;
+                                value = String.format("%.1f", dou);
+                            }
+                        }
+                        ((LinkedHashMap<String, String>) tempmap).put(string, value);
                     }
-                    ((LinkedHashMap<String, String>) tempmap).put(string, value);
                 }
                 templist.add(tempmap);
-                //Log.e("value",maplistSum.get(x).get(h).toString());
             }
-            maplistSum2.add(templist);
+            maplistSum2.put(typeTitle, templist);
         }
-
         updateAllTables(maplistSum2);
 
     }
@@ -584,7 +601,7 @@ public class Analysis extends AppCompatActivity {
 
     }
 
-    private void updateAllTables(ArrayList<List<Object>> map2) {
+    private void updateAllTables(LinkedHashMap<String, List<Object>> map2) {
         FragmentSystem fs = new FragmentSystem();
         FragmentClient fc = new FragmentClient();
         FragmentClientLob fcl = new FragmentClientLob();
@@ -592,39 +609,60 @@ public class Analysis extends AppCompatActivity {
         FragmentISGLOB fil = new FragmentISGLOB();
 
         ArrayList<List<Object>> ins = new ArrayList<>();
-        ins.add(map2.get(0));
-        ins.add(map2.get(1));
-        ins.add(map2.get(2));
-        fs.setMaplistInFragSys(ins, left, right);
+        ins.add((List<Object>) map2.get("systemoverall"));
+        ins.add((List<Object>) map2.get("systemclient"));
+        ins.add((List<Object>) map2.get("systemisg"));
+        fs.setMaplistInFragSys(ins, left, right, gbChoseCount);
 
 
         ArrayList<List<Object>> ins2 = new ArrayList<>();
-        for (int i = 3; i <= 12; i++) {
-            ins2.add(map2.get(i));
-        }
-        fc.setMaplistInFragClient(ins2, left, right);
+        ins2.add((List<Object>) map2.get("client"));
+        ins2.add((List<Object>) map2.get("Consumer"));
+        ins2.add((List<Object>) map2.get("Commercial"));
+        ins2.add((List<Object>) map2.get("Alienware"));
+        ins2.add((List<Object>) map2.get("Personal_Vostro"));
+        ins2.add((List<Object>) map2.get("XPS_DT_NB"));
+        ins2.add((List<Object>) map2.get("Lat_Opt"));
+        ins2.add((List<Object>) map2.get("Workstation"));
+        ins2.add((List<Object>) map2.get("CHROME"));
+        ins2.add((List<Object>) map2.get("CLOUD_CLIENT_IOT"));
+        Log.e("ins2", ins2.size() + "");
+        fc.setMaplistInFragClient(ins2, left, right, gbChoseCount);
 
         ArrayList<List<Object>> ins3 = new ArrayList<>();
-        for (int i = 12; i <= 26; i++) {
-            ins3.add(map2.get(i));
-        }
-        fcl.setMaplistInFragcl(ins3, left, right);
+        ins3.add((List<Object>) map2.get("ALIENWARE_DESKTOPS"));
+        ins3.add((List<Object>) map2.get("ALIENWARE_NOTEBOOKS"));
+        ins3.add((List<Object>) map2.get("PERSONAL_DESKTOPS"));
+        ins3.add((List<Object>) map2.get("PERSONAL_NOTEBOOKS"));
+        ins3.add((List<Object>) map2.get("VOSTRO_DESKTOPS"));
+        ins3.add((List<Object>) map2.get("VOSTRO_NOTEBOOKS"));
+        ins3.add((List<Object>) map2.get("XPS_DESKTOPS"));
+        ins3.add((List<Object>) map2.get("XPS_NOTEBOOKS"));
+        ins3.add((List<Object>) map2.get("LATITUDE"));
+        ins3.add((List<Object>) map2.get("OPTIPLEX_DESKTOPS"));
+        ins3.add((List<Object>) map2.get("FIXED_WORKSTATIONS"));
+        ins3.add((List<Object>) map2.get("MOBILE_WORKSTATIONS"));
+        ins3.add((List<Object>) map2.get("CHROME"));
+        ins3.add((List<Object>) map2.get("CLOUD_CLIENT"));
+        ins3.add((List<Object>) map2.get("INTERNET_OF_THINGS"));
+        Log.e("ins3", ins3.size() + "");
+        fcl.setMaplistInFragcl(ins3, left, right, gbChoseCount);
 
         ArrayList<List<Object>> ins4 = new ArrayList<>();
-        for (int i = 27; i <= 28; i++) {
-            ins4.add(map2.get(i));
-        }
-        ins4.add(map2.get(31));
-        fisg.setMaplistInFragIsg(ins4, left, right);
+        ins4.add((List<Object>) map2.get("isg_overall"));
+        ins4.add((List<Object>) map2.get("isg_system"));
+        ins4.add((List<Object>) map2.get("isg_Non_Sys"));
+        Log.e("ins4", ins4.size() + "");
+        fisg.setMaplistInFragIsg(ins4, left, right, gbChoseCount);
 
         ArrayList<List<Object>> ins5 = new ArrayList<>();
-        ins5.add(map2.get(29));
-        ins5.add(map2.get(30));
-        for (int i = 32; i < map2.size(); i++) {
-            ins5.add(map2.get(i));
-        }
-        fil.setMaplistInFragIsg(ins5, left, right);
+        ins5.add((List<Object>) map2.get("isg_PowerEdge"));
+        ins5.add((List<Object>) map2.get("isg_Cloud"));
+        ins5.add((List<Object>) map2.get("isg_storage"));
+        ins5.add((List<Object>) map2.get("isg_Networking"));
+        ins5.add((List<Object>) map2.get("isg_hit"));
+        Log.e("ins5", ins5.size() + "");
+        fil.setMaplistInFragIsg(ins5, left, right, gbChoseCount);
     }
-
 
 }

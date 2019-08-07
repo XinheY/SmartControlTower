@@ -79,17 +79,21 @@ public class DBUtil {
         return con;
     }
 
-    public static ArrayList<LinkedHashMap<String, String>> QuerySQL(String sql) {
+    public static ArrayList<LinkedHashMap<String, String>> QuerySQL(String sql, int no) {
         String result = "";
         ArrayList<LinkedHashMap<String, String>> answer = new ArrayList<>();
         try {
-            Connection conn = getSQLConnection("10.82.244.53", "sa", "Dell@2008", "PCWebsite");
+            Connection conn = getSQLConnection(地址账号用户名);
             Statement stmt = conn.createStatement();//
             ResultSet rs = stmt.executeQuery(sql);
             while (rs.next()) {
                 Log.e("rs", rs.getString(1));
                 String after = strChangeXML(rs.getString(1));
-                answer = parseXMLWithPull(after, answer);
+                if (no == 2) {
+                    answer = parseXMLWithPull2(after,answer);
+                } else {
+                    answer = parseXMLWithPull(after, answer);
+                }
             }
 
 
@@ -133,11 +137,11 @@ public class DBUtil {
                                 && (!"OPTIPLEX_DESKTOPS".equals(nodeName)) && (!"LATITUDE".equals(nodeName)) && (!"PERSONAL_DESKTOPS".equals(nodeName)) && (!"PERSONAL_NOTEBOOKS".equals(nodeName)) && (!"VOSTRO_DESKTOPS".equals(nodeName)) && (!"VOSTRO_NOTEBOOKS".equals(nodeName))
                                 && (!"FIXED_WORKSTATIONS".equals(nodeName)) && (!"MOBILE_WORKSTATIONS".equals(nodeName)) && (!"XPS_DESKTOPS".equals(nodeName)) && (!"XPS_NOTEBOOKS".equals(nodeName)) && (!"CLOUD_CLIENT".equals(nodeName)) && (!"INTERNET_OF_THINGS".equals(nodeName))
                                 && (!"isg_overall".equals(nodeName)) && (!"isg_system".equals(nodeName)) && (!"isg_PowerEdge".equals(nodeName)) && (!"isg_Cloud".equals(nodeName)) && (!"isg_Non_Sys".equals(nodeName)) && (!"isg_storage".equals(nodeName))
-                                && (!"isg_Networking".equals(nodeName)) && (!"isg_hit".equals(nodeName))&&(!"result".equals(nodeName))) {
+                                && (!"isg_Networking".equals(nodeName)) && (!"isg_hit".equals(nodeName)) && (!"result".equals(nodeName))) {
                             String id = xmlPullParser.nextText();
                             if (nodeName.equals("COL_TYPE")) {
                                 nodeName = "Item";
-                                map.put(nodeName,id);
+                                map.put(nodeName, id);
                             } else {
                                 map.put(nodeName, id);
                             }
@@ -160,6 +164,59 @@ public class DBUtil {
             e.printStackTrace();
         }
 
+        return answer;
+
+    }
+
+    private static ArrayList<LinkedHashMap<String, String>> parseXMLWithPull2(String xmlData, ArrayList<LinkedHashMap<String, String>> answer) {
+        try {
+            //ans.clear();
+            XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
+            // System.out.println(xmlData);
+            XmlPullParser xmlPullParser = factory.newPullParser();
+            xmlPullParser.setInput(new StringReader(xmlData));
+            int eventType = xmlPullParser.getEventType();
+
+            LinkedHashMap<String, String> map = new LinkedHashMap<>();
+            while (eventType != XmlPullParser.END_DOCUMENT) {
+                String nodeName = xmlPullParser.getName();
+
+                switch (eventType) {
+                    case XmlPullParser.START_TAG: {
+                        if ((!"Summary".equals(nodeName)) && (!"gva".equals(nodeName)) && (!"rawdata".equals(nodeName)) && (!"systemoverall".equals(nodeName)) && (!"row".equals(nodeName)) && (!"systemclient".equals(nodeName))
+                                && (!"systemisg".equals(nodeName)) && (!"client".equals(nodeName)) && (!"Consumer".equals(nodeName)) && (!"Commercial".equals(nodeName)) && (!"Workstation".equals(nodeName)) && (!"Alienware".equals(nodeName)) && (!"Lat_Opt".equals(nodeName))
+                                && (!"ALIENWARE_DESKTOPS".equals(nodeName)) && (!"Personal_Vostro".equals(nodeName)) && (!"XPS_DT_NB".equals(nodeName)) && (!"CLOUD_CLIENT_IOT".equals(nodeName)) && (!"CHROME".equals(nodeName)) && (!"ALIENWARE_NOTEBOOKS".equals(nodeName))
+                                && (!"OPTIPLEX_DESKTOPS".equals(nodeName)) && (!"LATITUDE".equals(nodeName)) && (!"PERSONAL_DESKTOPS".equals(nodeName)) && (!"PERSONAL_NOTEBOOKS".equals(nodeName)) && (!"VOSTRO_DESKTOPS".equals(nodeName)) && (!"VOSTRO_NOTEBOOKS".equals(nodeName))
+                                && (!"FIXED_WORKSTATIONS".equals(nodeName)) && (!"MOBILE_WORKSTATIONS".equals(nodeName)) && (!"XPS_DESKTOPS".equals(nodeName)) && (!"XPS_NOTEBOOKS".equals(nodeName)) && (!"CLOUD_CLIENT".equals(nodeName)) && (!"INTERNET_OF_THINGS".equals(nodeName))
+                                && (!"isg_overall".equals(nodeName)) && (!"isg_system".equals(nodeName)) && (!"isg_PowerEdge".equals(nodeName)) && (!"isg_Cloud".equals(nodeName)) && (!"isg_Non_Sys".equals(nodeName)) && (!"isg_storage".equals(nodeName))
+                                && (!"isg_Networking".equals(nodeName)) && (!"isg_hit".equals(nodeName)) && (!"result".equals(nodeName))) {
+                            String id = xmlPullParser.nextText();
+                            if (nodeName.equals("COL_TYPE")) {
+                                nodeName = "Item";
+                                map.put(nodeName, id);
+                            } else {
+                                map.put(nodeName, id);
+                            }
+                        } else if ((!"Summary".equals(nodeName)) && (!"gva".equals(nodeName)) && (!"rawdata".equals(nodeName)) && (!"row".equals(nodeName))) {
+                            map.put("Title", nodeName);
+                        }
+                        break;
+                    }
+                    case XmlPullParser.END_TAG: {
+                        if ("row".equals(nodeName)) {
+                            answer.add(map);
+                            map = new LinkedHashMap<>();
+                        }
+                        break;
+                    }
+                    default:
+                        break;
+                }
+                eventType = xmlPullParser.next();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return answer;
 
     }

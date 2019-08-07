@@ -20,7 +20,7 @@ import java.util.List;
 public class FragmentISGLOB extends Fragment {
 
     View view;
-    private ExpandableListView expandableListView;
+    private ExpandableListView expandableListView=null;
     private ArrayList<List<Object>> maplistInDragIsgLob = new ArrayList<>();
     private ISGLOB_ExpandableAdapter adapter = new ISGLOB_ExpandableAdapter();
 
@@ -48,11 +48,10 @@ public class FragmentISGLOB extends Fragment {
         return view;
     }
 
-    public void setMaplistInFragIsg(ArrayList<List<Object>> m,int left,int right) {
+    public void setMaplistInFragIsg(ArrayList<List<Object>> m,int left,int right,int count) {
         maplistInDragIsgLob.clear();
         maplistInDragIsgLob = m;
-        Log.e("FragSysSETMAP", maplistInDragIsgLob.size() + "");
-        adapter.getMaplist(maplistInDragIsgLob,left,right);
+        adapter.getMaplist(maplistInDragIsgLob,left,right,count);
         if (expandableListView != null) {
             for (int i = 0; i < new ISGLOB_ExpandableAdapter().getGroupCount(); i++) {
                 expandableListView.collapseGroup(i);
