@@ -24,11 +24,11 @@ import java.util.List;
 import java.util.Map;
 
 public class client_ExpandableAdapter extends BaseExpandableListAdapter {
-    private static ArrayList<SmartTable<Object>> tables=new ArrayList<>();
-    private static ArrayList<List<Object>> maplistInCliExp=new ArrayList<>();
-    public String[] groupString = {"OVERALL", "CONSUMER", "COMMERCIAL","ALIENWARE","PERSONAL VOSTRO",
-            "XPS_DT_NB","LAT/OPT","WORKSTATION","CHROME","CLOUD CLIENT"};
-    private static int left,right,count;
+    private static ArrayList<SmartTable<Object>> tables = new ArrayList<>();
+    private static ArrayList<List<Object>> maplistInCliExp = new ArrayList<>();
+    public String[] groupString = {"OVERALL", "CONSUMER", "COMMERCIAL", "ALIENWARE", "PERSONAL VOSTRO",
+            "XPS_DT_NB", "LAT/OPT", "WORKSTATION", "CHROME", "CLOUD CLIENT"};
+    private static int left, right, count;
 
 
     @Override
@@ -72,42 +72,42 @@ public class client_ExpandableAdapter extends BaseExpandableListAdapter {
     public boolean hasStableIds() {
         return true;
     }
+
     /**
-     *
      * 获取显示指定组的视图对象
      *
      * @param groupPosition 组位置
-     * @param isExpanded 该组是展开状态还是伸缩状态
-     * @param convertView 重用已有的视图对象
-     * @param parent 返回的视图对象始终依附于的视图组
+     * @param isExpanded    该组是展开状态还是伸缩状态
+     * @param convertView   重用已有的视图对象
+     * @param parent        返回的视图对象始终依附于的视图组
      */
 // 获取显示指定分组的视图
     @Override
     public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
         GroupViewHolder groupViewHolder;
-        if (convertView == null){
-            convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.parent_item,parent,false);
+        if (convertView == null) {
+            convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.parent_item, parent, false);
             groupViewHolder = new GroupViewHolder();
-            groupViewHolder.tvTitle = (TextView)convertView.findViewById(R.id.label_group_normal);
+            groupViewHolder.tvTitle = (TextView) convertView.findViewById(R.id.label_group_normal);
             convertView.setTag(groupViewHolder);
-        }else {
-            groupViewHolder = (GroupViewHolder)convertView.getTag();
+        } else {
+            groupViewHolder = (GroupViewHolder) convertView.getTag();
         }
         groupViewHolder.tvTitle.setText(groupString[groupPosition]);
         return convertView;
     }
+
     /**
-     *
      * 获取一个视图对象，显示指定组中的指定子元素数据。
      *
      * @param groupPosition 组位置
      * @param childPosition 子元素位置
-     * @param isLastChild 子元素是否处于组中的最后一个
-     * @param convertView 重用已有的视图(View)对象
-     * @param parent 返回的视图(View)对象始终依附于的视图组
+     * @param isLastChild   子元素是否处于组中的最后一个
+     * @param convertView   重用已有的视图(View)对象
+     * @param parent        返回的视图(View)对象始终依附于的视图组
      * @return
      * @see android.widget.ExpandableListAdapter#getChildView(int, int, boolean, android.view.View,
-     *      android.view.ViewGroup)
+     * android.view.ViewGroup)
      */
 
     //取得显示给定分组给定子位置的数据用的视图
@@ -117,33 +117,42 @@ public class client_ExpandableAdapter extends BaseExpandableListAdapter {
         convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.child_item, parent, false);
         MySmartTable<Object> table = (MySmartTable<Object>) convertView.findViewById(R.id.ana_table);
         convertView.setTag(table);
-        int more=15;
+        int more = 15;
         if (maplistInCliExp.size() != 0) {
 
-            MapTableData tableData=MapTableData.create("",maplistInCliExp.get(groupPosition));
+            MapTableData tableData = MapTableData.create("", maplistInCliExp.get(groupPosition));
 
-            List<Column> list4one=new ArrayList<>();
-            list4one.add(tableData.getColumns().get(0));
-            if(count==2){
-                list4one.add(tableData.getColumns().get(1));
+            List<Column> list4one = new ArrayList<>();
+            List<Column> list4one2 = new ArrayList<>();
+
+            list4one.addAll(tableData.getColumns().subList(left + count - 1, right + count));
+            list4one.add(tableData.getColumns().get(more + count - 1));
+            list4one.addAll(tableData.getColumns().subList(more + left + count - 1, more + count + right));
+            list4one.add(tableData.getColumns().get(2 * more + count - 1));
+            list4one.addAll(tableData.getColumns().subList(2 * more + left + count - 1, 2 * more + count + right));
+            list4one.add(tableData.getColumns().get(3 * more + count - 1));
+
+            int size1 = list4one.size() / 3;
+            Column one = new Column("previous", list4one.subList(0, size1 - 1));
+            Column two = new Column("compare", list4one.subList(size1, 2 * size1 - 1));
+            Column three = new Column("Delta", list4one.subList(2 * size1, 3 * size1 - 1));
+            list4one2.add(tableData.getColumns().get(0));
+            if (count == 2) {
+                list4one2.add(tableData.getColumns().get(1));
+            } else if (count == 3) {
+                list4one2.add(tableData.getColumns().get(1));
+                list4one2.add(tableData.getColumns().get(2));
             }
-            else if(count==3){
-                list4one.add(tableData.getColumns().get(1));
-                list4one.add(tableData.getColumns().get(2));
-            }
-            list4one.addAll(tableData.getColumns().subList(left+count-1,right+count));
-            list4one.add(tableData.getColumns().get(more+count-1));
-            list4one.addAll(tableData.getColumns().subList(more+left+count-1,more+count+right));
-            list4one.add(tableData.getColumns().get(2*more+count-1));
-            list4one.addAll(tableData.getColumns().subList(2*more+left+count-1,2*more+count+right));
-            list4one.add(tableData.getColumns().get(3*more+count-1));
-            tableData.setColumns(list4one);
+            list4one2.add(one);
+            list4one2.add(two);
+            list4one2.add(three);
+
+            tableData.setColumns(list4one2);
 
             table.getConfig().setFixedTitle(true);
-            if(count==2){
+            if (count == 2) {
                 tableData.getColumns().get(1).setFixed(true);
-            }
-            else if(count==3){
+            } else if (count == 3) {
                 tableData.getColumns().get(1).setFixed(true);
                 tableData.getColumns().get(2).setFixed(true);
             }
@@ -161,10 +170,9 @@ public class client_ExpandableAdapter extends BaseExpandableListAdapter {
             table.getConfig().setVerticalPadding(10);
             table.setTableData(tableData);
             tableData.getColumns().get(0).setAutoMerge(true);
-            if(count==2){
+            if (count == 2) {
                 tableData.getColumns().get(1).setAutoMerge(true);
-            }
-            else if(count==3){
+            } else if (count == 3) {
                 tableData.getColumns().get(1).setAutoMerge(true);
                 tableData.getColumns().get(2).setAutoMerge(true);
             }
@@ -189,11 +197,11 @@ public class client_ExpandableAdapter extends BaseExpandableListAdapter {
 
     }
 
-    public void inputdata(ArrayList<List<Object>> maplist,int left,int right,int count){
-        this.maplistInCliExp=null;
-        this.maplistInCliExp=maplist;
-        this.left=left;
-        this.right=right;
-        this.count=count;
+    public void inputdata(ArrayList<List<Object>> maplist, int left, int right, int count) {
+        this.maplistInCliExp = null;
+        this.maplistInCliExp = maplist;
+        this.left = left;
+        this.right = right;
+        this.count = count;
     }
 }

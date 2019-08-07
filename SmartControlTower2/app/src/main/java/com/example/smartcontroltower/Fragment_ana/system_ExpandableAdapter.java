@@ -121,27 +121,37 @@ public class system_ExpandableAdapter extends BaseExpandableListAdapter {
             if (groupPosition == 0) {
                 tableData = MapTableData.create("", maplistInSysExp.get(0));
                 List<Column> list4one=new ArrayList<>();
-                list4one.add(tableData.getColumns().get(0));
-                if(count==2){
-                    list4one.add(tableData.getColumns().get(1));
-                }
-                else if(count==3){
-                    list4one.add(tableData.getColumns().get(1));
-                    list4one.add(tableData.getColumns().get(2));
-                }
+                List<Column> list4one2=new ArrayList<>();
+
                 list4one.addAll(tableData.getColumns().subList(left+count-1,right+count));
                 list4one.add(tableData.getColumns().get(more+count-1));
                 list4one.addAll(tableData.getColumns().subList(more+left+count-1,more+count+right));
                 list4one.add(tableData.getColumns().get(2*more+count-1));
                 list4one.addAll(tableData.getColumns().subList(2*more+left+count-1,2*more+count+right));
                 list4one.add(tableData.getColumns().get(3*more+count-1));
-                //Log.e("open first",left+1+" "+(right+count)+" "+(more+left)+" "+(more+1+right)+" "+(2*more+left-1)+" "+(2*more+right));
-                tableData.setColumns(list4one);
+                int size1=list4one.size()/3;
+                Column one=new Column("previous",list4one.subList(0,size1-1));
+                Column two=new Column("compare",list4one.subList(size1,2*size1-1));
+                Column three=new Column("Delta",list4one.subList(2*size1,3*size1-1));
+                list4one2.add(tableData.getColumns().get(0));
+                if(count==2){
+                    list4one2.add(tableData.getColumns().get(1));
+                }
+                else if(count==3){
+                    list4one2.add(tableData.getColumns().get(1));
+                    list4one2.add(tableData.getColumns().get(2));
+                }
+                list4one2.add(one);
+                list4one2.add(two);
+                list4one2.add(three);
+
+                tableData.setColumns(list4one2);
 
 
             } else if (groupPosition == 1) {
                 tableData = MapTableData.create("", maplistInSysExp.get(1));
                 List<Column> list4two=new ArrayList<>();
+                List<Column> list4two2=new ArrayList<>();
                 list4two.add(tableData.getColumns().get(0));
                 if(count==2){
                     list4two.add(tableData.getColumns().get(1));
@@ -156,25 +166,51 @@ public class system_ExpandableAdapter extends BaseExpandableListAdapter {
                 list4two.add(tableData.getColumns().get(2*more+count-1));
                 list4two.addAll(tableData.getColumns().subList(2*more+left+count-1,2*more+count+right));
                 list4two.add(tableData.getColumns().get(3*more+count-1));
-                tableData.setColumns(list4two);
+
+                int size1=list4two.size()/3;
+                Column one=new Column("previous",list4two.subList(0,size1-1));
+                Column two=new Column("compare",list4two.subList(size1,2*size1-1));
+                Column three=new Column("Delta",list4two.subList(2*size1,3*size1-1));
+                list4two2.add(tableData.getColumns().get(0));
+                if(count==2){
+                    list4two2.add(tableData.getColumns().get(1));
+                }
+                else if(count==3){
+                    list4two2.add(tableData.getColumns().get(1));
+                    list4two2.add(tableData.getColumns().get(2));
+                }
+                list4two2.add(one);
+                list4two2.add(two);
+                list4two2.add(three);
+                tableData.setColumns(list4two2);
             } else {
                 tableData = MapTableData.create("", maplistInSysExp.get(2));
                 List<Column> list4third=new ArrayList<>();
-                list4third.add(tableData.getColumns().get(0));
-                if(count==2){
-                    list4third.add(tableData.getColumns().get(1));
-                }
-                else if(count==3){
-                    list4third.add(tableData.getColumns().get(1));
-                    list4third.add(tableData.getColumns().get(2));
-                }
+                List<Column> list4third2=new ArrayList<>();
+
                 list4third.addAll(tableData.getColumns().subList(left+count-1,right+count));
                 list4third.add(tableData.getColumns().get(more+count-1));
                 list4third.addAll(tableData.getColumns().subList(more+left,more+1+right));
                 list4third.add(tableData.getColumns().get(more+count-1));
                 list4third.addAll(tableData.getColumns().subList(2*more+left-1,2*more+right));
                 list4third.add(tableData.getColumns().get(2*more+count-1));
-                tableData.setColumns(list4third);
+
+                int size1=list4third.size()/3;
+                Column one=new Column("previous",list4third.subList(0,size1-1));
+                Column two=new Column("compare",list4third.subList(size1,2*size1-1));
+                Column three=new Column("Delta",list4third.subList(2*size1,3*size1-1));
+                list4third2.add(tableData.getColumns().get(0));
+                if(count==2){
+                    list4third2.add(tableData.getColumns().get(1));
+                }
+                else if(count==3){
+                    list4third2.add(tableData.getColumns().get(1));
+                    list4third2.add(tableData.getColumns().get(2));
+                }
+                list4third2.add(one);
+                list4third2.add(two);
+                list4third2.add(three);
+                tableData.setColumns(list4third2);
             }
 
 

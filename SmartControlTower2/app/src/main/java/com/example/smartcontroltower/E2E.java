@@ -9,6 +9,8 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.content.res.Resources;
@@ -19,6 +21,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -61,7 +64,7 @@ public class E2E extends AppCompatActivity {
     private RadioGroup viewType;
     private RadioGroup radioGroup;
     private String expandTitle = "Expand";
-    private InitializeInfo info=null;
+    private InitializeInfo info = null;
 
     @Override
     protected void onPause() {
@@ -93,12 +96,12 @@ public class E2E extends AppCompatActivity {
         verll = findViewById(R.id.e2e_ver);
         table = findViewById(R.id.table);
 
-        info  = (InitializeInfo) getIntent().getSerializableExtra("InitializeInfo");
-        Log.e("info",info.getVersion().toString());
+        info = (InitializeInfo) getIntent().getSerializableExtra("InitializeInfo");
+        Log.e("info", info.getVersion().toString());
         /////////////////Table//////////////////////////////////////////////////
         //设置初始值
-        if (answerE2E.size() != 0) {
-            setNumber(selectRadioBtn(radioGroup), expandTitle);
+        if (answerE2E.size() != 0||savedInstanceState != null) {
+                setNumber(selectRadioBtn(radioGroup), expandTitle);
         } else {
             ld = new LoadingDialog(this);
             ld.setLoadingText("Loading...").setSuccessText("Success").setFailedText("Failed")
@@ -114,12 +117,11 @@ public class E2E extends AppCompatActivity {
             public void onClick(View view) {
                 if (expandTitle.equals("Expand")) {
                     expandTitle = "Collapse";
-                }
-                else if(expandTitle.equals("Collapse")) {
+                } else if (expandTitle.equals("Collapse")) {
                     expandTitle = "Expand";
                 }
                 expand.setText(expandTitle);
-                Log.e("expand",expandTitle);
+                Log.e("expand", expandTitle);
                 setNumber(selectRadioBtn(radioGroup), expandTitle);
             }
         });
@@ -181,24 +183,24 @@ public class E2E extends AppCompatActivity {
                         break;
                     case R.id.nav_Dynamic:
                         Intent intent2 = new Intent(E2E.this, Dynamic.class);
-                        Bundle bundle2=new Bundle();
-                        bundle2.putSerializable("InitializeInfo",info);
+                        Bundle bundle2 = new Bundle();
+                        bundle2.putSerializable("InitializeInfo", info);
                         intent2.putExtras(bundle2);
                         startActivity(intent2);
                         finish();
                         break;
                     case R.id.nav_DirectBL:
                         Intent intent4 = new Intent(E2E.this, DirectBL.class);
-                        Bundle bundle4=new Bundle();
-                        bundle4.putSerializable("InitializeInfo",info);
+                        Bundle bundle4 = new Bundle();
+                        bundle4.putSerializable("InitializeInfo", info);
                         intent4.putExtras(bundle4);
                         startActivity(intent4);
                         finish();
                         break;
                     case R.id.nav_analysis:
                         Intent intent3 = new Intent(E2E.this, Analysis.class);
-                        Bundle bundle3=new Bundle();
-                        bundle3.putSerializable("InitializeInfo",info);
+                        Bundle bundle3 = new Bundle();
+                        bundle3.putSerializable("InitializeInfo", info);
                         intent3.putExtras(bundle3);
                         startActivity(intent3);
                         finish();
@@ -237,11 +239,11 @@ public class E2E extends AppCompatActivity {
         ///////////////////////CheckBox列表/////////////////////////////////////////
 
         LinearLayout e2ever = findViewById(R.id.e2e_ver);
-        String[] ver = ((String[])info.getVersion().toArray(new String[info.getVersion().size()]));
+        String[] ver = ((String[]) info.getVersion().toArray(new String[info.getVersion().size()]));
         ConstructCheck("version", ver, e2ever, "");
 
         LinearLayout e2eyq = findViewById(R.id.e2e_yq);
-        String[] yq = ((String[])info.getVersion_year_quar().toArray(new String[info.getVersion_year_quar().size()]));
+        String[] yq = ((String[]) info.getVersion_year_quar().toArray(new String[info.getVersion_year_quar().size()]));
         ConstructCheck("yq", yq, e2eyq, yq[0]);
 
         LinearLayout e2elob = findViewById(R.id.e2e_lob);
@@ -400,12 +402,16 @@ public class E2E extends AppCompatActivity {
             @Override
             public void run() {
                 //测试数据库的语句,在子线程操作
-                answerE2E = DBUtil.QuerySQL(sql,1);
+                Message msg = new Message();
+                answerE2E = DBUtil.QuerySQL(sql, 1);
                 //Log.e("SQL",sql);
                 //answerE2E = DBUtil.sendRequestWithOkHttp();
-                setNumber(selectRadioBtn(radioGroup), expandTitle);
-                Message msg = new Message();
-                msg.what = 1001;
+                if (answerE2E.size() == 0) {
+                    msg.what = 1002;
+                } else {
+                    setNumber(selectRadioBtn(radioGroup), expandTitle);
+                    msg.what = 1001;
+                }
                 Bundle data = new Bundle();
                 msg.setData(data);
                 mHandler.sendMessage(msg);
@@ -422,7 +428,10 @@ public class E2E extends AppCompatActivity {
                     String str = msg.getData().getString("result");
                     ld.loadSuccess();
                     break;
-
+                case 1002:
+                    Log.e("Timeout", "Timeout in handler");
+                    ld.setFailedText("No Data").loadFailed();
+                    break;
                 default:
                     ld.loadFailed();
                     break;
@@ -463,109 +472,115 @@ public class E2E extends AppCompatActivity {
     public void setNumber(String unit, String title) {
         List<Object> maplist = new ArrayList<>();
         List<Object> collapsemap = new ArrayList<>();
-        for (LinkedHashMap<String, String> a : answerE2E) {
-            LinkedHashMap<String, String> lhm = new LinkedHashMap<>();
-            LinkedHashMap<String,String> lhm2=new LinkedHashMap<>();
-            if (unit.equals("K")) {
-                for (String b : a.keySet()) {
-                    if (!b.equals("Item")) {
-                        double dou = Double.parseDouble(a.get(b));
-                        dou = dou / 1000;
-                        lhm.put(b, String.format("%.1f", dou));
+        if (answerE2E.size() != 0) {
+            for (LinkedHashMap<String, String> a : answerE2E) {
+                LinkedHashMap<String, String> lhm = new LinkedHashMap<>();
+                LinkedHashMap<String, String> lhm2 = new LinkedHashMap<>();
+                if (unit.equals("K")) {
+                    for (String b : a.keySet()) {
+                        if (!b.equals("Item")) {
+                            double dou = Double.parseDouble(a.get(b));
+                            dou = dou / 1000;
+                            lhm.put(b, String.format("%.1f", dou));
+                        } else {
+                            lhm.put(b, a.get(b));
+                        }
+                    }
+                    if (lhm.get("Item").contains("Direct_")) {
+                        String temp = lhm.get("Item");
+                        temp = temp.replace("Direct_", "    ");
+                        lhm.put("Item", temp.replace("_", " "));
+                    } else if (lhm.get("Item").contains("Scheduled_")) {
+                        String temp = lhm.get("Item");
+                        temp = temp.replace("Scheduled_", "    ");
+                        lhm.put("Item", temp.replace("_", " "));
                     } else {
-                        lhm.put(b, a.get(b));
+                        collapsemap.add(lhm);
                     }
-                }
-                if (lhm.get("Item").contains("Direct_")) {
-                    String temp = lhm.get("Item");
-                    temp = temp.replace("Direct_", "    ");
-                    lhm.put("Item", temp.replace("_", " "));
-                } else if (lhm.get("Item").contains("Scheduled_")) {
-                    String temp = lhm.get("Item");
-                    temp = temp.replace("Scheduled_", "    ");
-                    lhm.put("Item", temp.replace("_", " "));
+                    maplist.add(lhm);
                 } else {
-                    collapsemap.add(lhm);
-                }
-                maplist.add(lhm);
-            } else {
-                for (String b : a.keySet()) {
+                    for (String b : a.keySet()) {
                         lhm2.put(b, a.get(b));
+                    }
+                    Log.e("a", a.toString());
+                    if (a.get("Item").contains("Direct_")) {
+                        String temp = a.get("Item");
+                        temp = temp.replace("Direct_", "    ");
+                        lhm2.put("Item", temp.replace("_", " "));
+                    } else if (a.get("Item").contains("Scheduled_")) {
+                        String temp = a.get("Item");
+                        temp = temp.replace("Scheduled_", "    ");
+                        lhm2.put("Item", temp.replace("_", " "));
+                    } else {
+                        collapsemap.add(lhm2);
+                    }
+                    Log.e("a-after", a.toString());
+                    maplist.add(lhm2);
                 }
-                Log.e("a",a.toString());
-                if (a.get("Item").contains("Direct_")) {
-                    String temp = a.get("Item");
-                    temp = temp.replace("Direct_", "    ");
-                    lhm2.put("Item", temp.replace("_", " "));
-                } else if (a.get("Item").contains("Scheduled_")) {
-                    String temp = a.get("Item");
-                    temp = temp.replace("Scheduled_", "    ");
-                    lhm2.put("Item", temp.replace("_", " "));
+
+            }
+            RadioGroup radio = findViewById(R.id.e2e_rg);
+            RadioButton radioButton = findViewById(radio.getCheckedRadioButtonId());
+            String ratioText = radioButton.getText().toString();
+
+            if (maplist.size() != 0 && collapsemap.size() != 0) {
+                Log.e("size", maplist.size() + " " + collapsemap.size());
+                MapTableData tableData;
+                if (title.equals("Expand")) {
+                    tableData = MapTableData.create(ratioText, collapsemap);
+                    table.getConfig().setContentCellBackgroundFormat(new ICellBackgroundFormat<CellInfo>() {
+                        @Override
+                        public void drawBackground(Canvas canvas, Rect rect, CellInfo cellInfo, Paint paint) {
+                            if (cellInfo.row == 4 || cellInfo.row == 5) {
+                                paint.setColor(getResources().getColor(R.color.rowgray));
+                                canvas.drawRect(rect, paint);
+                            }
+                        }
+
+                        @Override
+                        public int getTextColor(CellInfo cellInfo) {
+                            return 0;
+                        }
+
+
+                    });
                 } else {
-                    collapsemap.add(lhm2);
+                    tableData = MapTableData.create("EoQ && IDC", maplist);
+                    table.getConfig().setContentCellBackgroundFormat(new ICellBackgroundFormat<CellInfo>() {
+                        @Override
+                        public void drawBackground(Canvas canvas, Rect rect, CellInfo cellInfo, Paint paint) {
+                            if (cellInfo.row == 4 || cellInfo.row == 11) {
+                                paint.setColor(getResources().getColor(R.color.rowgray));
+                                canvas.drawRect(rect, paint);
+                            } else if ((cellInfo.row > 4 && cellInfo.row < 11) || (cellInfo.row > 11 && cellInfo.row < 21)) {
+                                paint.setColor(getResources().getColor(R.color.itemgray));
+                                canvas.drawRect(rect, paint);
+                            }
+                        }
+
+                        @Override
+                        public int getTextColor(CellInfo cellInfo) {
+                            return 0;
+                        }
+
+
+                    });
                 }
-                Log.e("a-after",a.toString());
-                maplist.add(lhm2);
+
+                table.getConfig().setFixedTitle(true);
+                tableData.getColumns().get(0).setFixed(true);
+                tableData.getColumns().get(0).setTextAlign(Paint.Align.LEFT);
+                table.setZoom(true, 2, 1);
+                table.getConfig().setShowXSequence(false);
+                table.getConfig().setShowYSequence(false);
+                table.getConfig().setTableTitleStyle(new FontStyle(50, getResources().getColor(R.color.table_gray)));
+                table.getConfig().setColumnTitleBackground(new BaseBackgroundFormat(getResources().getColor(R.color.table_gray)));
+                table.getConfig().setContentStyle(new FontStyle(45, getResources().getColor(R.color.table_gray)));
+                table.getConfig().setColumnTitleStyle(new FontStyle(45, getResources().getColor(R.color.white)));
+                table.getConfig().setVerticalPadding(10);
+                table.setTableData(tableData);
+                table.invalidate();
             }
-
-        }
-
-        if (maplist.size() != 0 && collapsemap.size() != 0) {
-            Log.e("size",maplist.size()+" "+collapsemap.size());
-            MapTableData tableData;
-            if (title.equals("Expand")) {
-                tableData = MapTableData.create("EoQ && IDC", collapsemap);
-                table.getConfig().setContentCellBackgroundFormat(new ICellBackgroundFormat<CellInfo>() {
-                    @Override
-                    public void drawBackground(Canvas canvas, Rect rect, CellInfo cellInfo, Paint paint) {
-                        if (cellInfo.row==4||cellInfo.row==5) {
-                            paint.setColor(getResources().getColor(R.color.rowgray));
-                            canvas.drawRect(rect, paint);
-                        }
-                    }
-                    @Override
-                    public int getTextColor(CellInfo cellInfo) {
-                        return 0;
-                    }
-
-
-                });
-            } else {
-                tableData = MapTableData.create("EoQ && IDC", maplist);
-                table.getConfig().setContentCellBackgroundFormat(new ICellBackgroundFormat<CellInfo>() {
-                    @Override
-                    public void drawBackground(Canvas canvas, Rect rect, CellInfo cellInfo, Paint paint) {
-                        if (cellInfo.row==4||cellInfo.row==11) {
-                            paint.setColor(getResources().getColor(R.color.rowgray));
-                            canvas.drawRect(rect, paint);
-                        }
-                        else if((cellInfo.row>4&&cellInfo.row<11)||(cellInfo.row>11&&cellInfo.row<21)){
-                            paint.setColor(getResources().getColor(R.color.itemgray));
-                            canvas.drawRect(rect, paint);
-                        }
-                    }
-                    @Override
-                    public int getTextColor(CellInfo cellInfo) {
-                        return 0;
-                    }
-
-
-                });
-            }
-
-            table.getConfig().setFixedTitle(true);
-            tableData.getColumns().get(0).setFixed(true);
-            tableData.getColumns().get(0).setTextAlign(Paint.Align.LEFT);
-            table.setZoom(true, 2, 1);
-            table.getConfig().setShowXSequence(false);
-            table.getConfig().setShowYSequence(false);
-            table.getConfig().setTableTitleStyle(new FontStyle(50, getResources().getColor(R.color.table_gray)));
-            table.getConfig().setColumnTitleBackground(new BaseBackgroundFormat(getResources().getColor(R.color.table_gray)));
-            table.getConfig().setContentStyle(new FontStyle(45, getResources().getColor(R.color.table_gray)));
-            table.getConfig().setColumnTitleStyle(new FontStyle(45, getResources().getColor(R.color.white)));
-            table.getConfig().setVerticalPadding(10);
-            table.setTableData(tableData);
-            table.invalidate();
         }
     }
 
@@ -584,5 +599,29 @@ public class E2E extends AppCompatActivity {
 
     }
 
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        switch (keyCode) {
+            case KeyEvent.KEYCODE_BACK:
+                AlertDialog.Builder build = new AlertDialog.Builder(this);
+                build.setTitle("Notice").setMessage("Do you want to Log out?");
+                build.setPositiveButton("Exit",
+                        new DialogInterface.OnClickListener() {
+
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                finish();
+                            }
+                        });
+                build.setNegativeButton("Cancel",
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                            }
+                        }).show();
+                break;
+        }
+        return super.onKeyDown(keyCode, event);
+    }
 
 }

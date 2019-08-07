@@ -119,21 +119,31 @@ public class ISGLOB_ExpandableAdapter extends BaseExpandableListAdapter {
             MapTableData tableData = MapTableData.create("", maplistInIsgLob.get(groupPosition));
 
             List<Column> list4one = new ArrayList<>();
+            List<Column> list4one2=new ArrayList<>();
             list4one.add(tableData.getColumns().get(0));
-            if(count==2){
-                list4one.add(tableData.getColumns().get(1));
-            }
-            else if(count==3){
-                list4one.add(tableData.getColumns().get(1));
-                list4one.add(tableData.getColumns().get(2));
-            }
             list4one.addAll(tableData.getColumns().subList(left+count-1,right+count));
             list4one.add(tableData.getColumns().get(more+count-1));
             list4one.addAll(tableData.getColumns().subList(more+left+count-1,more+count+right));
             list4one.add(tableData.getColumns().get(2*more+count-1));
             list4one.addAll(tableData.getColumns().subList(2*more+left+count-1,2*more+count+right));
             list4one.add(tableData.getColumns().get(3*more+count-1));
-            tableData.setColumns(list4one);
+
+            int size1 = list4one.size() / 3;
+            Column one = new Column("previous", list4one.subList(0, size1 - 1));
+            Column two = new Column("compare", list4one.subList(size1, 2 * size1 - 1));
+            Column three = new Column("Delta", list4one.subList(2 * size1, 3 * size1 - 1));
+            list4one2.add(tableData.getColumns().get(0));
+            if (count == 2) {
+                list4one2.add(tableData.getColumns().get(1));
+            } else if (count == 3) {
+                list4one2.add(tableData.getColumns().get(1));
+                list4one2.add(tableData.getColumns().get(2));
+            }
+            list4one2.add(one);
+            list4one2.add(two);
+            list4one2.add(three);
+
+            tableData.setColumns(list4one2);
 
             table.getConfig().setFixedTitle(true);
             tableData.getColumns().get(0).setFixed(true);

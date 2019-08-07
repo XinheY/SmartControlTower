@@ -5,7 +5,7 @@
     android:id="@+id/dyn_drawer"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/welcome_bg"
+    android:background="@color/table_back"
     tools:context=".Dynamic">
 
     <LinearLayout
@@ -64,7 +64,7 @@
         android:layout_gravity="start"
         app:theme="@style/NavigationDrawerStyle"
         app:headerLayout="@layout/nav_header"
-        android:background="@color/table_back"
+        android:background="@color/nav_back"
         app:menu="@menu/nav_menu" />
 
     <include

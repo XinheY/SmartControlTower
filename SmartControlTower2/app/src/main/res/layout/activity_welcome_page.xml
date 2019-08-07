@@ -53,7 +53,7 @@
         android:id="@+id/nav_view"
         android:layout_gravity="start"
         app:menu="@menu/nav_menu"
-        android:background="@color/table_back"
+        android:background="@color/nav_back"
         app:theme="@style/NavigationDrawerStyle"
         app:headerLayout="@layout/nav_header"/>
 

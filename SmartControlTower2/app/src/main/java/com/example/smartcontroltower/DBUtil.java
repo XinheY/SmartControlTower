@@ -2,6 +2,7 @@ package com.example.smartcontroltower;
 
 
 import android.util.Log;
+import android.widget.Toast;
 
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -49,13 +50,6 @@ public class DBUtil {
             parseXMLWithPull(responseData, anss);
 
 
-            for (int i = 0; i < anss.size(); i++) {
-                LinkedHashMap<String, String> count = anss.get(i);
-                for (String s : count.keySet()) {
-                    // Log.d("jieguo", s + ":" + count.get(s) + ":" + i);
-                }
-            }
-
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -83,7 +77,8 @@ public class DBUtil {
         String result = "";
         ArrayList<LinkedHashMap<String, String>> answer = new ArrayList<>();
         try {
-            Connection conn = getSQLConnection(地址账号用户名);
+            Connection conn = getSQLConnection(地址密码用户名);
+            if(conn!=null){
             Statement stmt = conn.createStatement();//
             ResultSet rs = stmt.executeQuery(sql);
             while (rs.next()) {
@@ -97,16 +92,10 @@ public class DBUtil {
             }
 
 
-//            for(int i=0;i<answer.size();i++){
-//                LinkedHashMap<String,String> count=answer.get(i);
-//                for(String s:count.keySet()){
-//                    Log.d("jieguo",s+":"+count.get(s)+":"+i);
-//                }
-//            }
 
             rs.close();
             stmt.close();
-            conn.close();
+            conn.close();}
         } catch (SQLException e) {
             e.printStackTrace();
         } catch (IOException e) {

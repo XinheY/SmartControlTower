@@ -154,7 +154,9 @@
             <Button
                 android:id="@+id/e2e_yq_btn"
                 style="@style/e2e_btn"
+                android:background="@drawable/btn_inlist"
                 android:onClick="showMutilAlertDialog"
+                android:layout_margin="10dp"
                 android:text="Year/Quar"
                 android:radius="15dp"/>
 
@@ -170,7 +172,9 @@
             <Button
                 android:id="@+id/e2e_ver_btn"
                 style="@style/e2e_btn"
+                android:background="@drawable/btn_inlist"
                 android:onClick="showMutilAlertDialog"
+                android:layout_margin="10dp"
                 android:text="Submit Version"
                 android:visibility="gone"/>
 
@@ -185,7 +189,9 @@
 
             <Button
                 android:id="@+id/e2e_lob_btn"
+                android:background="@drawable/btn_inlist"
                 style="@style/e2e_btn"
+                android:layout_margin="10dp"
                 android:onClick="showMutilAlertDialog"
                 android:text="Lob" />
 
@@ -200,7 +206,9 @@
 
             <Button
                 android:id="@+id/e2e_sf_btn"
+                android:background="@drawable/btn_inlist"
                 style="@style/e2e_btn"
+                android:layout_margin="10dp"
                 android:onClick="showMutilAlertDialog"
                 android:text="System Flag" />
 
@@ -215,7 +223,9 @@
 
             <Button
                 android:id="@+id/e2e_pt_btn"
+                android:background="@drawable/btn_inlist"
                 style="@style/e2e_btn"
+                android:layout_margin="10dp"
                 android:onClick="showMutilAlertDialog"
                 android:text="Product Type" />
 
@@ -230,7 +240,9 @@
 
             <Button
                 android:id="@+id/e2e_lg_btn"
+                android:background="@drawable/btn_inlist"
                 style="@style/e2e_btn"
+                android:layout_margin="10dp"
                 android:onClick="showMutilAlertDialog"
                 android:text="Lob Group" />
 
@@ -245,7 +257,9 @@
 
             <Button
                 android:id="@+id/e2e_region_btn"
+                android:background="@drawable/btn_inlist"
                 style="@style/e2e_btn"
+                android:layout_margin="10dp"
                 android:onClick="showMutilAlertDialog"
                 android:text="Region" />
 
@@ -260,7 +274,9 @@
 
             <Button
                 android:id="@+id/e2e_segment_btn"
+                android:background="@drawable/btn_inlist"
                 style="@style/e2e_btn"
+                android:layout_margin="10dp"
                 android:onClick="showMutilAlertDialog"
                 android:text="Segment" />
 
@@ -276,6 +292,8 @@
             <Button
                 android:id="@+id/e2e_site_btn"
                 style="@style/e2e_btn"
+                android:layout_margin="10dp"
+                android:background="@drawable/btn_inlist"
                 android:onClick="showMutilAlertDialog"
                 android:text="Site" />
 

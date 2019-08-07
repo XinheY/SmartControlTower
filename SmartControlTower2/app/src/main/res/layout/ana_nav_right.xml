@@ -139,7 +139,9 @@
             <Button
                 android:id="@+id/ana_sv_btn"
                 android:layout_width="match_parent"
+                android:background="@drawable/btn_inlist"
                 android:layout_height="wrap_content"
+                android:layout_margin="10dp"
                 android:onClick="showMutilAlertDialog"
                 android:text="Submit Version" />
 
@@ -158,7 +160,9 @@
 
             <Button
                 android:id="@+id/ana_cv_btn"
+                android:background="@drawable/btn_inlist"
                 android:layout_width="match_parent"
+                android:layout_margin="10dp"
                 android:layout_height="wrap_content"
                 android:onClick="showMutilAlertDialog"
                 android:text="Compare Version" />
@@ -178,7 +182,9 @@
 
             <Button
                 android:id="@+id/ana_gb_btn"
+                android:background="@drawable/btn_inlist"
                 android:layout_width="match_parent"
+                android:layout_margin="10dp"
                 android:layout_height="wrap_content"
                 android:onClick="showMutilAlertDialog"
                 android:text="GroupBy" />
@@ -192,6 +198,8 @@
 
             <Button
                 android:id="@+id/ana_vt_btn"
+                android:background="@drawable/btn_inlist"
+                android:layout_margin="10dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:onClick="showMutilAlertDialog"
@@ -206,6 +214,8 @@
 
             <Button
                 android:id="@+id/ana_source_btn"
+                android:layout_margin="10dp"
+                android:background="@drawable/btn_inlist"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:onClick="showMutilAlertDialog"

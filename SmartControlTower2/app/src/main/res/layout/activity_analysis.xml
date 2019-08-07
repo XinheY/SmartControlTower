@@ -61,7 +61,7 @@
         android:layout_gravity="start"
         app:headerLayout="@layout/nav_header"
         app:menu="@menu/nav_menu"
-        android:background="@color/table_back"
+        android:background="@color/nav_back"
         app:theme="@style/NavigationDrawerStyle" />
 
     <include

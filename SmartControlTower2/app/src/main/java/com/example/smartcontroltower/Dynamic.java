@@ -10,6 +10,8 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.content.res.Resources;
@@ -17,6 +19,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -78,7 +81,9 @@ public class Dynamic extends AppCompatActivity {
             answer2 = new ArrayList<>();
         }
 
-
+        ld = new LoadingDialog(this);
+        ld.setLoadingText("Loading...").setSuccessText("Success").setFailedText("Failed")
+                .closeSuccessAnim();
         Toolbar toolbar = (Toolbar) findViewById(R.id.dyn_toolbar);
         setSupportActionBar(toolbar);
 
@@ -197,6 +202,9 @@ public class Dynamic extends AppCompatActivity {
         refresh.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                ld = new LoadingDialog(view.getContext());
+                ld.setLoadingText("Loading...").setSuccessText("Success").setFailedText("Failed")
+                        .closeSuccessAnim().show();
                 String first = "";
                 String second = "";
                 String third = "";
@@ -243,7 +251,7 @@ public class Dynamic extends AppCompatActivity {
         });
 
         ////////////////////////////////Initialize Table//////////////////////////////////
-        if (answer.size() == 0 && answer2.size() == 0) updateTable();
+        if ((answer.size() == 0 || answer2.size() == 0)||savedInstanceState != null) updateTable();
 
     }
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -266,20 +274,24 @@ public class Dynamic extends AppCompatActivity {
                 //测试数据库的语句,在子线程操作
                 answer.clear();
                 answer2.clear();
-                answer = DBUtil.QuerySQL(sql[0],3);
-                answer2 = DBUtil.QuerySQL(sql[1],3);
-                //answer = DBUtil.sendRequestWithOkHttp();
-                setNumber();
                 Message msg = new Message();
-                msg.what = 1001;
+                answer = DBUtil.QuerySQL(sql[0], 3);
+                answer2 = DBUtil.QuerySQL(sql[1], 3);
+                //answer = DBUtil.sendRequestWithOkHttp();
+                Log.e("大小",answer.size()+" "+answer2.size());
+                if (answer2.size() != 0 || answer.size() != 0) {
+                    msg.what = 1001;
+                } else {
+                    msg.what = 1002;
+                }
+                setNumber();
+                Fragment_Dynamic fd = (Fragment_Dynamic) adapter.getItem(0);
+                Fragment_goal fg = (Fragment_goal) adapter.getItem(1);
+                fd.refreshDate(maplist, "APJ Dynamic CSR BL (" + datepicker.getText() + " " + hour + ":00)");
+                fg.refreshDate(maplist2);
                 Bundle data = new Bundle();
                 msg.setData(data);
                 mHandler.sendMessage(msg);
-                Fragment_Dynamic fd = (Fragment_Dynamic) adapter.getItem(0);
-                Fragment_goal fg = (Fragment_goal) adapter.getItem(1);
-                Log.e("refreshDate", maplist.size() + "");
-                fd.refreshDate(maplist, "APJ Dynamic CSR BL (" + datepicker.getText() + " " + hour + ":00)");
-                fg.refreshDate(maplist2);
             }
         };
         new Thread(run).start();
@@ -291,6 +303,11 @@ public class Dynamic extends AppCompatActivity {
             switch (msg.what) {
                 case 1001:
                     String str = msg.getData().getString("result");
+                    ld.loadSuccess();
+                    break;
+                case 1002:
+                    Log.e("Timeout", "Timeout in handler");
+                    ld.setFailedText("No Data").loadFailed();
                     break;
                 default:
                     break;
@@ -481,10 +498,37 @@ public class Dynamic extends AppCompatActivity {
         String[] sql = new String[2];
         sql[0] = "EXEC [P_DYNAMIC_BACKLOG_XMN_RESULTE] '" + first + "','" + second + "','" + fourth + "','" + third + "'";
         sql[1] = "EXEC [P_DYNAMIC_BACKLOG_TRACK] '" + first + "','" + fourth + "','" + third + "'";
+        ld.setLoadingText("Loading...").show();
         test(sql);
         Log.e("Size", answer.size() + " " + answer2.size());
 
 
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        switch (keyCode) {
+            case KeyEvent.KEYCODE_BACK:
+                AlertDialog.Builder build = new AlertDialog.Builder(this);
+                build.setTitle("Notice").setMessage("Do you want to Log out?");
+                build.setPositiveButton("Exit",
+                        new DialogInterface.OnClickListener() {
+
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                finish();
+                            }
+                        });
+                build.setNegativeButton("Cancel",
+                        new DialogInterface.OnClickListener() {
+
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                            }
+                        }).show();
+                break;
+        }
+        return super.onKeyDown(keyCode, event);
     }
 
 }

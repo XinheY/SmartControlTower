@@ -9,6 +9,8 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.content.res.Resources;
@@ -16,6 +18,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,11 +35,6 @@ import com.example.smartcontroltower.Fragment_ana.FragmentClientLob;
 import com.example.smartcontroltower.Fragment_ana.FragmentISG;
 import com.example.smartcontroltower.Fragment_ana.FragmentISGLOB;
 import com.example.smartcontroltower.Fragment_ana.FragmentSystem;
-import com.example.smartcontroltower.Fragment_ana.ISGLOB_ExpandableAdapter;
-import com.example.smartcontroltower.Fragment_ana.ISG_ExpandableAdapter;
-import com.example.smartcontroltower.Fragment_ana.client_ExpandableAdapter;
-import com.example.smartcontroltower.Fragment_ana.clientlob_ExpandableAdapter;
-import com.example.smartcontroltower.Fragment_ana.system_ExpandableAdapter;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.tabs.TabLayout;
 import com.jaygoo.widget.OnRangeChangedListener;
@@ -44,6 +42,7 @@ import com.jaygoo.widget.RangeSeekBar;
 import com.xiasuhuei321.loadingdialog.view.LoadingDialog;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -72,7 +71,7 @@ public class Analysis extends AppCompatActivity {
     private ViewPagerAdapter adapter;
     private int finishAna = 0;
     private static CountDownLatch cdl = null;
-    private InitializeInfo info;
+    private InitializeInfo info,info2;
     private int left = 9;
     private int right = 13;
     private static int gbChoseCount = 1;
@@ -84,7 +83,6 @@ public class Analysis extends AppCompatActivity {
         if (savedInstanceState != null) {
             // Restore value of members from saved state
             answerAna = (ArrayList<LinkedHashMap<String, String>>) savedInstanceState.getSerializable("initial");
-            Log.e("初始化", answerAna.size() + "" + answerAna.toString());
             summaryOld = (HashMap<String, HashMap<String, CheckBox>>) savedInstanceState.getSerializable("initial2");
             radioOld = (LinkedHashMap<String, ArrayList<RadioButton>>) savedInstanceState.getSerializable("initial3");
             left = savedInstanceState.getInt("left");
@@ -93,6 +91,7 @@ public class Analysis extends AppCompatActivity {
             answerAna = new ArrayList<>();
         }
         info = (InitializeInfo) getIntent().getSerializableExtra("InitializeInfo");
+        info2=(InitializeInfo)getIntent().getSerializableExtra("InitializeInfo2");
         setContentView(R.layout.activity_analysis);
         radioGroup = findViewById(R.id.ana_range);
         ld = new LoadingDialog(this);
@@ -118,7 +117,7 @@ public class Analysis extends AppCompatActivity {
         info = (InitializeInfo) getIntent().getSerializableExtra("InitializeInfo");
         /////////////////Table//////////////////////////////////////////////////
         //设置初始值
-        if (answerAna.size() != 0) {
+        if (answerAna.size() != 0||savedInstanceState != null) {
             setNumber(selectRadioBtn(radioGroup));
         } else {
             ld.show();
@@ -332,7 +331,7 @@ public class Analysis extends AppCompatActivity {
                     }
                     if (count == 0 && i == 1) {
                         canrun = false;
-                        ld.closeFailedAnim().loadFailed();
+                        ld.loadFailed();
                     }
                     searchSum.add(oneCondition);
                 }
@@ -340,7 +339,7 @@ public class Analysis extends AppCompatActivity {
                     Toast.makeText(view.getContext(), "View Type can't be blank", Toast.LENGTH_SHORT).show();
                 }
                 else if (gbChoseCount > 3) {
-                    ld.closeFailedAnim().loadFailed();
+                    ld.loadFailed();
                     Toast.makeText(view.getContext(), "Group By more than 3 level", Toast.LENGTH_SHORT).show();
                 } else if (gbChoseCount == 0) {
                     ld.closeFailedAnim().loadFailed();
@@ -411,10 +410,15 @@ public class Analysis extends AppCompatActivity {
             public void run() {
                 //测试数据库的语句,在子线程操作
                 answerAna = DBUtil.QuerySQL(sql, 2);
+                Message msg = new Message();
+                if(answerAna.size()==0){
+                    msg.what= 1002;
+                }
+                else{
                 //answerAna = DBUtil.sendRequestWithOkHttp();
                 setNumber(selectRadioBtn(radioGroup));
-                Message msg = new Message();
                 msg.what = 1001;
+                }
                 Bundle data = new Bundle();
                 msg.setData(data);
                 mHandler.sendMessage(msg);
@@ -433,7 +437,10 @@ public class Analysis extends AppCompatActivity {
                     String str = msg.getData().getString("result");
                     ld.loadSuccess();
                     break;
-
+                case 1002:
+                    Log.e("Timeout","Timeout in handler");
+                    ld.setFailedText("No Data").loadFailed();
+                    break;
                 default:
                     //ld.loadFailed();
                     break;
@@ -527,60 +534,62 @@ public class Analysis extends AppCompatActivity {
 
     //将数字放进table里
     public void setNumber(String unit) {
-        List<Object> maplist = new ArrayList<>();
-        maplistSum.clear();
-        String title = "Empty";
-        Log.e("object", unit);
-        for (LinkedHashMap<String, String> a : answerAna) {
-            LinkedHashMap<String, String> b = a;
-            if (b.containsKey("Title")) {
-                maplistSum.put(title, maplist);
-                maplist = new ArrayList<>();
-                title = b.get("Title");
+        if(answerAna.size()!=0) {
+            List<Object> maplist = new ArrayList<>();
+            maplistSum.clear();
+            String title = "Empty";
+            Log.e("object", unit);
+            for (LinkedHashMap<String, String> a : answerAna) {
+                LinkedHashMap<String, String> b = a;
+                if (b.containsKey("Title")) {
+                    maplistSum.put(title, maplist);
+                    maplist = new ArrayList<>();
+                    title = b.get("Title");
 
+                }
+                maplist.add(b);
             }
-            maplist.add(b);
-        }
-        maplistSum.put(title, maplist);
-        maplistSum.remove("Empty");
+            maplistSum.put(title, maplist);
+            maplistSum.remove("Empty");
 
 //        for(String s:maplistSum.keySet()){
 //            Log.e("数组",maplistSum.get(s).toString());
 //        }
 
-        LinkedHashMap<String, List<Object>> maplistSum2 = new LinkedHashMap<>();
+            LinkedHashMap<String, List<Object>> maplistSum2 = new LinkedHashMap<>();
 
-        for (String typeTitle : maplistSum.keySet()) {
-            List<Object> templist = new ArrayList<>();
-            for (int h = 0; h < maplistSum.get(typeTitle).size(); h++) {
-                LinkedHashMap<String, String> tempmap = new LinkedHashMap<>();
-                for (String string : ((LinkedHashMap<String, String>) maplistSum.get(typeTitle).get(h)).keySet()) {
-                    if (!string.equals("Title")) {
-                        String value = ((LinkedHashMap<String, String>) maplistSum.get(typeTitle).get(h)).get(string);
-                        value = value.replace("_", "");
-                        if (value.contains("N") && !string.equals("COUNTRY") && !value.equals("-") && !string.equals("SITE") &&
-                                !string.equals("FACILITY") && !string.equals("ORDERTYPE")) {
-                            value = value.replace("N", "");
-                        }
-                        value = value.replace("SI-Y", "");
-                        value = value.replace("MFG-Y", "");
-                        if (value.equals("0")) value = "-";
-                        if (unit.equals("K")) {
-                            if (!string.equals("COUNTRY") && !value.equals("-") && !string.equals("SITE") &&
+            for (String typeTitle : maplistSum.keySet()) {
+                List<Object> templist = new ArrayList<>();
+                for (int h = 0; h < maplistSum.get(typeTitle).size(); h++) {
+                    LinkedHashMap<String, String> tempmap = new LinkedHashMap<>();
+                    for (String string : ((LinkedHashMap<String, String>) maplistSum.get(typeTitle).get(h)).keySet()) {
+                        if (!string.equals("Title")) {
+                            String value = ((LinkedHashMap<String, String>) maplistSum.get(typeTitle).get(h)).get(string);
+                            value = value.replace("_", "");
+                            if (value.contains("N") && !string.equals("COUNTRY") && !value.equals("-") && !string.equals("SITE") &&
                                     !string.equals("FACILITY") && !string.equals("ORDERTYPE")) {
-                                double dou = Double.parseDouble(value);
-                                dou = dou / 1000;
-                                value = String.format("%.1f", dou);
+                                value = value.replace("N", "");
                             }
+                            value = value.replace("SI-Y", "");
+                            value = value.replace("MFG-Y", "");
+                            if (value.equals("0")) value = "-";
+                            if (unit.equals("K")) {
+                                if (!string.equals("COUNTRY") && !value.equals("-") && !string.equals("SITE") &&
+                                        !string.equals("FACILITY") && !string.equals("ORDERTYPE")) {
+                                    double dou = Double.parseDouble(value);
+                                    dou = dou / 1000;
+                                    value = String.format("%.1f", dou);
+                                }
+                            }
+                            ((LinkedHashMap<String, String>) tempmap).put(string, value);
                         }
-                        ((LinkedHashMap<String, String>) tempmap).put(string, value);
                     }
+                    templist.add(tempmap);
                 }
-                templist.add(tempmap);
+                maplistSum2.put(typeTitle, templist);
             }
-            maplistSum2.put(typeTitle, templist);
+            updateAllTables(maplistSum2);
         }
-        updateAllTables(maplistSum2);
 
     }
 
@@ -663,6 +672,32 @@ public class Analysis extends AppCompatActivity {
         ins5.add((List<Object>) map2.get("isg_hit"));
         Log.e("ins5", ins5.size() + "");
         fil.setMaplistInFragIsg(ins5, left, right, gbChoseCount);
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        switch (keyCode) {
+            case KeyEvent.KEYCODE_BACK:
+                AlertDialog.Builder build = new AlertDialog.Builder(this);
+                build.setTitle("Notice").setMessage("Do you want to Log out?");
+                build.setPositiveButton("Exit",
+                        new DialogInterface.OnClickListener() {
+
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                finish();
+                            }
+                        });
+                build.setNegativeButton("Cancel",
+                        new DialogInterface.OnClickListener() {
+
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                            }
+                        }).show();
+                break;
+        }
+        return super.onKeyDown(keyCode, event);
     }
 
 }

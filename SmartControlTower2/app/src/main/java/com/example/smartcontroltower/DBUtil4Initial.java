@@ -78,7 +78,8 @@ public class DBUtil4Initial {
         String result = "";
         ArrayList<LinkedHashMap<String, String>> answer = new ArrayList<>();
         try {
-            Connection conn = getSQLConnection(地址账号用户名);
+            Connection conn = getSQLConnection(地址密码用户名);
+            if(conn!=null){
             Statement stmt = conn.createStatement();//
             ResultSet rs = stmt.executeQuery(sql);
             while (rs.next()) {
@@ -96,7 +97,7 @@ public class DBUtil4Initial {
 
             rs.close();
             stmt.close();
-            conn.close();
+            conn.close();}
         } catch (SQLException e) {
             e.printStackTrace();
         } catch (IOException e) {
