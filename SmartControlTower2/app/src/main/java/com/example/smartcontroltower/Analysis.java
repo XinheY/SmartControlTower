@@ -228,7 +228,7 @@ public class Analysis extends AppCompatActivity {
 
         RadioGroup anacv = findViewById(R.id.ana_rg_cv);
         String[] compareVersion = ((String[]) info.getVersion_addclosing().toArray(new String[info.getVersion().size()]));
-        ConstructRadio("cv", compareVersion, anacv, submitVersion[1]);
+        ConstructRadio("cv", compareVersion, anacv, compareVersion[1]);
 
         LinearLayout anagroupby = findViewById(R.id.ana_gb);
         String[] groupby = getResources().getStringArray(R.array.ana_groupby);

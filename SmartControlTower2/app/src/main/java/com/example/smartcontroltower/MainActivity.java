@@ -39,6 +39,10 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList<String> version_year_quar = null;
     private ArrayList<String> version_year_quar_week = null;
 
+    enum ACCESS {
+        PASS, DENY,NONE
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -73,10 +77,12 @@ public class MainActivity extends AppCompatActivity {
                 answerEOQ = DBUtil4Initial.QuerySQL("EXEC SP_IDC_EOQ_GETFILTER 'EOQ'");
                 answerIDC = DBUtil4Initial.QuerySQL("EXEC SP_IDC_EOQ_GETFILTER 'IDC'");
                 Message msg = new Message();
+                ACCESS[] signal=new ACCESS[4];
+                signal[0]=
                 // answerEOQ = DBUtil4Initial.sendRequestWithOkHttp();
-                if (answerEOQ.size() != 0&&answerIDC.size()!=0) {
+                if (answerEOQ.size() != 0 && answerIDC.size() != 0) {
                     ArrayList<String> temp = new ArrayList<>();
-                    ArrayList<String> temp2=new ArrayList<>();
+                    ArrayList<String> temp2 = new ArrayList<>();
                     for (int i = 0; i < answerEOQ.size(); i++) {
                         if (answerEOQ.get(i).containsValue("version_addclosing")) {
                             version = (ArrayList<String>) temp.clone();
@@ -120,7 +126,7 @@ public class MainActivity extends AppCompatActivity {
                     Intent intent = new Intent(MainActivity.this, WelcomePage.class);
                     Bundle bundle = new Bundle();
                     bundle.putSerializable("InitializeInfo", info);
-                    bundle.putSerializable("InitializeInfo2",info2);
+                    bundle.putSerializable("InitializeInfo2", info2);
                     intent.putExtras(bundle);
                     startActivity(intent);
                 } else {
@@ -179,5 +185,15 @@ public class MainActivity extends AppCompatActivity {
         return super.onKeyDown(keyCode, event);
     }
 
+    public ACCESS AccessRight(int i) {
+        switch (i) {
+            case 1:
+                return ACCESS.PASS;
+            case 0:
+                return ACCESS.DENY;
+            default:
+                return ACCESS.NONE;
+        }
+    }
 
 }
