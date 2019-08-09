@@ -57,17 +57,18 @@ public class E2E extends AppCompatActivity {
     private ArrayList<String[]> allContent = new ArrayList<>();
     private ArrayList<LinkedHashMap<String, String>> answerE2E;
     private LoadingDialog ld = null;
-    private Button verbtn;
+    private Button verbtn, verbtn2;
     private Button yqbtn;
     private Button expand;
     private LinearLayout yqll;
-    private LinearLayout verll;
+    private LinearLayout verll, verll2;
     private RadioGroup viewType;
     private RadioGroup radioGroup;
     private String expandTitle = "Expand";
     private InitializeInfo info = null;
-    private InitializeInfo info2=null;
-    private int[] AccessRight=null;
+    private InitializeInfo info2 = null;
+    private int[] AccessRight = null;
+    private RadioGroup IdcEoqChose = null;
 
     @Override
     protected void onPause() {
@@ -94,19 +95,21 @@ public class E2E extends AppCompatActivity {
         radioGroup = findViewById(R.id.e2e_range);
         viewType = findViewById(R.id.e2e_spinner);
         verbtn = findViewById(R.id.e2e_ver_btn);
+        verbtn2 = findViewById(R.id.e2e_ver_btn2);
         yqbtn = findViewById(R.id.e2e_yq_btn);
         yqll = findViewById(R.id.e2e_yq);
         verll = findViewById(R.id.e2e_ver);
+        verll2 = findViewById(R.id.e2e_ver2);
         table = findViewById(R.id.table);
 
         info = (InitializeInfo) getIntent().getSerializableExtra("InitializeInfo");
         info2 = (InitializeInfo) getIntent().getSerializableExtra("InitializeInfo2");
-        AccessRight= (int[]) getIntent().getSerializableExtra("AccessRight");
+        AccessRight = (int[]) getIntent().getSerializableExtra("AccessRight");
         Log.e("info", info.getVersion().toString());
         /////////////////Table//////////////////////////////////////////////////
         //设置初始值
-        if (answerE2E.size() != 0||savedInstanceState != null) {
-                setNumber(selectRadioBtn(radioGroup), expandTitle);
+        if (answerE2E.size() != 0 || savedInstanceState != null) {
+            setNumber(selectRadioBtn(radioGroup), expandTitle);
         } else {
             ld = new LoadingDialog(this);
             ld.setLoadingText("Loading...").setSuccessText("Success").setFailedText("Failed")
@@ -140,10 +143,32 @@ public class E2E extends AppCompatActivity {
 
         radioGroup.setOnCheckedChangeListener(listener);
 
+        IdcEoqChose = findViewById(R.id.e2e_rg);
+        IdcEoqChose.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup radioGroup, int i) {
+                if (selectRadioBtn(viewType).equals("VersionView")) {
+                    if (selectRadioBtn(radioGroup).equals("EoQ")) {
+                        verbtn.setVisibility(View.VISIBLE);
+                        verbtn2.setVisibility(View.GONE);
+                        verll2.setVisibility(View.GONE);
+                    } else {
+                        verbtn2.setVisibility(View.VISIBLE);
+                        verbtn.setVisibility(View.GONE);
+                        verll.setVisibility(View.GONE);
+                    }
+                }
+            }
+        });
+
         RadioGroup.OnCheckedChangeListener listener2 = new RadioGroup.OnCheckedChangeListener() {
             public void onCheckedChanged(RadioGroup group, int checkedId) {
                 if (selectRadioBtn(viewType).equals("VersionView")) {
-                    verbtn.setVisibility(View.VISIBLE);
+                    if (selectRadioBtn(IdcEoqChose).equals("EoQ")) {
+                        verbtn.setVisibility(View.VISIBLE);
+                    } else {
+                        verbtn2.setVisibility(View.VISIBLE);
+                    }
                     yqbtn.setVisibility(View.GONE);
                     yqll.setVisibility(View.GONE);
                     for (String checkb : summary.get("yq").keySet()) {
@@ -152,6 +177,8 @@ public class E2E extends AppCompatActivity {
                     }
                 } else {
                     verbtn.setVisibility(View.GONE);
+                    verbtn2.setVisibility(View.GONE);
+                    verll2.setVisibility(View.GONE);
                     verll.setVisibility(View.GONE);
                     yqbtn.setVisibility(View.VISIBLE);
                     for (String checkb : summary.get("version").keySet()) {
@@ -205,7 +232,7 @@ public class E2E extends AppCompatActivity {
                         Bundle bundle2 = new Bundle();
                         bundle2.putSerializable("InitializeInfo", info);
                         bundle2.putSerializable("InitializeInfo2", info2);
-                        bundle2.putSerializable("AccessRight",AccessRight);
+                        bundle2.putSerializable("AccessRight", AccessRight);
                         intent2.putExtras(bundle2);
                         startActivity(intent2);
                         finish();
@@ -215,7 +242,7 @@ public class E2E extends AppCompatActivity {
                         Bundle bundle4 = new Bundle();
                         bundle4.putSerializable("InitializeInfo", info);
                         bundle4.putSerializable("InitializeInfo2", info2);
-                        bundle4.putSerializable("AccessRight",AccessRight);
+                        bundle4.putSerializable("AccessRight", AccessRight);
                         intent4.putExtras(bundle4);
                         startActivity(intent4);
                         finish();
@@ -225,7 +252,7 @@ public class E2E extends AppCompatActivity {
                         Bundle bundle3 = new Bundle();
                         bundle3.putSerializable("InitializeInfo", info);
                         bundle3.putSerializable("InitializeInfo2", info2);
-                        bundle3.putSerializable("AccessRight",AccessRight);
+                        bundle3.putSerializable("AccessRight", AccessRight);
                         intent3.putExtras(bundle3);
                         startActivity(intent3);
                         finish();
@@ -266,6 +293,10 @@ public class E2E extends AppCompatActivity {
         LinearLayout e2ever = findViewById(R.id.e2e_ver);
         String[] ver = ((String[]) info.getVersion().toArray(new String[info.getVersion().size()]));
         ConstructCheck("version", ver, e2ever, "");
+
+        LinearLayout e2ever2 = findViewById(R.id.e2e_ver2);
+        String[] ver2 = ((String[]) info2.getVersion().toArray(new String[info2.getVersion().size()]));
+        ConstructCheck("version2", ver2, e2ever2, "");
 
         LinearLayout e2eyq = findViewById(R.id.e2e_yq);
         String[] yq = ((String[]) info.getVersion_year_quar().toArray(new String[info.getVersion_year_quar().size()]));
@@ -321,6 +352,12 @@ public class E2E extends AppCompatActivity {
                 searchSum.add(ratioText2);
                 boolean canrun = true;
                 for (int i = 0; i < summary.size(); i++) {
+                    Log.e(i + "", summary.get(allCondition.get(i)).toString());
+                    if (selectRadioBtn(IdcEoqChose).equals("EoQ") && i == 1) {
+                        continue;
+                    } else if (selectRadioBtn(IdcEoqChose).equals("IDC") && i == 0) {
+                        continue;
+                    }
                     String oneCondition = "";
                     HashMap<String, CheckBox> innerMap = summary.get(allCondition.get(i));
                     int count = 0;
@@ -335,7 +372,7 @@ public class E2E extends AppCompatActivity {
                             }
                         }
                     }
-                    if (count == 0 && i > 1) {
+                    if (count == 0 && i > 2) {
                         canrun = false;
                         Toast.makeText(E2E.this, "Blank " + allCondition.get(i), Toast.LENGTH_LONG).show();
                         ld.closeFailedAnim().loadFailed();
@@ -343,6 +380,7 @@ public class E2E extends AppCompatActivity {
                     }
                     searchSum.add(oneCondition);
                 }
+                Log.e("searchSum", searchSum.toString());
                 if (canrun) {
                     if (searchSum.get(2) != "" || searchSum.get(3) != "") {
                         String sql = "EXEC [SP_IDC_EOQ_SUMMARY] '" + searchSum.get(0) + "','" + searchSum.get(1) + "','" + searchSum.get(3) + "','" + searchSum.get(2) + "','" + searchSum.get(4) + "','" + searchSum.get(5) + "','" + searchSum.get(6) + "','" + searchSum.get(7) + "','" + searchSum.get(8) + "','" + searchSum.get(9) + "','" + searchSum.get(10) + "'";
@@ -399,6 +437,9 @@ public class E2E extends AppCompatActivity {
             case R.id.e2e_site_btn:
                 ll = findViewById(R.id.e2e_site);
                 break;
+            case R.id.e2e_ver_btn2:
+                ll = findViewById(R.id.e2e_ver2);
+                break;
             default:
 
         }
@@ -432,6 +473,8 @@ public class E2E extends AppCompatActivity {
                 //Log.e("SQL",sql);
                 //answerE2E = DBUtil.sendRequestWithOkHttp();
                 if (answerE2E.size() == 0) {
+                    Log.e("进阿里", "asd");
+                    setNumber(selectRadioBtn(radioGroup), expandTitle);
                     msg.what = 1002;
                 } else {
                     setNumber(selectRadioBtn(radioGroup), expandTitle);
@@ -451,10 +494,12 @@ public class E2E extends AppCompatActivity {
             switch (msg.what) {
                 case 1001:
                     String str = msg.getData().getString("result");
+                    table.setVisibility(View.VISIBLE);
                     ld.loadSuccess();
                     break;
                 case 1002:
                     Log.e("Timeout", "Timeout in handler");
+                    table.setVisibility(View.GONE);
                     ld.setFailedText("No Data").loadFailed();
                     break;
                 default:
@@ -519,6 +564,10 @@ public class E2E extends AppCompatActivity {
                         String temp = lhm.get("Item");
                         temp = temp.replace("Scheduled_", "    ");
                         lhm.put("Item", temp.replace("_", " "));
+                    } else if (lhm.get("Item").equals("ANZ") || lhm.get("Item").equals("GC") || lhm.get("Item").equals("India") || lhm.get("Item").equals("Japan") || lhm.get("Item").equals("Korea") || lhm.get("Item").equals("SA")) {
+                        String temp = lhm.get("Item");
+                        temp = "    " + temp;
+                        lhm.put("Item", temp);
                     } else {
                         collapsemap.add(lhm);
                     }
@@ -535,6 +584,10 @@ public class E2E extends AppCompatActivity {
                         String temp = a.get("Item");
                         temp = temp.replace("Scheduled_", "    ");
                         lhm2.put("Item", temp.replace("_", " "));
+                    } else if (a.get("Item").equals("ANZ") || a.get("Item").equals("GC") || a.get("Item").equals("India") || a.get("Item").equals("Japan") || a.get("Item").equals("Korea") || a.get("Item").equals("SA")) {
+                        String temp = a.get("Item");
+                        temp = "    " + temp;
+                        lhm2.put("Item", temp);
                     } else {
                         collapsemap.add(lhm2);
                     }
@@ -555,7 +608,7 @@ public class E2E extends AppCompatActivity {
                     table.getConfig().setContentCellBackgroundFormat(new ICellBackgroundFormat<CellInfo>() {
                         @Override
                         public void drawBackground(Canvas canvas, Rect rect, CellInfo cellInfo, Paint paint) {
-                            if (cellInfo.row == 4 || cellInfo.row == 5) {
+                            if (cellInfo.row == 4 || cellInfo.row == 5||cellInfo.row==6) {
                                 paint.setColor(getResources().getColor(R.color.rowgray));
                                 canvas.drawRect(rect, paint);
                             }
@@ -573,10 +626,10 @@ public class E2E extends AppCompatActivity {
                     table.getConfig().setContentCellBackgroundFormat(new ICellBackgroundFormat<CellInfo>() {
                         @Override
                         public void drawBackground(Canvas canvas, Rect rect, CellInfo cellInfo, Paint paint) {
-                            if (cellInfo.row == 4 || cellInfo.row == 11) {
+                            if (cellInfo.row == 4 || cellInfo.row == 11||cellInfo.row==21) {
                                 paint.setColor(getResources().getColor(R.color.rowgray));
                                 canvas.drawRect(rect, paint);
-                            } else if ((cellInfo.row > 4 && cellInfo.row < 11) || (cellInfo.row > 11 && cellInfo.row < 21)) {
+                            } else if ((cellInfo.row > 4 && cellInfo.row < 11) || (cellInfo.row > 11 && cellInfo.row < 21)||(cellInfo.row>21&&cellInfo.row<28)) {
                                 paint.setColor(getResources().getColor(R.color.itemgray));
                                 canvas.drawRect(rect, paint);
                             }
@@ -606,6 +659,8 @@ public class E2E extends AppCompatActivity {
                 table.invalidate();
             }
         }
+
+
     }
 
     //在界面刷新之前保存旧数据

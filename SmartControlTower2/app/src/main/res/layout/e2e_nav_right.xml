@@ -188,6 +188,24 @@
             </LinearLayout>
 
             <Button
+                android:id="@+id/e2e_ver_btn2"
+                style="@style/e2e_btn"
+                android:background="@drawable/btn_inlist"
+                android:onClick="showMutilAlertDialog"
+                android:layout_margin="10dp"
+                android:text="Submit Version"
+                android:visibility="gone"/>
+
+            <LinearLayout
+                android:id="@+id/e2e_ver2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+            </LinearLayout>
+
+            <Button
                 android:id="@+id/e2e_lob_btn"
                 android:background="@drawable/btn_inlist"
                 style="@style/e2e_btn"
