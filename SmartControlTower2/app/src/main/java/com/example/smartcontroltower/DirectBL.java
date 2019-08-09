@@ -24,6 +24,7 @@ import android.os.Message;
 import android.os.Parcelable;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -65,6 +66,7 @@ public class DirectBL extends AppCompatActivity {
     private ArrayList<String[]> allContent = new ArrayList<>();
     private static ArrayList<LinkedHashMap<String, String>> answerDir;
     private InitializeInfo info = null;
+    private InitializeInfo info2=null;
     private Button YearBtn, QuarBtn, WeekBtn;
     private Button b1, b2, b3, b4;
     private int count = 0;
@@ -72,6 +74,7 @@ public class DirectBL extends AppCompatActivity {
     private RadioGroup diryear, dirquar, dirweek;
     private HashMap<String, ArrayList<RadioButton>> radioSummary = new LinkedHashMap<>();
     private HashMap<String, ArrayList<RadioButton>> radioOld = new LinkedHashMap<>();
+    private int[] AccessRight=null;
 
 
     @Override
@@ -105,6 +108,8 @@ public class DirectBL extends AppCompatActivity {
         b4 = findViewById(R.id.dir_b4);
 
         info = (InitializeInfo) getIntent().getSerializableExtra("InitializeInfo");
+        info2 = (InitializeInfo) getIntent().getSerializableExtra("InitializeInfo2");
+        AccessRight= (int[]) getIntent().getSerializableExtra("AccessRight");
         /////////////////Table//////////////////////////////////////////////////
         //设置初始值
         if (answerDir.size() != 0 || savedInstanceState != null) {
@@ -113,7 +118,6 @@ public class DirectBL extends AppCompatActivity {
             setNumber3();
             setNumber4();
         } else {
-            Log.e("错误进入", "Error");
             ld.show();
             test("EXEC [SP_CTO_DAILY_REPORT] '','',''");
         }
@@ -125,6 +129,20 @@ public class DirectBL extends AppCompatActivity {
         drawerl = findViewById(R.id.dir_drawer);
         ActionBar actionb = getSupportActionBar();
         NavigationView nv = findViewById(R.id.dir_view);
+        Menu munu = nv.getMenu();
+        if (AccessRight[0] == 0) {
+            munu.findItem(R.id.nav_E2E).setVisible(false);
+        }
+        if (AccessRight[1] == 0) {
+            munu.findItem(R.id.nav_analysis).setVisible(false);
+        }
+        if (AccessRight[2] == 0) {
+            munu.findItem(R.id.nav_Dynamic).setVisible(false);
+        }
+        if (AccessRight[3] == 0) {
+            munu.findItem(R.id.nav_DirectBL).setVisible(false);
+        }
+
         if (actionb != null) {
             actionb.setDisplayHomeAsUpEnabled(true);
             actionb.setHomeAsUpIndicator(R.drawable.menu);
@@ -143,6 +161,8 @@ public class DirectBL extends AppCompatActivity {
                         Intent intent4 = new Intent(DirectBL.this, E2E.class);
                         Bundle bundle4 = new Bundle();
                         bundle4.putSerializable("InitializeInfo", info);
+                        bundle4.putSerializable("InitializeInfo2", info2);
+                        bundle4.putSerializable("AccessRight",AccessRight);
                         intent4.putExtras(bundle4);
                         startActivity(intent4);
                         finish();
@@ -151,6 +171,8 @@ public class DirectBL extends AppCompatActivity {
                         Intent intent2 = new Intent(DirectBL.this, Dynamic.class);
                         Bundle bundle2 = new Bundle();
                         bundle2.putSerializable("InitializeInfo", info);
+                        bundle2.putSerializable("InitializeInfo2", info2);
+                        bundle2.putSerializable("AccessRight",AccessRight);
                         intent2.putExtras(bundle2);
                         startActivity(intent2);
                         finish();
@@ -161,6 +183,8 @@ public class DirectBL extends AppCompatActivity {
                         Intent intent3 = new Intent(DirectBL.this, Analysis.class);
                         Bundle bundle3 = new Bundle();
                         bundle3.putSerializable("InitializeInfo", info);
+                        bundle3.putSerializable("InitializeInfo2", info2);
+                        bundle3.putSerializable("AccessRight",AccessRight);
                         intent3.putExtras(bundle3);
                         startActivity(intent3);
                         finish();
@@ -392,7 +416,7 @@ public class DirectBL extends AppCompatActivity {
                     break;
                 case 1003:
                     Log.e("Timeout", "Timeout in handler");
-                    ld.setFailedText("No Data").loadFailed();
+                    ld.setFailedText("Condition Wrong").loadFailed();
                     break;
                 default:
                     break;

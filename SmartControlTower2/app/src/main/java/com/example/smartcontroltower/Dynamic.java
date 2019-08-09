@@ -20,6 +20,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -64,7 +65,9 @@ public class Dynamic extends AppCompatActivity {
     public static SmartTable<Object> table;
     private ViewPagerAdapter adapter;
     private InitializeInfo info = null;
+    private InitializeInfo info2 = null;
     private String hour = "";
+    private int[] AccessRight = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,10 +100,26 @@ public class Dynamic extends AppCompatActivity {
         adapter.notifyDataSetChanged();
 
         info = (InitializeInfo) getIntent().getSerializableExtra("InitializeInfo");
+        info2 = (InitializeInfo) getIntent().getSerializableExtra("InitializeInfo2");
+        AccessRight = (int[]) getIntent().getSerializableExtra("AccessRight");
 ////////////////////////////////////////////left side///////////////////////////////////////////
         drawerl = findViewById(R.id.dyn_drawer);
         ActionBar actionb = getSupportActionBar();
         NavigationView nv = findViewById(R.id.nav_view);
+        Menu munu = nv.getMenu();
+        if (AccessRight[0] == 0) {
+            munu.findItem(R.id.nav_E2E).setVisible(false);
+        }
+        if (AccessRight[1] == 0) {
+            munu.findItem(R.id.nav_analysis).setVisible(false);
+        }
+        if (AccessRight[2] == 0) {
+            munu.findItem(R.id.nav_Dynamic).setVisible(false);
+        }
+        if (AccessRight[3] == 0) {
+            munu.findItem(R.id.nav_DirectBL).setVisible(false);
+        }
+
         if (actionb != null) {
             actionb.setDisplayHomeAsUpEnabled(true);
             actionb.setHomeAsUpIndicator(R.drawable.menu);
@@ -120,6 +139,8 @@ public class Dynamic extends AppCompatActivity {
                         Intent intent2 = new Intent(Dynamic.this, E2E.class);
                         Bundle bundle2 = new Bundle();
                         bundle2.putSerializable("InitializeInfo", info);
+                        bundle2.putSerializable("InitializeInfo2", info2);
+                        bundle2.putSerializable("AccessRight", AccessRight);
                         intent2.putExtras(bundle2);
                         startActivity(intent2);
                         finish();
@@ -130,6 +151,8 @@ public class Dynamic extends AppCompatActivity {
                         Intent intent4 = new Intent(Dynamic.this, DirectBL.class);
                         Bundle bundle4 = new Bundle();
                         bundle4.putSerializable("InitializeInfo", info);
+                        bundle4.putSerializable("InitializeInfo2", info2);
+                        bundle4.putSerializable("AccessRight", AccessRight);
                         intent4.putExtras(bundle4);
                         startActivity(intent4);
                         finish();
@@ -138,6 +161,8 @@ public class Dynamic extends AppCompatActivity {
                         Intent intent3 = new Intent(Dynamic.this, Analysis.class);
                         Bundle bundle3 = new Bundle();
                         bundle3.putSerializable("InitializeInfo", info);
+                        bundle3.putSerializable("InitializeInfo2", info2);
+                        bundle3.putSerializable("AccessRight", AccessRight);
                         intent3.putExtras(bundle3);
                         startActivity(intent3);
                         finish();
@@ -251,8 +276,15 @@ public class Dynamic extends AppCompatActivity {
         });
 
         ////////////////////////////////Initialize Table//////////////////////////////////
-        if ((answer.size() == 0 || answer2.size() == 0)||savedInstanceState != null) updateTable();
-
+        if ((answer.size() == 0 || answer2.size() == 0)) {
+            updateTable();
+        } else if (savedInstanceState != null) {
+            setNumber();
+            Fragment_Dynamic fd = (Fragment_Dynamic) adapter.getItem(0);
+            Fragment_goal fg = (Fragment_goal) adapter.getItem(1);
+            fd.refreshDate(maplist, "APJ Dynamic CSR BL (" + datepicker.getText() + " " + hour + ":00)");
+            fg.refreshDate(maplist2);
+        }
     }
 /////////////////////////////////////////////////////////////////////////////////////////
 
@@ -278,7 +310,7 @@ public class Dynamic extends AppCompatActivity {
                 answer = DBUtil.QuerySQL(sql[0], 3);
                 answer2 = DBUtil.QuerySQL(sql[1], 3);
                 //answer = DBUtil.sendRequestWithOkHttp();
-                Log.e("大小",answer.size()+" "+answer2.size());
+                Log.e("大小", answer.size() + " " + answer2.size());
                 if (answer2.size() != 0 || answer.size() != 0) {
                     msg.what = 1001;
                 } else {

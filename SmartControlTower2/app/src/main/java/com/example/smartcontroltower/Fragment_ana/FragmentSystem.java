@@ -49,10 +49,10 @@ public class FragmentSystem extends Fragment {
         return view;
     }
 
-    public void setMaplistInFragSys(ArrayList<List<Object>> m,int left,int right,int count) {
+    public void setMaplistInFragSys(ArrayList<List<Object>> m,int left,int right,int count,String pre,String comp) {
         maplistInFragSys.clear();
         maplistInFragSys = m;
-        adapter.getMaplist(maplistInFragSys,left,right,count);
+        adapter.getMaplist(maplistInFragSys,left,right,count,pre,comp);
         if(expandableListView!=null) {
             for (int i = 0; i < new system_ExpandableAdapter().getGroupCount(); i++) {
                 expandableListView.collapseGroup(i);

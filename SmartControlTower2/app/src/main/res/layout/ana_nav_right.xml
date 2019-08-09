@@ -159,6 +159,29 @@
             </LinearLayout>
 
             <Button
+                android:id="@+id/ana_sv_btn2"
+                android:layout_width="match_parent"
+                android:background="@drawable/btn_inlist"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:onClick="showMutilAlertDialog"
+                android:text="Submit Version"
+                android:visibility="gone"/>
+
+            <LinearLayout
+                android:id="@+id/ana_sv2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <RadioGroup
+                    android:id="@+id/ana_rg_sv2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"></RadioGroup>
+            </LinearLayout>
+
+            <Button
                 android:id="@+id/ana_cv_btn"
                 android:background="@drawable/btn_inlist"
                 android:layout_width="match_parent"
@@ -176,6 +199,29 @@
 
                 <RadioGroup
                     android:id="@+id/ana_rg_cv"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"></RadioGroup>
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/ana_cv_btn2"
+                android:background="@drawable/btn_inlist"
+                android:layout_width="match_parent"
+                android:layout_margin="10dp"
+                android:layout_height="wrap_content"
+                android:onClick="showMutilAlertDialog"
+                android:text="Compare Version"
+                android:visibility="gone"/>
+
+            <LinearLayout
+                android:id="@+id/ana_cv2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <RadioGroup
+                    android:id="@+id/ana_rg_cv2"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"></RadioGroup>
             </LinearLayout>

@@ -22,6 +22,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -65,6 +66,8 @@ public class E2E extends AppCompatActivity {
     private RadioGroup radioGroup;
     private String expandTitle = "Expand";
     private InitializeInfo info = null;
+    private InitializeInfo info2=null;
+    private int[] AccessRight=null;
 
     @Override
     protected void onPause() {
@@ -97,6 +100,8 @@ public class E2E extends AppCompatActivity {
         table = findViewById(R.id.table);
 
         info = (InitializeInfo) getIntent().getSerializableExtra("InitializeInfo");
+        info2 = (InitializeInfo) getIntent().getSerializableExtra("InitializeInfo2");
+        AccessRight= (int[]) getIntent().getSerializableExtra("AccessRight");
         Log.e("info", info.getVersion().toString());
         /////////////////Table//////////////////////////////////////////////////
         //设置初始值
@@ -170,6 +175,20 @@ public class E2E extends AppCompatActivity {
             actionb.setHomeAsUpIndicator(R.drawable.menu);
         }
         nv.setCheckedItem(R.id.nav_E2E);
+        Menu munu = nv.getMenu();
+        if (AccessRight[0] == 0) {
+            munu.findItem(R.id.nav_E2E).setVisible(false);
+        }
+        if (AccessRight[1] == 0) {
+            munu.findItem(R.id.nav_analysis).setVisible(false);
+        }
+        if (AccessRight[2] == 0) {
+            munu.findItem(R.id.nav_Dynamic).setVisible(false);
+        }
+        if (AccessRight[3] == 0) {
+            munu.findItem(R.id.nav_DirectBL).setVisible(false);
+        }
+
         Resources resource = getBaseContext().getResources();
         ColorStateList csl = resource.getColorStateList(R.color.nav_status_color);
         nv.setItemTextColor(csl);
@@ -185,6 +204,8 @@ public class E2E extends AppCompatActivity {
                         Intent intent2 = new Intent(E2E.this, Dynamic.class);
                         Bundle bundle2 = new Bundle();
                         bundle2.putSerializable("InitializeInfo", info);
+                        bundle2.putSerializable("InitializeInfo2", info2);
+                        bundle2.putSerializable("AccessRight",AccessRight);
                         intent2.putExtras(bundle2);
                         startActivity(intent2);
                         finish();
@@ -193,6 +214,8 @@ public class E2E extends AppCompatActivity {
                         Intent intent4 = new Intent(E2E.this, DirectBL.class);
                         Bundle bundle4 = new Bundle();
                         bundle4.putSerializable("InitializeInfo", info);
+                        bundle4.putSerializable("InitializeInfo2", info2);
+                        bundle4.putSerializable("AccessRight",AccessRight);
                         intent4.putExtras(bundle4);
                         startActivity(intent4);
                         finish();
@@ -201,6 +224,8 @@ public class E2E extends AppCompatActivity {
                         Intent intent3 = new Intent(E2E.this, Analysis.class);
                         Bundle bundle3 = new Bundle();
                         bundle3.putSerializable("InitializeInfo", info);
+                        bundle3.putSerializable("InitializeInfo2", info2);
+                        bundle3.putSerializable("AccessRight",AccessRight);
                         intent3.putExtras(bundle3);
                         startActivity(intent3);
                         finish();
@@ -502,7 +527,6 @@ public class E2E extends AppCompatActivity {
                     for (String b : a.keySet()) {
                         lhm2.put(b, a.get(b));
                     }
-                    Log.e("a", a.toString());
                     if (a.get("Item").contains("Direct_")) {
                         String temp = a.get("Item");
                         temp = temp.replace("Direct_", "    ");

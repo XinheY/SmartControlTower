@@ -27,6 +27,7 @@ public class ISGLOB_ExpandableAdapter extends BaseExpandableListAdapter {
     public String[] groupString = {"POWEREDGE", "CLOUD", "STORAGE", "NETWORKING", "Hyperconverged Infras Trans"};
     private static ArrayList<List<Object>> maplistInIsgLob = new ArrayList<>();
     private static int left, right,count;
+    private static String pre,comp;
 
     @Override
     // 获取分组的个数
@@ -116,65 +117,64 @@ public class ISGLOB_ExpandableAdapter extends BaseExpandableListAdapter {
         convertView.setTag(table);
         int more=15;
         if (maplistInIsgLob.size() != 0) {
-            MapTableData tableData = MapTableData.create("", maplistInIsgLob.get(groupPosition));
+            if (maplistInIsgLob.get(groupPosition).size() > 0) {
+                MapTableData tableData = MapTableData.create("", maplistInIsgLob.get(groupPosition));
 
-            List<Column> list4one = new ArrayList<>();
-            List<Column> list4one2=new ArrayList<>();
-            list4one.add(tableData.getColumns().get(0));
-            list4one.addAll(tableData.getColumns().subList(left+count-1,right+count));
-            list4one.add(tableData.getColumns().get(more+count-1));
-            list4one.addAll(tableData.getColumns().subList(more+left+count-1,more+count+right));
-            list4one.add(tableData.getColumns().get(2*more+count-1));
-            list4one.addAll(tableData.getColumns().subList(2*more+left+count-1,2*more+count+right));
-            list4one.add(tableData.getColumns().get(3*more+count-1));
+                List<Column> list4one = new ArrayList<>();
+                List<Column> list4one2 = new ArrayList<>();
+                list4one.addAll(tableData.getColumns().subList(left + count - 1, right + count));
+                list4one.add(tableData.getColumns().get(more + count - 1));
+                list4one.addAll(tableData.getColumns().subList(more + left + count - 1, more + count + right));
+                list4one.add(tableData.getColumns().get(2 * more + count - 1));
+                list4one.addAll(tableData.getColumns().subList(2 * more + left + count - 1, 2 * more + count + right));
+                list4one.add(tableData.getColumns().get(3 * more + count - 1));
 
-            int size1 = list4one.size() / 3;
-            Column one = new Column("previous", list4one.subList(0, size1 - 1));
-            Column two = new Column("compare", list4one.subList(size1, 2 * size1 - 1));
-            Column three = new Column("Delta", list4one.subList(2 * size1, 3 * size1 - 1));
-            list4one2.add(tableData.getColumns().get(0));
-            if (count == 2) {
-                list4one2.add(tableData.getColumns().get(1));
-            } else if (count == 3) {
-                list4one2.add(tableData.getColumns().get(1));
-                list4one2.add(tableData.getColumns().get(2));
-            }
-            list4one2.add(one);
-            list4one2.add(two);
-            list4one2.add(three);
+                int size1 = list4one.size() / 3;
+                Column one = new Column(pre, list4one.subList(0, size1));
+                Column two = new Column(comp, list4one.subList(size1, 2 * size1));
+                Column three = new Column("Delta", list4one.subList(2 * size1, 3 * size1));
+                list4one2.add(tableData.getColumns().get(0));
+                if (count == 2) {
+                    list4one2.add(tableData.getColumns().get(1));
+                } else if (count == 3) {
+                    list4one2.add(tableData.getColumns().get(1));
+                    list4one2.add(tableData.getColumns().get(2));
+                }
+                list4one2.add(one);
+                list4one2.add(two);
+                list4one2.add(three);
 
-            tableData.setColumns(list4one2);
+                tableData.setColumns(list4one2);
 
-            table.getConfig().setFixedTitle(true);
-            tableData.getColumns().get(0).setFixed(true);
-            if(count==2){
-                tableData.getColumns().get(1).setFixed(true);
-            }
-            else if(count==3){
-                tableData.getColumns().get(1).setFixed(true);
-                tableData.getColumns().get(2).setFixed(true);
-            }
-            //tableData.getColumns().get(0).setTextAlign(Paint.Align.LEFT);
-            table.setZoom(true, 2, 1);
-            table.getConfig().setShowXSequence(false);
-            table.getConfig().setShowYSequence(false);
+                table.getConfig().setFixedTitle(true);
+                tableData.getColumns().get(0).setFixed(true);
+                if (count == 2) {
+                    tableData.getColumns().get(1).setFixed(true);
+                } else if (count == 3) {
+                    tableData.getColumns().get(1).setFixed(true);
+                    tableData.getColumns().get(2).setFixed(true);
+                }
+                //tableData.getColumns().get(0).setTextAlign(Paint.Align.LEFT);
+                table.setZoom(true, 2, 1);
+                table.getConfig().setShowXSequence(false);
+                table.getConfig().setShowYSequence(false);
 
-            table.getConfig().setTableTitleStyle(new FontStyle(50, convertView.getResources().getColor(R.color.table_gray)));
-            table.getConfig().setColumnTitleBackground(new BaseBackgroundFormat(convertView.getResources().getColor(R.color.table_gray)));
-            table.getConfig().setContentStyle(new FontStyle(40, convertView.getResources().getColor(R.color.table_gray)));
-            table.getConfig().setColumnTitleStyle(new FontStyle(40, convertView.getResources().getColor(R.color.white)));
-            table.getConfig().setVerticalPadding(10);
-            table.setTableData(tableData);
-            tableData.getColumns().get(0).setAutoMerge(true);
-            if(count==2){
-                tableData.getColumns().get(1).setAutoMerge(true);
+                table.getConfig().setTableTitleStyle(new FontStyle(50, convertView.getResources().getColor(R.color.table_gray)));
+                table.getConfig().setColumnTitleBackground(new BaseBackgroundFormat(convertView.getResources().getColor(R.color.table_gray)));
+                table.getConfig().setContentStyle(new FontStyle(40, convertView.getResources().getColor(R.color.table_gray)));
+                table.getConfig().setColumnTitleStyle(new FontStyle(40, convertView.getResources().getColor(R.color.white)));
+                table.getConfig().setVerticalPadding(10);
+                table.setTableData(tableData);
+                tableData.getColumns().get(0).setAutoMerge(true);
+                if (count == 2) {
+                    tableData.getColumns().get(1).setAutoMerge(true);
+                } else if (count == 3) {
+                    tableData.getColumns().get(1).setAutoMerge(true);
+                    tableData.getColumns().get(2).setAutoMerge(true);
+                }
+                table.notifyDataChanged();
+                table.invalidate();
             }
-            else if(count==3){
-                tableData.getColumns().get(1).setAutoMerge(true);
-                tableData.getColumns().get(2).setAutoMerge(true);
-            }
-            table.notifyDataChanged();
-            table.invalidate();
         }
         return convertView;
     }
@@ -194,11 +194,13 @@ public class ISGLOB_ExpandableAdapter extends BaseExpandableListAdapter {
 
     }
 
-    public void getMaplist(ArrayList<List<Object>> m, int left, int right,int count) {
+    public void getMaplist(ArrayList<List<Object>> m, int left, int right,int count,String pre,String comp) {
         maplistInIsgLob.clear();
         maplistInIsgLob = m;
         this.count=count;
         this.left = left;
         this.right = right;
+        this.pre=pre;
+        this.comp=comp;
     }
 }

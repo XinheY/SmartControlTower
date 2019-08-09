@@ -66,10 +66,10 @@ public class FragmentISG extends Fragment {
     }
 
 
-    public void setMaplistInFragIsg(ArrayList<List<Object>> m,int left,int right,int count) {
+    public void setMaplistInFragIsg(ArrayList<List<Object>> m,int left,int right,int count,String pre,String comp) {
         maplistInFragIsg.clear();
         maplistInFragIsg = m;
-        adapter.getMaplist(maplistInFragIsg,left,right,count);
+        adapter.getMaplist(maplistInFragIsg,left,right,count,pre,comp);
         if (expandableListView != null) {
             for (int i = 0; i < new ISG_ExpandableAdapter().getGroupCount(); i++) {
                 expandableListView.collapseGroup(i);

@@ -13,6 +13,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 
@@ -23,6 +24,7 @@ public class WelcomePage extends AppCompatActivity {
     private DrawerLayout drawerl;
     private InitializeInfo info = null;
     private InitializeInfo info2 = null;
+    private int[] AccessRight = new int[4];
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,6 +33,11 @@ public class WelcomePage extends AppCompatActivity {
 
         info = (InitializeInfo) getIntent().getSerializableExtra("InitializeInfo");
         info2 = (InitializeInfo) getIntent().getSerializableExtra("InitializeInfo2");
+        AccessRight = (int[]) getIntent().getSerializableExtra("AccessRight");
+        String username=getIntent().getStringExtra("username");
+
+        TextView welcome=findViewById(R.id.welcome_welcome);
+        welcome.setText("ASIA-PACIFIC/"+username);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.welcome_toolbar);
         setSupportActionBar(toolbar);
@@ -38,6 +45,19 @@ public class WelcomePage extends AppCompatActivity {
         drawerl = findViewById(R.id.welcome_drawer);
         ActionBar actionb = getSupportActionBar();
         NavigationView nv = findViewById(R.id.nav_view);
+        Menu munu = nv.getMenu();
+        if (AccessRight[0] == 0) {
+            munu.findItem(R.id.nav_E2E).setVisible(false);
+        }
+        if (AccessRight[1] == 0) {
+            munu.findItem(R.id.nav_analysis).setVisible(false);
+        }
+        if (AccessRight[2] == 0) {
+            munu.findItem(R.id.nav_Dynamic).setVisible(false);
+        }
+        if (AccessRight[3] == 0) {
+            munu.findItem(R.id.nav_DirectBL).setVisible(false);
+        }
         if (actionb != null) {
             actionb.setDisplayHomeAsUpEnabled(true);
             actionb.setHomeAsUpIndicator(R.drawable.menu);
@@ -52,6 +72,7 @@ public class WelcomePage extends AppCompatActivity {
                         Bundle bundle = new Bundle();
                         bundle.putSerializable("InitializeInfo", info);
                         bundle.putSerializable("InitializeInfo2", info2);
+                        bundle.putSerializable("AccessRight",AccessRight);
                         intent.putExtras(bundle);
                         TextView tt = findViewById(R.id.nav_E2E);
                         startActivity(intent);
@@ -63,6 +84,7 @@ public class WelcomePage extends AppCompatActivity {
                         Bundle bundle2 = new Bundle();
                         bundle2.putSerializable("InitializeInfo", info);
                         bundle2.putSerializable("InitializeInfo2", info2);
+                        bundle2.putSerializable("AccessRight",AccessRight);
                         intent2.putExtras(bundle2);
                         startActivity(intent2);
                         finish();
@@ -73,6 +95,7 @@ public class WelcomePage extends AppCompatActivity {
                         Bundle bundle4 = new Bundle();
                         bundle4.putSerializable("InitializeInfo", info);
                         bundle4.putSerializable("InitializeInfo2", info2);
+                        bundle4.putSerializable("AccessRight",AccessRight);
                         intent4.putExtras(bundle4);
                         startActivity(intent4);
                         finish();
@@ -83,6 +106,7 @@ public class WelcomePage extends AppCompatActivity {
                         Bundle bundle3 = new Bundle();
                         bundle3.putSerializable("InitializeInfo", info);
                         bundle3.putSerializable("InitializeInfo2", info2);
+                        bundle3.putSerializable("AccessRight",AccessRight);
                         intent3.putExtras(bundle3);
                         startActivity(intent3);
                         finish();

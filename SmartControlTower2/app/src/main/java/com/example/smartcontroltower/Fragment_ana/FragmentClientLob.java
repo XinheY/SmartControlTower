@@ -66,10 +66,10 @@ public class FragmentClientLob extends Fragment {
     }
 
 
-    public void setMaplistInFragcl(ArrayList<List<Object>> m,int left,int right,int count) {
+    public void setMaplistInFragcl(ArrayList<List<Object>> m,int left,int right,int count,String pre,String comp) {
         maplistInFragcl.clear();
         maplistInFragcl = m;
-        adapter.getMaplist(maplistInFragcl,left,right,count);
+        adapter.getMaplist(maplistInFragcl,left,right,count,pre,comp);
         Log.e("FragSysSET", (expandableListView == null) + " " + new system_ExpandableAdapter().getGroupCount());
         if (expandableListView != null) {
             for (int i = 0; i < new clientlob_ExpandableAdapter().getGroupCount(); i++) {

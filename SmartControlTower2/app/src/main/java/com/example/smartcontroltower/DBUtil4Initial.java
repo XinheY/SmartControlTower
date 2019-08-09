@@ -15,11 +15,13 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
@@ -173,5 +175,24 @@ public class DBUtil4Initial {
         return afterFormat;
     }
 
+    public static int QuerySQLAccess(String sql,String username,String link) {
+       int id=-10;
+        try {
+            Connection conn = getSQLConnection("10.82.244.53", "sa", "Dell@2008", "PCWebsite");
+            if(conn!=null){
+                CallableStatement cst = null;
+                cst = conn.prepareCall(sql);
+                cst.setString(1,"ASIA-PACIFIC\\"+username);
+                cst.setString(2,link);
+                cst.registerOutParameter(3, Types.INTEGER);
+                int cou = cst.executeUpdate();
+                 id= cst.getInt(3);
+                System.out.println(id);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return id;
+    }
 
 }
