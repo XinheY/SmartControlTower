@@ -25,7 +25,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.ExpandableListView;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -43,7 +42,6 @@ import com.jaygoo.widget.RangeSeekBar;
 import com.xiasuhuei321.loadingdialog.view.LoadingDialog;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -56,9 +54,9 @@ public class Analysis extends AppCompatActivity {
     private ActionBarDrawerToggle toggle;
     public static MySmartTable<Object> table;
     private LinkedHashMap<String, List<Object>> maplistSum = new LinkedHashMap<>();
-    private HashMap<String, HashMap<String, CheckBox>> summary = new LinkedHashMap<>();//所有checkbox的集合
+    private HashMap<String, HashMap<String, Boolean>> summary = new LinkedHashMap<>();//所有checkbox的集合
     private HashMap<String, ArrayList<RadioButton>> radioSummary = new LinkedHashMap<>();
-    private HashMap<String, HashMap<String, CheckBox>> summaryOld = new LinkedHashMap<>();//之前所有checkbox的集合
+    private HashMap<String, HashMap<String, Boolean>> summaryOld = new LinkedHashMap<>();//之前所有checkbox的集合
     private HashMap<String, ArrayList<RadioButton>> radioOld = new LinkedHashMap<>();
     private ArrayList<String> allCondition = new ArrayList<>();
     private ArrayList<String[]> allContent = new ArrayList<>();
@@ -76,6 +74,7 @@ public class Analysis extends AppCompatActivity {
     private int left = 9;
     private int right = 13;
     private static int gbChoseCount = 1;
+    private static int tempgbChoseCount=1;
     private String pre,comp;
     private int[] AccessRight;
 
@@ -86,7 +85,7 @@ public class Analysis extends AppCompatActivity {
         if (savedInstanceState != null) {
             // Restore value of members from saved state
             answerAna = (ArrayList<LinkedHashMap<String, String>>) savedInstanceState.getSerializable("initial");
-            summaryOld = (HashMap<String, HashMap<String, CheckBox>>) savedInstanceState.getSerializable("initial2");
+            summaryOld = (HashMap<String, HashMap<String, Boolean>>) savedInstanceState.getSerializable("initial2");
             radioOld = (LinkedHashMap<String, ArrayList<RadioButton>>) savedInstanceState.getSerializable("initial3");
             left = savedInstanceState.getInt("left");
             right = savedInstanceState.getInt("right");
@@ -391,41 +390,23 @@ public class Analysis extends AppCompatActivity {
                 ArrayList<String> searchSum = new ArrayList<>();
                 boolean canrun = true;
                 gbChoseCount = 0;
-                Log.e("summary", summary.size() + "");
+                summary.clear();
+                searchSum=getSelectedCheckbox();
+                Log.e("summary", summary.size() + " "+searchSum.get(0));
                 Log.e("allcontent", allContent.size() + "");
-                for (int i = 0; i < summary.size(); i++) {
-                    String oneCondition = "";
-                    HashMap<String, CheckBox> innerMap = summary.get(allCondition.get(i + 5));
-                    int count = 0;
-                    for (int j = 0; j < innerMap.size(); j++) {
-                        CheckBox cbc = innerMap.get((allContent.get(i + 5))[j]);
-                        if (cbc.isChecked()) {
-                            if (i == 0) {
-                                gbChoseCount++;
-                            }
-                            count++;
-                            if (oneCondition.equals("")) {
-                                oneCondition += cbc.getText();
-                            } else {
-                                oneCondition += "," + cbc.getText();
-                            }
-                        }
-                    }
-                    if (count == 0 && i == 1) {
-                        canrun = false;
-                        ld.loadFailed();
-                    }
-                    searchSum.add(oneCondition);
-                }
+                gbChoseCount=searchSum.get(0).split(",").length;
                 if (canrun == false) {
                     Toast.makeText(view.getContext(), "View Type can't be blank", Toast.LENGTH_SHORT).show();
                 } else if (gbChoseCount > 3) {
+                    gbChoseCount=tempgbChoseCount;
                     ld.loadFailed();
                     Toast.makeText(view.getContext(), "Group By more than 3 level", Toast.LENGTH_SHORT).show();
                 } else if (gbChoseCount == 0) {
+                    gbChoseCount=tempgbChoseCount;
                     ld.closeFailedAnim().loadFailed();
                     Toast.makeText(view.getContext(), "Group by can't be blank", Toast.LENGTH_SHORT).show();
                 } else {
+                    tempgbChoseCount=gbChoseCount;
                     String sql = "";
                     Log.e("IErb",IErb.getText().toString());
                     if (IErb.getText().toString().equals("EoQ")) {
@@ -549,14 +530,13 @@ public class Analysis extends AppCompatActivity {
     //将checklist放进界面中
     public void ConstructCheck(String title, String[] items, LinearLayout ll, String ini) {
         String[] initial = ini.split(",");
-        HashMap<String, CheckBox> map = new LinkedHashMap<>();
+        HashMap<String, Boolean> map = new LinkedHashMap<>();
         allContent.add(items);
         for (int i = 0; i < items.length; i++) {
             CheckBox cb = new CheckBox(this);
             cb.setTextColor(getResources().getColor(R.color.colorAccent));
             cb.setText(items[i]);
             cb.setTextSize(18);
-            map.put(items[i], cb);
             if (title.equals("viewtype")) {
                 if (items[i].equals("MFG-Backlog") || items[i].equals("SNI-Backlog")) {
                     cb.setChecked(false);
@@ -568,7 +548,7 @@ public class Analysis extends AppCompatActivity {
                 }
             }
             if (summaryOld.size() != 0) {
-                if (summaryOld.get(title).get(items[i]).isChecked()) {
+                if (summaryOld.get(title).get(items[i])) {
                     cb.setChecked(true);
                 }
             } else {
@@ -578,6 +558,7 @@ public class Analysis extends AppCompatActivity {
                     }
                 }
             }
+            map.put(items[i], cb.isChecked());
             ll.addView(cb);
         }
         summary.put(title, map);
@@ -694,6 +675,8 @@ public class Analysis extends AppCompatActivity {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
+        summary.clear();
+        getSelectedCheckbox();
         outState.putSerializable("initial", answerAna);
         outState.putSerializable("initial2", summary);
         outState.putSerializable("initial3", radioSummary);
@@ -800,5 +783,42 @@ public class Analysis extends AppCompatActivity {
         return super.onKeyDown(keyCode, event);
     }
 
+    public ArrayList<String> getSelectedCheckbox() {
+        ArrayList<String> searchResult = new ArrayList<>();
 
+        HashMap<String, Boolean> gbmap = new HashMap<>();
+        LinearLayout gbll = findViewById(R.id.ana_gb);
+        String gb = "";
+        for (int i = 0; i < gbll.getChildCount(); i++) {
+            if (((CheckBox) gbll.getChildAt(i)).isChecked()) {
+                if (gb.equals("")) {
+                    gb += ((CheckBox) gbll.getChildAt(i)).getText();
+                } else {
+                    gb = gb + "," + ((CheckBox) gbll.getChildAt(i)).getText();
+                }
+            }
+            gbmap.put(((CheckBox) gbll.getChildAt(i)).getText().toString(), ((CheckBox) gbll.getChildAt(i)).isChecked());
+
+        }
+        summary.put("groupby", gbmap);
+        searchResult.add(gb);
+
+        HashMap<String, Boolean> vtmap = new HashMap<>();
+        LinearLayout vtll = findViewById(R.id.ana_vt);
+        String vt = "";
+        for (int i = 0; i < vtll.getChildCount(); i++) {
+            if (((CheckBox) vtll.getChildAt(i)).isChecked()) {
+                if (vt.equals("")) {
+                    vt += ((CheckBox) vtll.getChildAt(i)).getText();
+                } else {
+                    vt = vt + "," + ((CheckBox) vtll.getChildAt(i)).getText();
+                }
+            }
+            vtmap.put(((CheckBox) vtll.getChildAt(i)).getText().toString(), ((CheckBox) vtll.getChildAt(i)).isChecked());
+
+        }
+        summary.put("viewtype", vtmap);
+        searchResult.add(vt);
+        return searchResult;
+    }
 }

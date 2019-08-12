@@ -33,7 +33,7 @@ import java.util.List;
 public class Fragment_Dynamic extends Fragment {
 
     public static View view;
-    private ArrayList<Object> maplist1 = new ArrayList<>();
+    private static ArrayList<Object> maplist1 = new ArrayList<>();
     public static final String Tag = "Dynamic";
     private String title = "";
 
@@ -55,72 +55,13 @@ public class Fragment_Dynamic extends Fragment {
     }
 
     @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        Log.e("Tag", "onattach");
-    }
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        Log.e("Tag", "oncreate");
-    }
-
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        Log.e("Tag", "on activity create");
-    }
-
-    @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putSerializable("map", maplist1);
         outState.putString("title", title);
-        Log.e("Tag", "onSaveInstance");
+        Log.e("Tag", maplist1.size()+"");
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-        Log.e("Tag", "on start");
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        Log.e("Tag", "on resume");
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        Log.e("Tag", "on pause");
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        Log.e("Tag", "on stop");
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        Log.e("Tag", "des view");
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        Log.e("Tag", "destroy");
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        Log.e("Tag", "detach");
-    }
 
     public void refreshDate(ArrayList<Object> map, String title) {
         Log.e("Summary1", "map:" + map.size());
@@ -130,6 +71,7 @@ public class Fragment_Dynamic extends Fragment {
         if (map.size() != 0) {
             Log.e("Summary2", "map:" + map.size() + " table:" + table.getVisibility());
             maplist1 = map;
+            Log.e("点",maplist1.toString());
             tableData = MapTableData.create(title, maplist1);
             Column groupColumn = new Column("Factory Backlog", tableData.getColumns().get(2), tableData.getColumns().get(3), tableData.getColumns().get(4), tableData.getColumns().get(5), tableData.getColumns().get(6));
             Column groupColumn1 = new Column("APJ", tableData.getColumns().get(1));

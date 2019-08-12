@@ -45,10 +45,13 @@
                     android:id="@+id/dir_b1"
                     android:layout_width="match_parent"
                     android:layout_height="40dp"
-                    android:layout_margin="2dp"
+                    android:layout_margin="1dp"
                     android:background="@drawable/btn_inlist"
                     android:onClick="showMutilAlertDialog"
                     android:text="Overall"
+                    android:paddingLeft="10dp"
+                    android:textStyle="italic|bold"
+                    android:gravity="start|center_vertical"
                     android:textColor="@color/white"
                     android:textSize="17dp" />
 
@@ -62,10 +65,13 @@
                     android:id="@+id/dir_b2"
                     android:layout_width="match_parent"
                     android:layout_height="40dp"
-                    android:layout_margin="2dp"
+                    android:layout_margin="1dp"
                     android:background="@drawable/btn_inlist"
                     android:onClick="showMutilAlertDialog"
                     android:text="ISG Backlog Break down"
+                    android:paddingLeft="10dp"
+                    android:gravity="start|center_vertical"
+                    android:textStyle="italic|bold"
                     android:textColor="@color/white"
                     android:textSize="17dp" />
 
@@ -80,10 +86,13 @@
                     android:id="@+id/dir_b3"
                     android:layout_width="match_parent"
                     android:layout_height="40dp"
-                    android:layout_margin="2dp"
+                    android:layout_margin="1dp"
                     android:background="@drawable/btn_inlist"
+                    android:paddingLeft="10dp"
+                    android:gravity="start|center_vertical"
                     android:onClick="showMutilAlertDialog"
                     android:text="Client Backlog Break down"
+                    android:textStyle="italic|bold"
                     android:textColor="@color/white"
                     android:textSize="17dp" />
 
@@ -98,10 +107,13 @@
                     android:id="@+id/dir_b4"
                     android:layout_width="match_parent"
                     android:layout_height="40dp"
-                    android:layout_margin="2dp"
+                    android:layout_margin="1dp"
                     android:background="@drawable/btn_inlist"
+                    android:paddingLeft="10dp"
+                    android:gravity="start|center_vertical"
                     android:onClick="showMutilAlertDialog"
                     android:text="Direct backlog break down"
+                    android:textStyle="italic|bold"
                     android:textColor="@color/white"
                     android:textSize="17dp" />
 

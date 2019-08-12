@@ -21,26 +21,22 @@ import android.graphics.Rect;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.os.Parcelable;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
-import com.bin.david.form.core.SmartTable;
 import com.bin.david.form.data.CellInfo;
 import com.bin.david.form.data.column.Column;
 import com.bin.david.form.data.format.bg.BaseBackgroundFormat;
 import com.bin.david.form.data.format.bg.ICellBackgroundFormat;
 import com.bin.david.form.data.style.FontStyle;
-import com.bin.david.form.data.style.LineStyle;
 import com.bin.david.form.data.table.TableData;
 import com.example.smartcontroltower.Info.FirstInfo;
 import com.example.smartcontroltower.Info.ForthInfo;
@@ -60,20 +56,16 @@ public class DirectBL extends AppCompatActivity {
     private DrawerLayout drawerl;
     private ActionBarDrawerToggle toggle;
     public static MySmartTable<Object> table1, table2, table3, table4;
-    private HashMap<String, HashMap<String, CheckBox>> summary = new HashMap<>();//所有checkbox的集合
-    private HashMap<String, HashMap<String, CheckBox>> summaryOld = new HashMap<>();//之前所有checkbox的集合
     private ArrayList<String> allCondition = new ArrayList<>();
     private ArrayList<String[]> allContent = new ArrayList<>();
     private static ArrayList<LinkedHashMap<String, String>> answerDir;
     private InitializeInfo info = null;
     private InitializeInfo info2=null;
-    private Button YearBtn, QuarBtn, WeekBtn;
-    private Button b1, b2, b3, b4;
     private int count = 0;
     private LoadingDialog ld;
     private RadioGroup diryear, dirquar, dirweek;
-    private HashMap<String, ArrayList<RadioButton>> radioSummary = new LinkedHashMap<>();
-    private HashMap<String, ArrayList<RadioButton>> radioOld = new LinkedHashMap<>();
+    private HashMap<String, ArrayList<Boolean>> radioSummary = new LinkedHashMap<>();
+    private HashMap<String, ArrayList<Boolean>> radioOld = new LinkedHashMap<>();
     private int[] AccessRight=null;
 
 
@@ -84,8 +76,7 @@ public class DirectBL extends AppCompatActivity {
         if (savedInstanceState != null) {
             // Restore value of members from saved state
             answerDir = (ArrayList<LinkedHashMap<String, String>>) savedInstanceState.getSerializable("initial");
-            summaryOld = (HashMap<String, HashMap<String, CheckBox>>) savedInstanceState.getSerializable("initial2");
-            radioOld = (LinkedHashMap<String, ArrayList<RadioButton>>) savedInstanceState.getSerializable("initial3");
+            radioOld = (LinkedHashMap<String, ArrayList<Boolean>>) savedInstanceState.getSerializable("initial3");
 
         } else {
             answerDir = new ArrayList<>();
@@ -99,13 +90,6 @@ public class DirectBL extends AppCompatActivity {
         table2 = findViewById(R.id.dir_table2);
         table3 = findViewById(R.id.dir_table3);
         table4 = findViewById(R.id.dir_table4);
-        YearBtn = findViewById(R.id.dir_year_btn);
-        QuarBtn = findViewById(R.id.dir_qr_btn);
-        WeekBtn = findViewById(R.id.dir_wk_btn);
-        b1 = findViewById(R.id.dir_b1);
-        b2 = findViewById(R.id.dir_b2);
-        b3 = findViewById(R.id.dir_b3);
-        b4 = findViewById(R.id.dir_b4);
 
         info = (InitializeInfo) getIntent().getSerializableExtra("InitializeInfo");
         info2 = (InitializeInfo) getIntent().getSerializableExtra("InitializeInfo2");
@@ -427,7 +411,7 @@ public class DirectBL extends AppCompatActivity {
     /////////////////////////////////////////////////////////////////////////////////////////
 
     public void ConstructRadio(String title, String[] items, RadioGroup rg, String ini) {
-        ArrayList<RadioButton> radioButtons = new ArrayList<>();
+        ArrayList<Boolean> radioButtons = new ArrayList<>();
         allContent.add(items);
         for (int i = 0; i < items.length; i++) {
             RadioButton rb = new RadioButton(rg.getContext());
@@ -436,10 +420,10 @@ public class DirectBL extends AppCompatActivity {
             rb.setTextSize(18);
             rb.setId(count++);
             rb.setTextColor(getResources().getColor(R.color.colorAccent));
-            radioButtons.add(rb);
+            radioButtons.add(rb.isChecked());
             rg.addView(rb);
             if (radioOld.size() != 0) {
-                if (radioOld.get(title).get(i).isChecked()) {
+                if (radioOld.get(title).get(i)) {
                     rb.setChecked(true);
                 }
             } else {
@@ -458,7 +442,6 @@ public class DirectBL extends AppCompatActivity {
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putSerializable("initial", answerDir);
-        outState.putSerializable("initial2", summary);
         outState.putSerializable("initial3", radioSummary);
     }
 
@@ -583,7 +566,7 @@ public class DirectBL extends AppCompatActivity {
             table1.getConfig().setContentCellBackgroundFormat(new ICellBackgroundFormat<CellInfo>() {
                 @Override
                 public void drawBackground(Canvas canvas, Rect rect, CellInfo cellInfo, Paint paint) {
-                    Log.e("位置", cellInfo.row + "," + cellInfo.col);
+                   // Log.e("位置", cellInfo.row + "," + cellInfo.col);
                     if ((cellInfo.col % 3 == 2 || cellInfo.col % 3 == 0) && cellInfo.col != 0) {
                         paint.setColor(Color.GREEN);
                         canvas.drawRect(rect, paint);
