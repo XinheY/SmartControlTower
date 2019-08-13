@@ -55,12 +55,12 @@ public class Analysis extends AppCompatActivity {
     public static MySmartTable<Object> table;
     private LinkedHashMap<String, List<Object>> maplistSum = new LinkedHashMap<>();
     private HashMap<String, HashMap<String, Boolean>> summary = new LinkedHashMap<>();//所有checkbox的集合
-    private HashMap<String, ArrayList<RadioButton>> radioSummary = new LinkedHashMap<>();
+    private HashMap<String, ArrayList<Boolean>> radioSummary = new LinkedHashMap<>();
     private HashMap<String, HashMap<String, Boolean>> summaryOld = new LinkedHashMap<>();//之前所有checkbox的集合
-    private HashMap<String, ArrayList<RadioButton>> radioOld = new LinkedHashMap<>();
+    private HashMap<String, ArrayList<Boolean>> radioOld = new LinkedHashMap<>();
     private ArrayList<String> allCondition = new ArrayList<>();
     private ArrayList<String[]> allContent = new ArrayList<>();
-    private ArrayList<LinkedHashMap<String, String>> answerAna;
+    private static ArrayList<LinkedHashMap<String, String>> answerAna;
     private LoadingDialog ld;
     private RadioGroup radioGroup, idcEoqGroup,anasv,anasv2,anacv,anacv2,anaSources;
     private RadioGroup IdcEoq;
@@ -84,9 +84,8 @@ public class Analysis extends AppCompatActivity {
 ////////////////////////////////继承之前的数据//////////////////////////////////////////
         if (savedInstanceState != null) {
             // Restore value of members from saved state
-            answerAna = (ArrayList<LinkedHashMap<String, String>>) savedInstanceState.getSerializable("initial");
             summaryOld = (HashMap<String, HashMap<String, Boolean>>) savedInstanceState.getSerializable("initial2");
-            radioOld = (LinkedHashMap<String, ArrayList<RadioButton>>) savedInstanceState.getSerializable("initial3");
+            radioOld = (LinkedHashMap<String, ArrayList<Boolean>>) savedInstanceState.getSerializable("initial3");
             left = savedInstanceState.getInt("left");
             right = savedInstanceState.getInt("right");
             pre=savedInstanceState.getString("pre");
@@ -365,7 +364,6 @@ public class Analysis extends AppCompatActivity {
         });
 ///////////////////////////////Checkbox列表结束////////////////////////////////////
         //刷新表格（按钮监听器）
-        final RadioButton Sourb = findViewById(anaSources.getCheckedRadioButtonId());
         Button refresh = findViewById(R.id.ana_refresh);
 
         refresh.setOnClickListener(new View.OnClickListener() {//Refresh的动态监控
@@ -376,6 +374,7 @@ public class Analysis extends AppCompatActivity {
                 RadioButton CVrb = findViewById(anacv.getCheckedRadioButtonId());
                 RadioButton SVrb2 = findViewById(anasv2.getCheckedRadioButtonId());
                 RadioButton CVrb2 = findViewById(anacv2.getCheckedRadioButtonId());
+                RadioButton Sourb=findViewById(anaSources.getCheckedRadioButtonId());
                 ld = new LoadingDialog(view.getContext());
                 ld.setLoadingText("Loading...").setSuccessText("Success").setFailedText("Failed")
                         .closeSuccessAnim().show();
@@ -387,7 +386,7 @@ public class Analysis extends AppCompatActivity {
                 ((FragmentISG) adapter.getItem(3)).collapse(adapter.getItem(3));
                 ((FragmentISGLOB) adapter.getItem(4)).collapse(adapter.getItem(4));
 
-                ArrayList<String> searchSum = new ArrayList<>();
+                ArrayList<String> searchSum;
                 boolean canrun = true;
                 gbChoseCount = 0;
                 summary.clear();
@@ -412,11 +411,12 @@ public class Analysis extends AppCompatActivity {
                     if (IErb.getText().toString().equals("EoQ")) {
                         pre=SVrb.getText().toString();
                         comp=CVrb.getText().toString();
-                        sql = "EXEC SP_IDC_EOQ_SNI_CHANGE_ANALYSIS '" + IErb.getText() + "','" + SVrb.getText() + "','" + CVrb.getText() + "','" + searchSum.get(0) + "','" + searchSum.get(1) + "','" + Sourb.getText() + "'";
+                        sql = "EXEC SP_IDC_EOQ_SNI_CHANGE_ANALYSIS '" + IErb.getText() + "','" + SVrb.getText().toString() + "','" + CVrb.getText().toString() + "','" + searchSum.get(0) + "','" + searchSum.get(1) + "','" + Sourb.getText() + "'";
                     } else {
                         pre=SVrb2.getText().toString();
                         comp=CVrb2.getText().toString();
-                        sql = "EXEC SP_IDC_EOQ_SNI_CHANGE_ANALYSIS '" + IErb.getText() + "','" + SVrb2.getText() + "','" + CVrb2.getText() + "','" + searchSum.get(0) + "','" + searchSum.get(1) + "','" + Sourb.getText() + "'";
+                        Log.e("检测",Sourb.getText().toString());
+                        sql = "EXEC SP_IDC_EOQ_SNI_CHANGE_ANALYSIS '" + IErb.getText() + "','" + SVrb2.getText().toString() + "','" + CVrb2.getText().toString() + "','" + searchSum.get(0) + "','" + searchSum.get(1) + "','" + Sourb.getText() + "'";
                     }
 
                     test(sql);
@@ -566,7 +566,7 @@ public class Analysis extends AppCompatActivity {
     }
 
     public void ConstructRadio(String title, String[] items, RadioGroup rg, String ini) {
-        ArrayList<RadioButton> radioButtons = new ArrayList<>();
+        ArrayList<Boolean> radioButtons = new ArrayList<>();
         allContent.add(items);
         for (int i = 0; i < items.length; i++) {
             RadioButton rb = new RadioButton(rg.getContext());
@@ -575,7 +575,7 @@ public class Analysis extends AppCompatActivity {
             rb.setId(radioid);
             radioid += 1;
             rb.setTextColor(getResources().getColor(R.color.colorAccent));
-            radioButtons.add(rb);
+            radioButtons.add(rb.isChecked());
             rg.addView(rb);
             if (title.equals("sources")) {
                 if (items[i].equals("Sales Impact") || items[i].equals("Parameters Impact") || items[i].equals("E2E Summary")) {
@@ -587,12 +587,14 @@ public class Analysis extends AppCompatActivity {
                 }
             }
             if (radioOld.size() != 0) {
-                if (radioOld.get(title).get(i).isChecked()) {
+                if (radioOld.get(title).get(i)) {
                     rb.setChecked(true);
                     Button vt = findViewById(R.id.ana_vt_btn);
                     LinearLayout vtll = findViewById(R.id.ana_vt);
                     if (title.equals("sources")) {
-                        if (!(radioOld.get(title).get(i).getText() + "").equals("Sales")) {
+                        RadioGroup sources=findViewById(R.id.ana_rg_source);
+                        RadioButton sourrb=findViewById(sources.getCheckedRadioButtonId());
+                        if (!(sourrb.getText()).equals("Sales")) {
                             vt.setVisibility(View.GONE);
                             vtll.setVisibility(View.GONE);
                         } else {
@@ -677,7 +679,6 @@ public class Analysis extends AppCompatActivity {
         super.onSaveInstanceState(outState);
         summary.clear();
         getSelectedCheckbox();
-        outState.putSerializable("initial", answerAna);
         outState.putSerializable("initial2", summary);
         outState.putSerializable("initial3", radioSummary);
         outState.putInt("left", left);

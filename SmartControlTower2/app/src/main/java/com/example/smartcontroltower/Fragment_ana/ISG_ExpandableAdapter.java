@@ -117,7 +117,7 @@ public class ISG_ExpandableAdapter extends BaseExpandableListAdapter {
         convertView.setTag(table);
         int more = 15;
         if (maplistInFragIsg.size() != 0) {
-            if (maplistInFragIsg.get(groupPosition).size() > 0) {
+            if (maplistInFragIsg.get(groupPosition)!=null) {
                 MapTableData tableData = MapTableData.create("", maplistInFragIsg.get(groupPosition));
 
                 List<Column> list4one = new ArrayList<>();

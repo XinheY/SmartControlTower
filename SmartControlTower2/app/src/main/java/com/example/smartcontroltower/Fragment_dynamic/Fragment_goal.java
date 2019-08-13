@@ -24,6 +24,7 @@ import com.bin.david.form.data.table.MapTableData;
 import com.example.smartcontroltower.MySmartTable;
 import com.example.smartcontroltower.R;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -34,25 +35,16 @@ public class Fragment_goal extends Fragment {
 
     public static View view2;
     private static ArrayList<Object> maplist22 = new ArrayList<>();
-    private ArrayList<Object> maplistNew = new ArrayList<>();
+    private static ArrayList<Object> maplistNew = new ArrayList<>();
 
-    public Fragment_goal() {
-
-    }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view2 = inflater.inflate(R.layout.goal_fragment, container, false);
-        if (savedInstanceState != null) {
-            ArrayList<Object> maplistold = new ArrayList<>();
-            maplistold = (ArrayList<Object>) savedInstanceState.getSerializable("map");
-            Log.e("Change Screen", maplistold.size() + "");
-            refreshDate(maplistold);
-        } else if (maplistNew.size() != 0) {
-            refreshDate(maplistNew);
-        }
-        Log.e("Tag222", "on create view");
+        ArrayList<Object> maplistOld;
+        maplistOld= (ArrayList<Object>) maplist22.clone();
+        refreshDate(maplistOld);
         return view2;
     }
 
@@ -94,7 +86,6 @@ public class Fragment_goal extends Fragment {
                 maplist22.add(map.get(h));
 
             }
-
             tableData = MapTableData.create("", maplist22);
 
             List<Column> a = new LinkedList<>();
@@ -141,6 +132,7 @@ public class Fragment_goal extends Fragment {
         table.getConfig().setContentStyle(new FontStyle(45, Color.rgb(115, 135, 156)));
         table.getConfig().setColumnTitleStyle(new FontStyle(45, Color.WHITE));
         table.getConfig().setVerticalPadding(10);
+        Log.e("tableData", tableData.getColumns().size() + "");
         table.setTableData(tableData);
         table.invalidate();
 
@@ -149,7 +141,6 @@ public class Fragment_goal extends Fragment {
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putSerializable("map", maplist22);
     }
 
     public void initialFragment(ArrayList<Object> map) {

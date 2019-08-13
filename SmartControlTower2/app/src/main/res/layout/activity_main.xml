@@ -66,6 +66,7 @@
                     android:background="@null"
                     android:hint="username"
                     android:singleLine="true"
+                    android:text="Xinhe_Yang"
                     android:textColor="#FFF"
                     android:textColorHint="#9F9FA0"
                     android:textSize="20dp"

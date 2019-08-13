@@ -121,7 +121,7 @@ public class clientlob_ExpandableAdapter extends BaseExpandableListAdapter {
         int more = 15;
         if (maplistInClExp.size() != 0) {
             Log.e("SE", groupPosition + "::");
-            if (maplistInClExp.get(groupPosition).size() > 0) {
+            if (maplistInClExp.get(groupPosition)!=null) {
                 MapTableData tableData = MapTableData.create("", maplistInClExp.get(groupPosition));
                 List<Column> list4one = new ArrayList<>();
                 List<Column> list4one2 = new ArrayList<>();

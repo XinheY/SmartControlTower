@@ -1,10 +1,8 @@
 package com.example.smartcontroltower.Fragment_dynamic;
 
-import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,7 +12,6 @@ import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
-import com.bin.david.form.core.SmartTable;
 import com.bin.david.form.core.TableConfig;
 import com.bin.david.form.data.column.Column;
 import com.bin.david.form.data.format.bg.BaseBackgroundFormat;
@@ -45,12 +42,10 @@ public class Fragment_Dynamic extends Fragment {
         if (savedInstanceState != null) {
             ArrayList<Object> maplist1old = new ArrayList<>();
             maplist1old = (ArrayList<Object>) savedInstanceState.getSerializable("map");
-            Log.e("Change Screen", maplist1.size() + "");
             refreshDate(maplist1old, savedInstanceState.getString("title"));
         } else if (maplist1.size() != 0) {
             refreshDate(maplist1, title);
         }
-        Log.e("TAG", "oncreate view");
         return view;
     }
 
@@ -59,19 +54,15 @@ public class Fragment_Dynamic extends Fragment {
         super.onSaveInstanceState(outState);
         outState.putSerializable("map", maplist1);
         outState.putString("title", title);
-        Log.e("Tag", maplist1.size()+"");
     }
 
 
     public void refreshDate(ArrayList<Object> map, String title) {
-        Log.e("Summary1", "map:" + map.size());
         MySmartTable<Object> table = view.findViewById(R.id.dyn_table);
         this.title = title;
         MapTableData tableData;
         if (map.size() != 0) {
-            Log.e("Summary2", "map:" + map.size() + " table:" + table.getVisibility());
             maplist1 = map;
-            Log.e("点",maplist1.toString());
             tableData = MapTableData.create(title, maplist1);
             Column groupColumn = new Column("Factory Backlog", tableData.getColumns().get(2), tableData.getColumns().get(3), tableData.getColumns().get(4), tableData.getColumns().get(5), tableData.getColumns().get(6));
             Column groupColumn1 = new Column("APJ", tableData.getColumns().get(1));

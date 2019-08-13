@@ -117,7 +117,7 @@ public class ISGLOB_ExpandableAdapter extends BaseExpandableListAdapter {
         convertView.setTag(table);
         int more=15;
         if (maplistInIsgLob.size() != 0) {
-            if (maplistInIsgLob.get(groupPosition).size() > 0) {
+            if (maplistInIsgLob.get(groupPosition)!=null) {
                 MapTableData tableData = MapTableData.create("", maplistInIsgLob.get(groupPosition));
 
                 List<Column> list4one = new ArrayList<>();

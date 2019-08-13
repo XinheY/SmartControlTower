@@ -29,7 +29,6 @@ import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 
-import com.bin.david.form.core.SmartTable;
 import com.example.smartcontroltower.Fragment_dynamic.Fragment_Dynamic;
 import com.example.smartcontroltower.Fragment_dynamic.Fragment_goal;
 import com.gingold.basislibrary.utils.BasisTimesUtils;
@@ -45,7 +44,6 @@ import java.util.LinkedHashMap;
 
 public class Dynamic extends AppCompatActivity {
 
-    private int finish = 0;
     private DrawerLayout drawerl;
     private ActionBarDrawerToggle toggle;
     private TabLayout tl;
@@ -53,16 +51,15 @@ public class Dynamic extends AppCompatActivity {
     private Button datepicker;
     private ArrayList<Object> maplist = new ArrayList<>();
     private ArrayList<Object> maplist2 = new ArrayList<>();
-    private HashMap<String, HashMap<String, CheckBox>> summary = new LinkedHashMap<>();//所有checkbox的集合
-    private HashMap<String, ArrayList<RadioButton>> radioSummary = new LinkedHashMap<>();
-    private HashMap<String, HashMap<String, CheckBox>> summaryOld = new LinkedHashMap<>();//之前所有checkbox的集合
-    private HashMap<String, ArrayList<RadioButton>> radioOld = new LinkedHashMap<>();
+    private HashMap<String, HashMap<String, Boolean>> summary = new LinkedHashMap<>();//所有checkbox的集合
+    private HashMap<String, ArrayList<Boolean>> radioSummary = new LinkedHashMap<>();
+    private HashMap<String, HashMap<String, Boolean>> summaryOld = new LinkedHashMap<>();//之前所有checkbox的集合
+    private HashMap<String, ArrayList<Boolean>> radioOld = new LinkedHashMap<>();
     private ArrayList<String> allCondition = new ArrayList<>();
     private ArrayList<String[]> allContent = new ArrayList<>();
-    private ArrayList<LinkedHashMap<String, String>> answer;
-    private ArrayList<LinkedHashMap<String, String>> answer2;
+    private static ArrayList<LinkedHashMap<String, String>> answer;
+    private static ArrayList<LinkedHashMap<String, String>> answer2;
     private LoadingDialog ld = null;
-    public static SmartTable<Object> table;
     private ViewPagerAdapter adapter;
     private InitializeInfo info = null;
     private InitializeInfo info2 = null;
@@ -75,10 +72,8 @@ public class Dynamic extends AppCompatActivity {
         setContentView(R.layout.activity_dynamic);
         if (savedInstanceState != null) {
             // Restore value of members from saved state
-            answer = (ArrayList<LinkedHashMap<String, String>>) savedInstanceState.getSerializable("initial");
-            summaryOld = (HashMap<String, HashMap<String, CheckBox>>) savedInstanceState.getSerializable("initial2");
-            radioOld = (LinkedHashMap<String, ArrayList<RadioButton>>) savedInstanceState.getSerializable("initial3");
-            answer2 = (ArrayList<LinkedHashMap<String, String>>) savedInstanceState.getSerializable("initial4");
+            summaryOld = (HashMap<String, HashMap<String, Boolean>>) savedInstanceState.getSerializable("initial2");
+            radioOld = (LinkedHashMap<String, ArrayList<Boolean>>) savedInstanceState.getSerializable("initial3");
         } else {
             answer = new ArrayList<>();
             answer2 = new ArrayList<>();
@@ -230,63 +225,41 @@ public class Dynamic extends AppCompatActivity {
                 ld = new LoadingDialog(view.getContext());
                 ld.setLoadingText("Loading...").setSuccessText("Success").setFailedText("Failed")
                         .closeSuccessAnim().show();
-                String first = "";
-                String second = "";
+                summary.clear();
+                ArrayList<String> searchResult = getSelectedCheckbox();
+
                 String third = "";
                 String fourth = "";
-                for (String str : summary.get("ordertype").keySet()) {
-                    CheckBox cb = summary.get("ordertype").get(str);
-                    if (cb.isChecked()) {
-                        if (first.equals("")) {
-                            first += cb.getText();
-                        } else {
-                            first = first + "," + cb.getText();
-                        }
-                    }
-                }
 
-
-                for (String str : summary.get("lob").keySet()) {
-                    CheckBox cb = summary.get("lob").get(str);
-                    if (cb.isChecked()) {
-                        if (second.equals("")) {
-                            second += cb.getText();
-                        } else {
-                            second = second + "," + cb.getText();
-                        }
-                    }
-                }
-
-                for (int k = 0; k < radioSummary.get("hour").size(); k++) {
-                    RadioButton rb = radioSummary.get("hour").get(k);
-                    if (rb.isChecked()) {
-                        third = rb.getText() + "";
-                    }
-                }
+                RadioGroup rg = findViewById(R.id.dyn_rg_hour);
+                RadioButton rb = findViewById(rg.getCheckedRadioButtonId());
+                third = rb.getText().toString();
                 third = (third.split(":"))[0];
                 hour = third;
                 fourth = datepicker.getText() + "";
                 //////////////////////////////////////////////////////////////////
                 String[] sql = new String[2];
-                sql[0] = "EXEC [P_DYNAMIC_BACKLOG_XMN_RESULTE] '" + first + "','" + second + "','" + fourth + "','" + third + "'";
-                sql[1] = "EXEC [P_DYNAMIC_BACKLOG_TRACK] '" + first + "','" + fourth + "','" + third + "'";
+                sql[0] = "EXEC [P_DYNAMIC_BACKLOG_XMN_RESULTE] '" + searchResult.get(0) + "','" + searchResult.get(1) + "','" + fourth + "','" + third + "'";
+                sql[1] = "EXEC [P_DYNAMIC_BACKLOG_TRACK] '" + searchResult.get(0) + "','" + fourth + "','" + third + "'";
+                Log.e("sql0", sql[0]);
+                Log.e("sql1", sql[1]);
                 test(sql);
                 toggleRightSliding();
             }
         });
 
         ////////////////////////////////Initialize Table//////////////////////////////////
-        if ((answer.size() == 0 || answer2.size() == 0)) {
-            updateTable();
-        } else if (savedInstanceState != null) {
+        if (savedInstanceState != null) {
             setNumber();
             Fragment_Dynamic fd = (Fragment_Dynamic) adapter.getItem(0);
             Fragment_goal fg = (Fragment_goal) adapter.getItem(1);
             fd.refreshDate(maplist, "APJ Dynamic CSR BL (" + datepicker.getText() + " " + hour + ":00)");
             fg.refreshDate(maplist2);
+        } else if ((answer.size() == 0 && answer2.size() == 0)) {
+            updateTable();
         }
     }
-/////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////Help Method///////////////////////////////////////////
 
     ///其他help method///
 
@@ -310,7 +283,6 @@ public class Dynamic extends AppCompatActivity {
                 answer = DBUtil.QuerySQL(sql[0], 3);
                 answer2 = DBUtil.QuerySQL(sql[1], 3);
                 //answer = DBUtil.sendRequestWithOkHttp();
-                Log.e("大小", answer.size() + " " + answer2.size());
                 if (answer2.size() != 0 || answer.size() != 0) {
                     msg.what = 1001;
                 } else {
@@ -349,16 +321,15 @@ public class Dynamic extends AppCompatActivity {
 
     public void ConstructCheck(String title, String[] items, LinearLayout ll, String ini) {
         String[] initial = ini.split(",");
-        HashMap<String, CheckBox> map = new LinkedHashMap<>();
+        HashMap<String, Boolean> map = new LinkedHashMap<>();
         allContent.add(items);
         for (int i = 0; i < items.length; i++) {
             CheckBox cb = new CheckBox(this);
             cb.setTextColor(getResources().getColor(R.color.colorAccent));
             cb.setText(items[i]);
             cb.setTextSize(18);
-            map.put(items[i], cb);
             if (summaryOld.size() != 0) {
-                if (summaryOld.get(title).get(items[i]).isChecked()) {
+                if (summaryOld.get(title).get(items[i])) {
                     cb.setChecked(true);
                 }
             } else {
@@ -368,6 +339,7 @@ public class Dynamic extends AppCompatActivity {
                     }
                 }
             }
+            map.put(items[i], cb.isChecked());
             ll.addView(cb);
         }
         summary.put(title, map);
@@ -375,7 +347,7 @@ public class Dynamic extends AppCompatActivity {
     }
 
     public void ConstructRadio(String title, String[] items, RadioGroup rg, String ini) {
-        ArrayList<RadioButton> radioButtons = new ArrayList<>();
+        ArrayList<Boolean> radioButtons = new ArrayList<>();
         allContent.add(items);
         for (int i = 0; i < items.length; i++) {
             RadioButton rb = new RadioButton(rg.getContext());
@@ -383,10 +355,10 @@ public class Dynamic extends AppCompatActivity {
             rb.setTextSize(18);
             rb.setId(i);
             rb.setTextColor(getResources().getColor(R.color.colorAccent));
-            radioButtons.add(rb);
+            radioButtons.add(rb.isChecked());
             rg.addView(rb);
             if (radioOld.size() != 0) {
-                if (radioOld.get(title).get(i).isChecked()) {
+                if (radioOld.get(title).get(i)) {
                     rb.setChecked(true);
                 }
             } else {
@@ -478,10 +450,8 @@ public class Dynamic extends AppCompatActivity {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putSerializable("initial", answer);
         outState.putSerializable("initial2", summary);
         outState.putSerializable("initial3", radioSummary);
-        outState.putSerializable("initial4", answer2);
     }
 
     @Override
@@ -496,34 +466,31 @@ public class Dynamic extends AppCompatActivity {
         String third = "";
         String fourth = "";
         for (String str : summary.get("ordertype").keySet()) {
-            CheckBox cb = summary.get("ordertype").get(str);
-            if (cb.isChecked()) {
+            Boolean cb = summary.get("ordertype").get(str);
+            if (cb) {
                 if (first.equals("")) {
-                    first += cb.getText();
+                    first += str;
                 } else {
-                    first = first + "," + cb.getText();
+                    first = first + "," + str;
                 }
             }
         }
 
 
         for (String str : summary.get("lob").keySet()) {
-            CheckBox cb = summary.get("lob").get(str);
-            if (cb.isChecked()) {
+            Boolean cb = summary.get("lob").get(str);
+            if (cb) {
                 if (second.equals("")) {
-                    second += cb.getText();
+                    second += str;
                 } else {
-                    second = second + "," + cb.getText();
+                    second = second + "," + str;
                 }
             }
         }
 
-        for (int k = 0; k < radioSummary.get("hour").size(); k++) {
-            RadioButton rb = radioSummary.get("hour").get(k);
-            if (rb.isChecked()) {
-                third = rb.getText() + "";
-            }
-        }
+        RadioGroup rg = findViewById(R.id.dyn_rg_hour);
+        RadioButton rb = findViewById(rg.getCheckedRadioButtonId());
+        third = rb.getText().toString();
         third = (third.split(":"))[0];
         hour = third;
         fourth = datepicker.getText() + "";
@@ -561,6 +528,45 @@ public class Dynamic extends AppCompatActivity {
                 break;
         }
         return super.onKeyDown(keyCode, event);
+    }
+
+    public ArrayList<String> getSelectedCheckbox() {
+        ArrayList<String> searchResult = new ArrayList<>();
+
+        HashMap<String, Boolean> otmap = new HashMap<>();
+        LinearLayout otll = findViewById(R.id.dyn_ot);
+        String ot = "";
+        for (int i = 0; i < otll.getChildCount(); i++) {
+            if (((CheckBox) otll.getChildAt(i)).isChecked()) {
+                if (ot.equals("")) {
+                    ot += ((CheckBox) otll.getChildAt(i)).getText();
+                } else {
+                    ot = ot + "," + ((CheckBox) otll.getChildAt(i)).getText();
+                }
+            }
+            otmap.put(((CheckBox) otll.getChildAt(i)).getText().toString(), ((CheckBox) otll.getChildAt(i)).isChecked());
+
+        }
+        summary.put("ordertype", otmap);
+        searchResult.add(ot);
+
+        HashMap<String, Boolean> Lobmap = new HashMap<>();
+        LinearLayout Lobll = findViewById(R.id.dyn_lob);
+        String Lob = "";
+        for (int i = 0; i < Lobll.getChildCount(); i++) {
+            if (((CheckBox) Lobll.getChildAt(i)).isChecked()) {
+                if (Lob.equals("")) {
+                    Lob += ((CheckBox) Lobll.getChildAt(i)).getText();
+                } else {
+                    Lob = Lob + "," + ((CheckBox) Lobll.getChildAt(i)).getText();
+                }
+            }
+            Lobmap.put(((CheckBox) Lobll.getChildAt(i)).getText().toString(), ((CheckBox) Lobll.getChildAt(i)).isChecked());
+
+        }
+        summary.put("lob", Lobmap);
+        searchResult.add(Lob);
+        return searchResult;
     }
 
 }
