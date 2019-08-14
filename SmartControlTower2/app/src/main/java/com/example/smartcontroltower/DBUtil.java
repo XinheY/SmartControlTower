@@ -2,7 +2,6 @@ package com.example.smartcontroltower;
 
 
 import android.util.Log;
-import android.widget.Toast;
 
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -16,50 +15,28 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.sql.Array;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.SQLTimeoutException;
 import java.sql.Statement;
-import java.sql.Time;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
-import java.util.List;
 
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
-import okio.Timeout;
-
 
 public class DBUtil {
 
-    public static ArrayList<LinkedHashMap<String, String>> sendRequestWithOkHttp() {
-        ArrayList<LinkedHashMap<String, String>> anss = new ArrayList<>();
-        try {
-            OkHttpClient client = new OkHttpClient();
-            Request request = new Request.Builder()
-                    .url("http://10.0.2.2/initial.xml")
-                    .build();
-            Log.d("URL", request.toString());
-            Response response = client.newCall(request).execute();
-            Log.d("Content", response.toString());
-            String responseData = response.body().string();
-            parseXMLWithPull(responseData, anss);
-
-
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return anss;
-
-    }
-
-
+    /**
+     * 通过ip地址，用户名，密码和数据库名称连接数据库
+     * @param ip
+     * @param user
+     * @param pwd
+     * @param db
+     * @return
+     */
     private static Connection getSQLConnection(String ip, String user, String pwd, String db) {
         Connection con = null;
         try {
@@ -73,6 +50,12 @@ public class DBUtil {
         return con;
     }
 
+    /**
+     * 获取数据库数据
+     * @param sql
+     * @param no
+     * @return
+     */
     public static ArrayList<LinkedHashMap<String, String>> QuerySQL(String sql, int no) {
         String result = "";
         ArrayList<LinkedHashMap<String, String>> answer = new ArrayList<>();
@@ -90,9 +73,6 @@ public class DBUtil {
                     answer = parseXMLWithPull(after, answer);
                 }
             }
-
-
-
             rs.close();
             stmt.close();
             conn.close();}
@@ -104,12 +84,15 @@ public class DBUtil {
         return answer;
     }
 
-
+    /**
+     * 将被解析成string的xml文件放进存储变量
+     * @param xmlData
+     * @param answer
+     * @return
+     */
     private static ArrayList<LinkedHashMap<String, String>> parseXMLWithPull(String xmlData, ArrayList<LinkedHashMap<String, String>> answer) {
         try {
-            //ans.clear();
             XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
-            // System.out.println(xmlData);
             XmlPullParser xmlPullParser = factory.newPullParser();
             xmlPullParser.setInput(new StringReader(xmlData));
             int eventType = xmlPullParser.getEventType();
@@ -157,6 +140,12 @@ public class DBUtil {
 
     }
 
+    /**
+     * 解析analysis page专用
+     * @param xmlData
+     * @param answer
+     * @return
+     */
     private static ArrayList<LinkedHashMap<String, String>> parseXMLWithPull2(String xmlData, ArrayList<LinkedHashMap<String, String>> answer) {
         try {
             //ans.clear();
@@ -210,6 +199,12 @@ public class DBUtil {
 
     }
 
+    /**
+     * 将xml文件解析成string
+     * @param str
+     * @return
+     * @throws IOException
+     */
     public static String strChangeXML(String str) throws IOException {
         SAXReader saxReader = new SAXReader();
         Document document;

@@ -30,7 +30,6 @@ import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
-import android.widget.Toast;
 
 import com.bin.david.form.data.CellInfo;
 import com.bin.david.form.data.format.bg.BaseBackgroundFormat;
@@ -51,24 +50,17 @@ public class E2E extends AppCompatActivity {
     private DrawerLayout drawerl;
     private ActionBarDrawerToggle toggle;
     public static MySmartTable<Object> table;
-    private HashMap<String, HashMap<String, Boolean>> summary = new HashMap<>();//所有checkbox的集合
+    private HashMap<String, HashMap<String, Boolean>> summary = new HashMap<>();//所有checkbox的集合 HashMap<类型, HashMap <内容，是否被打勾>>
     private HashMap<String, HashMap<String, Boolean>> summaryOld = new HashMap<>();//之前所有checkbox的集合
-    private ArrayList<String> allCondition = new ArrayList<>();
-    private ArrayList<String[]> allContent = new ArrayList<>();
-    private ArrayList<LinkedHashMap<String, String>> answerE2E;
-    private LoadingDialog ld = null;
-    private Button verbtn, verbtn2;
-    private Button yqbtn;
-    private Button expand;
-    private LinearLayout yqll;
-    private LinearLayout verll, verll2;
-    private RadioGroup viewType;
-    private RadioGroup radioGroup;
+    private static ArrayList<LinkedHashMap<String, String>> answerE2E=new ArrayList<>();//储存表格中数据
+    private LoadingDialog ld = null;//加载动画
+    private Button version_button, version_button2,year_quar_button,expand;
+    private LinearLayout year_quar_LinearLayout,version_linearlayout,version_linearlayout2;
+    private RadioGroup viewType,radioGroup,IdcEoqChose;
     private String expandTitle = "Expand";
-    private InitializeInfo info = null;
-    private InitializeInfo info2 = null;
+    private InitializeInfo EoQInitialInfo = null;//EoQ模式下的version,version_year等
+    private InitializeInfo IDCInitialInfo = null;//IDC模式下的version，version_year等
     private int[] AccessRight = null;
-    private RadioGroup IdcEoqChose = null;
 
     @Override
     protected void onPause() {
@@ -81,42 +73,41 @@ public class E2E extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+         //判断是否存在之前的缓存内容，存在就继承，不存在就创建新的
         if (savedInstanceState != null) {
             // Restore value of members from saved state
-            answerE2E = (ArrayList<LinkedHashMap<String, String>>) savedInstanceState.getSerializable("initial");
             summaryOld = (HashMap<String, HashMap<String, Boolean>>) savedInstanceState.getSerializable("initial2");
             expandTitle = savedInstanceState.getString("initial3");
-        } else {
-            answerE2E = new ArrayList<>();
         }
 
         setContentView(R.layout.activity_e2_e);
         radioGroup = findViewById(R.id.e2e_range);
         viewType = findViewById(R.id.e2e_spinner);
-        verbtn = findViewById(R.id.e2e_ver_btn);
-        verbtn2 = findViewById(R.id.e2e_ver_btn2);
-        yqbtn = findViewById(R.id.e2e_yq_btn);
-        yqll = findViewById(R.id.e2e_yq);
-        verll = findViewById(R.id.e2e_ver);
-        verll2 = findViewById(R.id.e2e_ver2);
+        version_button = findViewById(R.id.e2e_ver_btn);
+        version_button2 = findViewById(R.id.e2e_ver_btn2);
+        year_quar_button = findViewById(R.id.e2e_yq_btn);
+        year_quar_LinearLayout = findViewById(R.id.e2e_yq);
+        version_linearlayout = findViewById(R.id.e2e_ver);
+        version_linearlayout2 = findViewById(R.id.e2e_ver2);
         table = findViewById(R.id.table);
 
-        info = (InitializeInfo) getIntent().getSerializableExtra("InitializeInfo");
-        info2 = (InitializeInfo) getIntent().getSerializableExtra("InitializeInfo2");
+        //从之前的页面获取变量
+        EoQInitialInfo = (InitializeInfo) getIntent().getSerializableExtra("InitializeInfo");
+        IDCInitialInfo = (InitializeInfo) getIntent().getSerializableExtra("InitializeInfo2");
         AccessRight = (int[]) getIntent().getSerializableExtra("AccessRight");
-        Log.e("info", info.getVersion().toString());
         /////////////////Table//////////////////////////////////////////////////
         //设置初始值
         if (answerE2E.size() != 0 || savedInstanceState != null) {
+            //如果存在历史数据直接放进表格中，主要用于屏幕旋转
             setNumber(selectRadioBtn(radioGroup), expandTitle);
         } else {
+            //不存在历史数据重新从数据库获取数据
             ld = new LoadingDialog(this);
             ld.setLoadingText("Loading...").setSuccessText("Success").setFailedText("Failed")
                     .closeSuccessAnim().show();
-            test("EXEC [SP_IDC_EOQ_SUMMARY] '" + "EoQ" + "','" + "QuarView" + "','" + info.getVersion_year_quar().get(0) + "','" + "" + "','" + "overall" + "','" + "system" + "','" + "overall" + "','" + "overall" + "','" + "overall" + "','" + "overall" + "','" + "overall" + "'");
-            }
-        ///////////////////////////////Expand Button//////////////////////////////////////////
+            test("EXEC [SP_IDC_EOQ_SUMMARY] '" + "EoQ" + "','" + "QuarView" + "','" + EoQInitialInfo.getVersion_year_quar().get(0) + "','" + "" + "','" + "overall" + "','" + "system" + "','" + "overall" + "','" + "overall" + "','" + "overall" + "','" + "overall" + "','" + "overall" + "'");
+        }
+        ///////////////////////////////Expand Button 展开or收起数据/////////////////////////////////////
         expand = findViewById(R.id.e2e_isexpand);
         expand.setText(expandTitle);
         expand.setOnClickListener(new View.OnClickListener() {
@@ -128,7 +119,6 @@ public class E2E extends AppCompatActivity {
                     expandTitle = "Expand";
                 }
                 expand.setText(expandTitle);
-                Log.e("expand", expandTitle);
                 setNumber(selectRadioBtn(radioGroup), expandTitle);
             }
         });
@@ -148,13 +138,13 @@ public class E2E extends AppCompatActivity {
             public void onCheckedChanged(RadioGroup radioGroup, int i) {
                 if (selectRadioBtn(viewType).equals("VersionView")) {
                     if (selectRadioBtn(radioGroup).equals("EoQ")) {
-                        verbtn.setVisibility(View.VISIBLE);
-                        verbtn2.setVisibility(View.GONE);
-                        verll2.setVisibility(View.GONE);
+                        version_button.setVisibility(View.VISIBLE);
+                        version_button2.setVisibility(View.GONE);
+                        version_linearlayout2.setVisibility(View.GONE);
                     } else {
-                        verbtn2.setVisibility(View.VISIBLE);
-                        verbtn.setVisibility(View.GONE);
-                        verll.setVisibility(View.GONE);
+                        version_button2.setVisibility(View.VISIBLE);
+                        version_button.setVisibility(View.GONE);
+                        version_linearlayout.setVisibility(View.GONE);
                     }
                 }
             }
@@ -164,26 +154,18 @@ public class E2E extends AppCompatActivity {
             public void onCheckedChanged(RadioGroup group, int checkedId) {
                 if (selectRadioBtn(viewType).equals("VersionView")) {
                     if (selectRadioBtn(IdcEoqChose).equals("EoQ")) {
-                        verbtn.setVisibility(View.VISIBLE);
+                        version_button.setVisibility(View.VISIBLE);
                     } else {
-                        verbtn2.setVisibility(View.VISIBLE);
+                        version_button2.setVisibility(View.VISIBLE);
                     }
-                    yqbtn.setVisibility(View.GONE);
-                    yqll.setVisibility(View.GONE);
-//                    for (String checkb : summary.get("yq").keySet()) {
-//                        CheckBox cbb = summary.get("yq").get(checkb);
-//                        cbb.setChecked(false);
-//                    }
+                    year_quar_button.setVisibility(View.GONE);
+                    year_quar_LinearLayout.setVisibility(View.GONE);
                 } else {
-                    verbtn.setVisibility(View.GONE);
-                    verbtn2.setVisibility(View.GONE);
-                    verll2.setVisibility(View.GONE);
-                    verll.setVisibility(View.GONE);
-                    yqbtn.setVisibility(View.VISIBLE);
-//                    for (String checkb : summary.get("version").keySet()) {
-//                        CheckBox cbb = summary.get("version").get(checkb);
-//                        cbb.setChecked(false);
-//                    }
+                    version_button.setVisibility(View.GONE);
+                    version_button2.setVisibility(View.GONE);
+                    version_linearlayout2.setVisibility(View.GONE);
+                    version_linearlayout.setVisibility(View.GONE);
+                    year_quar_button.setVisibility(View.VISIBLE);
                 }
             }
         };
@@ -229,8 +211,8 @@ public class E2E extends AppCompatActivity {
                     case R.id.nav_Dynamic:
                         Intent intent2 = new Intent(E2E.this, Dynamic.class);
                         Bundle bundle2 = new Bundle();
-                        bundle2.putSerializable("InitializeInfo", info);
-                        bundle2.putSerializable("InitializeInfo2", info2);
+                        bundle2.putSerializable("InitializeInfo", EoQInitialInfo);
+                        bundle2.putSerializable("InitializeInfo2", IDCInitialInfo);
                         bundle2.putSerializable("AccessRight", AccessRight);
                         intent2.putExtras(bundle2);
                         startActivity(intent2);
@@ -239,8 +221,8 @@ public class E2E extends AppCompatActivity {
                     case R.id.nav_DirectBL:
                         Intent intent4 = new Intent(E2E.this, DirectBL.class);
                         Bundle bundle4 = new Bundle();
-                        bundle4.putSerializable("InitializeInfo", info);
-                        bundle4.putSerializable("InitializeInfo2", info2);
+                        bundle4.putSerializable("InitializeInfo", EoQInitialInfo);
+                        bundle4.putSerializable("InitializeInfo2", IDCInitialInfo);
                         bundle4.putSerializable("AccessRight", AccessRight);
                         intent4.putExtras(bundle4);
                         startActivity(intent4);
@@ -249,8 +231,8 @@ public class E2E extends AppCompatActivity {
                     case R.id.nav_analysis:
                         Intent intent3 = new Intent(E2E.this, Analysis.class);
                         Bundle bundle3 = new Bundle();
-                        bundle3.putSerializable("InitializeInfo", info);
-                        bundle3.putSerializable("InitializeInfo2", info2);
+                        bundle3.putSerializable("InitializeInfo", EoQInitialInfo);
+                        bundle3.putSerializable("InitializeInfo2", IDCInitialInfo);
                         bundle3.putSerializable("AccessRight", AccessRight);
                         intent3.putExtras(bundle3);
                         startActivity(intent3);
@@ -290,15 +272,15 @@ public class E2E extends AppCompatActivity {
         ///////////////////////CheckBox列表/////////////////////////////////////////
 
         LinearLayout e2ever = findViewById(R.id.e2e_ver);
-        String[] ver = ((String[]) info.getVersion().toArray(new String[info.getVersion().size()]));
+        String[] ver = ((String[]) EoQInitialInfo.getVersion().toArray(new String[EoQInitialInfo.getVersion().size()]));
         ConstructCheck("version", ver, e2ever, "");
 
         LinearLayout e2ever2 = findViewById(R.id.e2e_ver2);
-        String[] ver2 = ((String[]) info2.getVersion().toArray(new String[info2.getVersion().size()]));
+        String[] ver2 = ((String[]) IDCInitialInfo.getVersion().toArray(new String[IDCInitialInfo.getVersion().size()]));
         ConstructCheck("version2", ver2, e2ever2, "");
 
         LinearLayout e2eyq = findViewById(R.id.e2e_yq);
-        String[] yq = ((String[]) info.getVersion_year_quar().toArray(new String[info.getVersion_year_quar().size()]));
+        String[] yq = ((String[]) EoQInitialInfo.getVersion_year_quar().toArray(new String[EoQInitialInfo.getVersion_year_quar().size()]));
         ConstructCheck("yq", yq, e2eyq, yq[0]);
 
         LinearLayout e2elob = findViewById(R.id.e2e_lob);
@@ -352,8 +334,6 @@ public class E2E extends AppCompatActivity {
                 boolean canrun = true;
                 summary.clear();
                 ArrayList<String> searchSum2 = getSelectedCheckbox();
-                Log.e("searchSum", searchSum.toString());
-                Log.e("searchSum2", searchSum2.toString());
                 String sql = "";
                 if (searchSum.get(0).equals("IDC")) {
                     sql = "EXEC [SP_IDC_EOQ_SUMMARY] '" + searchSum.get(0) + "','" + searchSum.get(1) + "','" + searchSum2.get(0) + "','" + searchSum2.get(2) + "','" + searchSum2.get(3) + "','" + searchSum2.get(4) + "','" + searchSum2.get(5) + "','" + searchSum2.get(6) + "','" + searchSum2.get(7) + "','" + searchSum2.get(8) + "','" + searchSum2.get(9) + "'";
@@ -361,7 +341,6 @@ public class E2E extends AppCompatActivity {
                     sql = "EXEC [SP_IDC_EOQ_SUMMARY] '" + searchSum.get(0) + "','" + searchSum.get(1) + "','" + searchSum2.get(0) + "','" + searchSum2.get(1) + "','" + searchSum2.get(3) + "','" + searchSum2.get(4) + "','" + searchSum2.get(5) + "','" + searchSum2.get(6) + "','" + searchSum2.get(7) + "','" + searchSum2.get(8) + "','" + searchSum2.get(9) + "'";
                 }
                 toggleRightSliding();
-                Log.e("输入内容", sql);
                 test(sql);
 
             }
@@ -435,6 +414,10 @@ public class E2E extends AppCompatActivity {
         return true;
     }
 
+    /**
+     * 连接数据库获取数据之后放进表格中
+     * @param sql
+     */
     private void test(final String sql) {
         Runnable run = new Runnable() {
             @Override
@@ -442,8 +425,6 @@ public class E2E extends AppCompatActivity {
                 //测试数据库的语句,在子线程操作
                 Message msg = new Message();
                 answerE2E = DBUtil.QuerySQL(sql, 1);
-                //Log.e("SQL",sql);
-                //answerE2E = DBUtil.sendRequestWithOkHttp();
                 if (answerE2E.size() == 0) {
                     setNumber(selectRadioBtn(radioGroup), expandTitle);
                     msg.what = 1002;
@@ -481,18 +462,24 @@ public class E2E extends AppCompatActivity {
     };
 
     /////////////////////////////////////////////////////////////////////////////////////////
-    //将checklist放进界面中
+
+    /**
+     * 将checklist放进界面中
+     * @param title
+     * @param items
+     * @param ll
+     * @param ini
+     */
     public void ConstructCheck(String title, String[] items, LinearLayout ll, String ini) {
         String[] initial = ini.split(",");
         HashMap<String, Boolean> map = new LinkedHashMap<>();
-        allContent.add(items);
         for (int i = 0; i < items.length; i++) {
             CheckBox cb = new CheckBox(this);
             cb.setTextColor(getResources().getColor(R.color.colorAccent));
             cb.setText(items[i]);
             cb.setTextSize(18);
             if (summaryOld.size() != 0) {
-                Log.e("item",items[i]);
+                Log.e("item", items[i]);
                 if (summaryOld.get(title).get(items[i])) {
                     cb.setChecked(true);
                 }
@@ -507,10 +494,13 @@ public class E2E extends AppCompatActivity {
             ll.addView(cb);
         }
         summary.put(title, map);
-        allCondition.add(title);
     }
 
-    //将数字放进table里
+    /**
+     * 将数字放进table里
+     * @param unit
+     * @param title
+     */
     public void setNumber(String unit, String title) {
         List<Object> maplist = new ArrayList<>();
         List<Object> collapsemap = new ArrayList<>();
@@ -563,17 +553,14 @@ public class E2E extends AppCompatActivity {
                     } else {
                         collapsemap.add(lhm2);
                     }
-                    Log.e("a-after", a.toString());
                     maplist.add(lhm2);
                 }
-
             }
             RadioGroup radio = findViewById(R.id.e2e_rg);
             RadioButton radioButton = findViewById(radio.getCheckedRadioButtonId());
             String ratioText = radioButton.getText().toString();
 
             if (maplist.size() != 0 && collapsemap.size() != 0) {
-                Log.e("size", maplist.size() + " " + collapsemap.size());
                 MapTableData tableData;
                 if (title.equals("Expand")) {
                     tableData = MapTableData.create(ratioText, collapsemap);
@@ -585,12 +572,11 @@ public class E2E extends AppCompatActivity {
                                 canvas.drawRect(rect, paint);
                             }
                         }
+
                         @Override
                         public int getTextColor(CellInfo cellInfo) {
                             return 0;
                         }
-
-
                     });
                 } else {
                     tableData = MapTableData.create(ratioText, maplist);
@@ -605,13 +591,10 @@ public class E2E extends AppCompatActivity {
                                 canvas.drawRect(rect, paint);
                             }
                         }
-
                         @Override
                         public int getTextColor(CellInfo cellInfo) {
                             return 0;
                         }
-
-
                     });
                 }
 
@@ -634,7 +617,10 @@ public class E2E extends AppCompatActivity {
 
     }
 
-    //在界面刷新之前保存旧数据
+    /**
+     * 在界面刷新之前保存旧数据
+     * @param outState
+     */
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -645,12 +631,23 @@ public class E2E extends AppCompatActivity {
         outState.putString("initial3", expandTitle);
     }
 
+    /**
+     * 获取在当前radiogroup中被选中的radioButton
+     * @param rg
+     * @return
+     */
     private String selectRadioBtn(RadioGroup rg) {
         RadioButton rb = E2E.this.findViewById(rg.getCheckedRadioButtonId());
         return rb.getText() + "";
 
     }
 
+    /**
+     * 返回键退出
+     * @param keyCode
+     * @param event
+     * @return
+     */
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         switch (keyCode) {
@@ -676,49 +673,53 @@ public class E2E extends AppCompatActivity {
         return super.onKeyDown(keyCode, event);
     }
 
+    /**
+     * 获取filter中所有被选中的checkbox
+     * @return
+     */
     public ArrayList<String> getSelectedCheckbox() {
         ArrayList<String> searchResult = new ArrayList<>();
         String yq = "";
         HashMap<String, Boolean> yqmap = new HashMap<>();
-        for (int i = 0; i < yqll.getChildCount(); i++) {
-            if (((CheckBox) yqll.getChildAt(i)).isChecked()) {
+        for (int i = 0; i < year_quar_LinearLayout.getChildCount(); i++) {
+            if (((CheckBox) year_quar_LinearLayout.getChildAt(i)).isChecked()) {
                 if (yq.equals("")) {
-                    yq += ((CheckBox) yqll.getChildAt(i)).getText();
+                    yq += ((CheckBox) year_quar_LinearLayout.getChildAt(i)).getText();
                 } else {
-                    yq = yq + "," + ((CheckBox) yqll.getChildAt(i)).getText();
+                    yq = yq + "," + ((CheckBox) year_quar_LinearLayout.getChildAt(i)).getText();
                 }
             }
-            yqmap.put(((CheckBox) yqll.getChildAt(i)).getText().toString(), ((CheckBox) yqll.getChildAt(i)).isChecked());
+            yqmap.put(((CheckBox) year_quar_LinearLayout.getChildAt(i)).getText().toString(), ((CheckBox) year_quar_LinearLayout.getChildAt(i)).isChecked());
         }
         summary.put("yq", yqmap);
         searchResult.add(yq);
 
         String ver = "";
         HashMap<String, Boolean> vermap = new HashMap<>();
-        for (int i = 0; i < verll.getChildCount(); i++) {
-            if (((CheckBox) verll.getChildAt(i)).isChecked()) {
+        for (int i = 0; i < version_linearlayout.getChildCount(); i++) {
+            if (((CheckBox) version_linearlayout.getChildAt(i)).isChecked()) {
                 if (ver.equals("")) {
-                    ver += ((CheckBox) verll.getChildAt(i)).getText();
+                    ver += ((CheckBox) version_linearlayout.getChildAt(i)).getText();
                 } else {
-                    ver = ver + "," + ((CheckBox) verll.getChildAt(i)).getText();
+                    ver = ver + "," + ((CheckBox) version_linearlayout.getChildAt(i)).getText();
                 }
             }
-            vermap.put(((CheckBox) verll.getChildAt(i)).getText().toString(), ((CheckBox) verll.getChildAt(i)).isChecked());
-            }
+            vermap.put(((CheckBox) version_linearlayout.getChildAt(i)).getText().toString(), ((CheckBox) version_linearlayout.getChildAt(i)).isChecked());
+        }
         summary.put("version", vermap);
         searchResult.add(ver);
 
         String ver2 = "";
         HashMap<String, Boolean> ver2map = new HashMap<>();
-        for (int i = 0; i < verll2.getChildCount(); i++) {
-            if (((CheckBox) verll2.getChildAt(i)).isChecked()) {
+        for (int i = 0; i < version_linearlayout2.getChildCount(); i++) {
+            if (((CheckBox) version_linearlayout2.getChildAt(i)).isChecked()) {
                 if (ver2.equals("")) {
-                    ver2 += ((CheckBox) verll2.getChildAt(i)).getText();
+                    ver2 += ((CheckBox) version_linearlayout2.getChildAt(i)).getText();
                 } else {
-                    ver2 = ver2 + "," + ((CheckBox) verll2.getChildAt(i)).getText();
+                    ver2 = ver2 + "," + ((CheckBox) version_linearlayout2.getChildAt(i)).getText();
                 }
             }
-            ver2map.put(((CheckBox) verll2.getChildAt(i)).getText().toString(), ((CheckBox) verll2.getChildAt(i)).isChecked());
+            ver2map.put(((CheckBox) version_linearlayout2.getChildAt(i)).getText().toString(), ((CheckBox) version_linearlayout2.getChildAt(i)).isChecked());
         }
         summary.put("version2", ver2map);
         searchResult.add(ver2);
@@ -769,7 +770,7 @@ public class E2E extends AppCompatActivity {
             }
             ptmap.put(((CheckBox) ptll.getChildAt(i)).getText().toString(), ((CheckBox) ptll.getChildAt(i)).isChecked());
         }
-        summary.put("pt",ptmap);
+        summary.put("pt", ptmap);
         searchResult.add(pt);
 
         LinearLayout lgll = findViewById(R.id.e2e_lg);

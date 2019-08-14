@@ -29,8 +29,7 @@ import java.util.TimerTask;
 
 public class MainActivity extends AppCompatActivity {
 
-    private ProgressBar pb = null;
-    private Button btn;
+    private Button btn;//登陆键
     private ArrayList<LinkedHashMap<String, String>> answerEOQ;
     private ArrayList<LinkedHashMap<String, String>> answerIDC;
     private LoadingDialog ld = null;
@@ -44,62 +43,69 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList<String> version_addclosing2 = null;
     private ArrayList<String> version_year_quar2 = null;
     private ArrayList<String> version_year_quar_week2 = null;
-    private int[] AccessRight=new int[4];
+    private int[] AccessRight = new int[4];
     private EditText userName;
 
-
+    /**
+     * 创建界面，获取layout中组件
+     * @param savedInstanceState
+     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        userName=findViewById(R.id.login_username);
+        userName = findViewById(R.id.login_username);
+        //加载中动画
         ld = new LoadingDialog(this);
         ld.setLoadingText("Loading...").setSuccessText("Success").setFailedText("Failed")
                 .closeSuccessAnim();
+
+        //登陆键
         btn = findViewById(R.id.login_login);
+        //按键监听
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // pb.setVisibility(View.VISIBLE);
-                ///////////////////Need edit////////////////////
                 ld = new LoadingDialog(view.getContext());
                 ld.setLoadingText("Loading...").setSuccessText("Success").setFailedText("Failed")
                         .closeSuccessAnim();
                 ld.show();
                 test("sql");
-
-                //////////////////////////////////////////////
             }
         });
-
     }
 
+    /**
+     * 链接数据库获取数据
+     * @param sql
+     */
     private void test(final String sql) {
         Runnable run = new Runnable() {
             @Override
             public void run() {
-                //测试数据库的语句,在子线程操作
 
-
-                AccessRight[0]=DBUtil4Initial.QuerySQLAccess("EXEC SP_MENU_PKG_CHECKACCESSRIGHT ?,?,? output",userName.getText().toString(),"/View/SmartControlTower/PerfDashboard/IDC_EOQ_SummaryNew.aspx");
-                AccessRight[1]=DBUtil4Initial.QuerySQLAccess("EXEC SP_MENU_PKG_CHECKACCESSRIGHT ?,?,? output",userName.getText().toString(),"/View/SmartControlTower/PerfDashboard/IDC_EOQ_SNI_ChangeAnalysis.aspx");
+                //判断用户名是否拥有权限查看该软件包含的四个表格的内容
+                AccessRight[0] = DBUtil4Initial.QuerySQLAccess("EXEC SP_MENU_PKG_CHECKACCESSRIGHT ?,?,? output", userName.getText().toString(), "/View/SmartControlTower/PerfDashboard/IDC_EOQ_SummaryNew.aspx");
+                AccessRight[1] = DBUtil4Initial.QuerySQLAccess("EXEC SP_MENU_PKG_CHECKACCESSRIGHT ?,?,? output", userName.getText().toString(), "/View/SmartControlTower/PerfDashboard/IDC_EOQ_SNI_ChangeAnalysis.aspx");
                 AccessRight[2] = DBUtil4Initial.QuerySQLAccess("EXEC SP_MENU_PKG_CHECKACCESSRIGHT ?,?,? output", userName.getText().toString(), "/View/SmartControlTower/PerfDashboard/Dynamic_CSR_BL.aspx");
-                AccessRight[3]=DBUtil4Initial.QuerySQLAccess("EXEC SP_MENU_PKG_CHECKACCESSRIGHT ?,?,? output",userName.getText().toString(),"/View/SmartControlTower/PerfDashboard/BacklogTracking.aspx");
-                Log.e("Access",AccessRight[0]+" "+AccessRight[1]+" "+AccessRight[2]+" "+AccessRight[3]);
-                boolean canrun=false;
+                AccessRight[3] = DBUtil4Initial.QuerySQLAccess("EXEC SP_MENU_PKG_CHECKACCESSRIGHT ?,?,? output", userName.getText().toString(), "/View/SmartControlTower/PerfDashboard/BacklogTracking.aspx");
+
+                boolean canrun = false;
                 Message msg = new Message();
-                for(int i:AccessRight){
-                    if(i==1){
-                        canrun=true;
+                for (int i : AccessRight) {
+                    if (i == 1) {
+                        canrun = true;
                         break;
                     }
                 }
-                if(canrun) {
+
+                if (canrun) {
+                    /**用户有至少一个表格的权限，获取初始化的信息：version/version_addclosing/version_year/
+                    version_year_quar/version_year_quar_week
+                     初始化包括IDC和EOQ模式**/
                     answerEOQ = DBUtil4Initial.QuerySQL("EXEC SP_IDC_EOQ_GETFILTER 'EOQ'");
                     answerIDC = DBUtil4Initial.QuerySQL("EXEC SP_IDC_EOQ_GETFILTER 'IDC'");
-
-                    // answerEOQ = DBUtil4Initial.sendRequestWithOkHttp();
                     if (answerEOQ.size() != 0 && answerIDC.size() != 0) {
                         ArrayList<String> temp = new ArrayList<>();
                         ArrayList<String> temp2 = new ArrayList<>();
@@ -147,16 +153,16 @@ public class MainActivity extends AppCompatActivity {
                         Bundle bundle = new Bundle();
                         bundle.putSerializable("InitializeInfo", info);
                         bundle.putSerializable("InitializeInfo2", info2);
-                        bundle.putSerializable("AccessRight",AccessRight);
-                        bundle.putString("username",userName.getText().toString());
+                        bundle.putSerializable("AccessRight", AccessRight);
+                        bundle.putString("username", userName.getText().toString());
                         intent.putExtras(bundle);
                         startActivity(intent);
                     } else {
-                        msg.what = 1002;
+                        msg.what = 1002;//加载超时，输出错误代码
                     }
-                }
-                else{
-                   msg.what=1003;
+                } else {
+                    //用户无权限
+                    msg.what = 1003;
                 }
                 Bundle data = new Bundle();
                 msg.setData(data);
@@ -168,6 +174,9 @@ public class MainActivity extends AppCompatActivity {
         new Thread(run).start();
     }
 
+    /**
+     * 通过获取结果代码来判断输出结果为成功加载，加载失败或者没有权限
+     */
     @SuppressLint("HandlerLeak")
     Handler mHandler = new Handler() {
         public void handleMessage(android.os.Message msg) {
@@ -188,6 +197,12 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
+    /**
+     * 返回键退出程序
+     * @param keyCode
+     * @param event
+     * @return
+     */
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         switch (keyCode) {

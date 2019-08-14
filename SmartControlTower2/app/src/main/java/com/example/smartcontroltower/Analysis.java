@@ -45,7 +45,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
 
 public class Analysis extends AppCompatActivity {
 
@@ -63,13 +62,10 @@ public class Analysis extends AppCompatActivity {
     private static ArrayList<LinkedHashMap<String, String>> answerAna;
     private LoadingDialog ld;
     private RadioGroup radioGroup, idcEoqGroup,anasv,anasv2,anacv,anacv2,anaSources;
-    private RadioGroup IdcEoq;
     private TabLayout tl;
     private NoSrcoll vp;
     private RangeSeekBar rsb;
     private ViewPagerAdapter adapter;
-    private int finishAna = 0;
-    private static CountDownLatch cdl = null;
     private InitializeInfo info, info2;
     private int left = 9;
     private int right = 13;
@@ -289,22 +285,22 @@ public class Analysis extends AppCompatActivity {
 
         anasv = findViewById(R.id.ana_rg_sv);
         String[] submitVersion;
-        submitVersion = ((String[]) info.getVersion_addclosing().toArray(new String[info.getVersion().size()]));
+        submitVersion = info.getVersion_addclosing().toArray(new String[info.getVersion().size()]);
         ConstructRadio("sv", submitVersion, anasv, submitVersion[0]);
 
         anasv2 = findViewById(R.id.ana_rg_sv2);
         String[] submitVersion2;
-        submitVersion2 = ((String[]) info2.getVersion_addclosing().toArray(new String[info2.getVersion().size()]));
+        submitVersion2 = info2.getVersion_addclosing().toArray(new String[info2.getVersion().size()]);
         ConstructRadio("sv2", submitVersion2, anasv2, submitVersion2[0]);
 
         anacv = findViewById(R.id.ana_rg_cv);
         String[] compareVersion;
-        compareVersion = ((String[]) info.getVersion_addclosing().toArray(new String[info.getVersion().size()]));
+        compareVersion = info.getVersion_addclosing().toArray(new String[info.getVersion().size()]);
         ConstructRadio("cv", compareVersion, anacv, compareVersion[1]);
 
         anacv2 = findViewById(R.id.ana_rg_cv2);
         String[] compareVersion2;
-        compareVersion2 = ((String[]) info2.getVersion_addclosing().toArray(new String[info2.getVersion().size()]));
+        compareVersion2 = info2.getVersion_addclosing().toArray(new String[info2.getVersion().size()]);
         ConstructRadio("cv2", compareVersion2, anacv2, compareVersion2[1]);
 
         LinearLayout anagroupby = findViewById(R.id.ana_gb);
@@ -661,7 +657,7 @@ public class Analysis extends AppCompatActivity {
                                     value = String.format("%.1f", dou);
                                 }
                             }
-                            ((LinkedHashMap<String, String>) tempmap).put(string, value);
+                            tempmap.put(string, value);
                         }
                     }
                     templist.add(tempmap);
@@ -701,58 +697,58 @@ public class Analysis extends AppCompatActivity {
         FragmentISGLOB fil = new FragmentISGLOB();
 
         ArrayList<List<Object>> ins = new ArrayList<>();
-        ins.add((List<Object>) map2.get("systemoverall"));
-        ins.add((List<Object>) map2.get("systemclient"));
-        ins.add((List<Object>) map2.get("systemisg"));
+        ins.add(map2.get("systemoverall"));
+        ins.add(map2.get("systemclient"));
+        ins.add(map2.get("systemisg"));
         fs.setMaplistInFragSys(ins, left, right, gbChoseCount,pre,comp);
 
 
         ArrayList<List<Object>> ins2 = new ArrayList<>();
-        ins2.add((List<Object>) map2.get("client"));
-        ins2.add((List<Object>) map2.get("Consumer"));
-        ins2.add((List<Object>) map2.get("Commercial"));
-        ins2.add((List<Object>) map2.get("Alienware"));
-        ins2.add((List<Object>) map2.get("Personal_Vostro"));
-        ins2.add((List<Object>) map2.get("XPS_DT_NB"));
-        ins2.add((List<Object>) map2.get("Lat_Opt"));
-        ins2.add((List<Object>) map2.get("Workstation"));
-        ins2.add((List<Object>) map2.get("CHROME"));
-        ins2.add((List<Object>) map2.get("CLOUD_CLIENT_IOT"));
+        ins2.add(map2.get("client"));
+        ins2.add(map2.get("Consumer"));
+        ins2.add(map2.get("Commercial"));
+        ins2.add(map2.get("Alienware"));
+        ins2.add(map2.get("Personal_Vostro"));
+        ins2.add(map2.get("XPS_DT_NB"));
+        ins2.add(map2.get("Lat_Opt"));
+        ins2.add(map2.get("Workstation"));
+        ins2.add(map2.get("CHROME"));
+        ins2.add(map2.get("CLOUD_CLIENT_IOT"));
         Log.e("ins2", ins2.size() + "");
         fc.setMaplistInFragClient(ins2, left, right, gbChoseCount,pre,comp);
 
         ArrayList<List<Object>> ins3 = new ArrayList<>();
-        ins3.add((List<Object>) map2.get("ALIENWARE_DESKTOPS"));
-        ins3.add((List<Object>) map2.get("ALIENWARE_NOTEBOOKS"));
-        ins3.add((List<Object>) map2.get("PERSONAL_DESKTOPS"));
-        ins3.add((List<Object>) map2.get("PERSONAL_NOTEBOOKS"));
-        ins3.add((List<Object>) map2.get("VOSTRO_DESKTOPS"));
-        ins3.add((List<Object>) map2.get("VOSTRO_NOTEBOOKS"));
-        ins3.add((List<Object>) map2.get("XPS_DESKTOPS"));
-        ins3.add((List<Object>) map2.get("XPS_NOTEBOOKS"));
-        ins3.add((List<Object>) map2.get("LATITUDE"));
-        ins3.add((List<Object>) map2.get("OPTIPLEX_DESKTOPS"));
-        ins3.add((List<Object>) map2.get("FIXED_WORKSTATIONS"));
-        ins3.add((List<Object>) map2.get("MOBILE_WORKSTATIONS"));
-        ins3.add((List<Object>) map2.get("CHROME"));
-        ins3.add((List<Object>) map2.get("CLOUD_CLIENT"));
-        ins3.add((List<Object>) map2.get("INTERNET_OF_THINGS"));
+        ins3.add(map2.get("ALIENWARE_DESKTOPS"));
+        ins3.add(map2.get("ALIENWARE_NOTEBOOKS"));
+        ins3.add(map2.get("PERSONAL_DESKTOPS"));
+        ins3.add(map2.get("PERSONAL_NOTEBOOKS"));
+        ins3.add(map2.get("VOSTRO_DESKTOPS"));
+        ins3.add(map2.get("VOSTRO_NOTEBOOKS"));
+        ins3.add(map2.get("XPS_DESKTOPS"));
+        ins3.add(map2.get("XPS_NOTEBOOKS"));
+        ins3.add(map2.get("LATITUDE"));
+        ins3.add(map2.get("OPTIPLEX_DESKTOPS"));
+        ins3.add(map2.get("FIXED_WORKSTATIONS"));
+        ins3.add(map2.get("MOBILE_WORKSTATIONS"));
+        ins3.add(map2.get("CHROME"));
+        ins3.add(map2.get("CLOUD_CLIENT"));
+        ins3.add(map2.get("INTERNET_OF_THINGS"));
         Log.e("ins3", ins3.size() + "");
         fcl.setMaplistInFragcl(ins3, left, right, gbChoseCount,pre,comp);
 
         ArrayList<List<Object>> ins4 = new ArrayList<>();
-        ins4.add((List<Object>) map2.get("isg_overall"));
-        ins4.add((List<Object>) map2.get("isg_system"));
-        ins4.add((List<Object>) map2.get("isg_Non_Sys"));
+        ins4.add(map2.get("isg_overall"));
+        ins4.add(map2.get("isg_system"));
+        ins4.add(map2.get("isg_Non_Sys"));
         Log.e("ins4", ins4.size() + "");
         fisg.setMaplistInFragIsg(ins4, left, right, gbChoseCount,pre,comp);
 
         ArrayList<List<Object>> ins5 = new ArrayList<>();
-        ins5.add((List<Object>) map2.get("isg_PowerEdge"));
-        ins5.add((List<Object>) map2.get("isg_Cloud"));
-        ins5.add((List<Object>) map2.get("isg_storage"));
-        ins5.add((List<Object>) map2.get("isg_Networking"));
-        ins5.add((List<Object>) map2.get("isg_hit"));
+        ins5.add(map2.get("isg_PowerEdge"));
+        ins5.add(map2.get("isg_Cloud"));
+        ins5.add(map2.get("isg_storage"));
+        ins5.add(map2.get("isg_Networking"));
+        ins5.add(map2.get("isg_hit"));
         Log.e("ins5", ins5.size() + "");
         fil.setMaplistInFragIsg(ins5, left, right, gbChoseCount,pre,comp);
     }

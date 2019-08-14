@@ -22,15 +22,16 @@ import com.google.android.material.navigation.NavigationView;
 public class WelcomePage extends AppCompatActivity {
 
     private DrawerLayout drawerl;
-    private InitializeInfo info = null;
-    private InitializeInfo info2 = null;
-    private int[] AccessRight = new int[4];
+    private InitializeInfo info = null;//初始化EOQ 数据
+    private InitializeInfo info2 = null;//初始化IDC 数据
+    private int[] AccessRight = new int[4];//存储该用户权限
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_welcome_page);
 
+        //从MainPage继承数据
         info = (InitializeInfo) getIntent().getSerializableExtra("InitializeInfo");
         info2 = (InitializeInfo) getIntent().getSerializableExtra("InitializeInfo2");
         AccessRight = (int[]) getIntent().getSerializableExtra("AccessRight");
@@ -39,11 +40,14 @@ public class WelcomePage extends AppCompatActivity {
         TextView welcome=findViewById(R.id.welcome_welcome);
         welcome.setText("ASIA-PACIFIC/"+username);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.welcome_toolbar);
+        Toolbar toolbar = findViewById(R.id.welcome_toolbar);
         setSupportActionBar(toolbar);
 
+        //右侧filter page
         drawerl = findViewById(R.id.welcome_drawer);
         ActionBar actionb = getSupportActionBar();
+
+        //左侧导航栏，根据用户权限判断能被显示的功能
         NavigationView nv = findViewById(R.id.nav_view);
         Menu munu = nv.getMenu();
         if (AccessRight[0] == 0) {
@@ -63,6 +67,7 @@ public class WelcomePage extends AppCompatActivity {
             actionb.setHomeAsUpIndicator(R.drawable.menu);
         }
 
+        //左侧导航栏界面转换
         nv.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
@@ -121,6 +126,11 @@ public class WelcomePage extends AppCompatActivity {
 
     }
 
+    /**
+     * 点开左上角按钮出现导航栏
+     * @param item
+     * @return
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -132,6 +142,12 @@ public class WelcomePage extends AppCompatActivity {
         return true;
     }
 
+    /**
+     * 返回键退出
+     * @param keyCode
+     * @param event
+     * @return
+     */
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         switch (keyCode) {
