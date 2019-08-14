@@ -38,7 +38,7 @@
 
     <string-array name="Segment">
         <item>OVERALL</item>
-        <item>Customer</item>
+        <item>Consumer</item>
         <item>Commercial</item>
     </string-array>
 

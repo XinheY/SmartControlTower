@@ -183,7 +183,7 @@ public class Dynamic extends AppCompatActivity {
 
         RadioGroup dynhourrg = findViewById(R.id.dyn_rg_hour);
         String[] dynhour = getResources().getStringArray(R.array.dyn_hour);
-        ConstructRadio("hour", dynhour, dynhourrg, "0:00");
+        ConstructRadio("hour", dynhour, dynhourrg, "7:00");
         ///////////////////////////////添加checkbox结束///////////////////////////////////////
         toggle = new ActionBarDrawerToggle(this, drawerl,
                 toolbar, R.string.draw_open, R.string.draw_close) {
