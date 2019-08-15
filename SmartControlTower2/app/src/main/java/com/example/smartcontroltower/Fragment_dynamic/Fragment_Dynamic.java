@@ -6,12 +6,10 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
-
 import com.bin.david.form.core.TableConfig;
 import com.bin.david.form.data.column.Column;
 import com.bin.david.form.data.format.bg.BaseBackgroundFormat;
@@ -21,7 +19,6 @@ import com.bin.david.form.data.style.FontStyle;
 import com.bin.david.form.data.table.MapTableData;
 import com.example.smartcontroltower.MySmartTable;
 import com.example.smartcontroltower.R;
-
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -31,7 +28,6 @@ public class Fragment_Dynamic extends Fragment {
 
     public static View view;
     private static ArrayList<Object> maplist1 = new ArrayList<>();
-    public static final String Tag = "Dynamic";
     private String title = "";
 
 
@@ -40,7 +36,7 @@ public class Fragment_Dynamic extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.dynamic_fragment, container, false);
         if (savedInstanceState != null) {
-            ArrayList<Object> maplist1old = new ArrayList<>();
+            ArrayList<Object> maplist1old;
             maplist1old = (ArrayList<Object>) savedInstanceState.getSerializable("map");
             refreshDate(maplist1old, savedInstanceState.getString("title"));
         } else if (maplist1.size() != 0) {
@@ -49,6 +45,10 @@ public class Fragment_Dynamic extends Fragment {
         return view;
     }
 
+    /**
+     * 储存旧数据
+     * @param outState
+     */
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -57,6 +57,11 @@ public class Fragment_Dynamic extends Fragment {
     }
 
 
+    /**
+     * 创建表格然后将数据放进表格中
+     * @param map 数据
+     * @param title 表格的title
+     */
     public void refreshDate(ArrayList<Object> map, String title) {
         MySmartTable<Object> table = view.findViewById(R.id.dyn_table);
         this.title = title;
@@ -73,7 +78,6 @@ public class Fragment_Dynamic extends Fragment {
             for (int i = 7; i < tableData.getColumns().size(); i++) {
                 a.add(tableData.getColumns().get(i));
             }
-
             tableData.setColumns(a);
             table.getConfig().setFixedTitle(true);
             tableData.getColumns().get(0).setFixed(true);
@@ -82,25 +86,6 @@ public class Fragment_Dynamic extends Fragment {
             table.setZoom(true, 2, 1);
             table.getConfig().setShowXSequence(false);
             table.getConfig().setShowYSequence(false);
-
-
-            ICellBackgroundFormat<Integer> backgroundFormat = new BaseCellBackgroundFormat<Integer>() {
-                @Override
-                public int getBackGroundColor(Integer position) {
-                    if (position % 2 == 0) {
-                        return ContextCompat.getColor(view.getContext(), R.color.lightgray);
-                    }
-                    return TableConfig.INVALID_COLOR;
-                }
-
-                @Override
-                public int getTextColor(Integer position) {
-                    if (position % 2 == 0) {
-                        return ContextCompat.getColor(view.getContext(), R.color.white);
-                    }
-                    return TableConfig.INVALID_COLOR;
-                }
-            };
         }
         else{
             tableData=MapTableData.create("",map);
@@ -116,12 +101,4 @@ public class Fragment_Dynamic extends Fragment {
         table.invalidate();
 
     }
-
-    public void initialFragment(ArrayList<Object> map, String title) {
-        maplist1.clear();
-        maplist1 = map;
-        this.title = title;
-    }
-
-
 }

@@ -48,6 +48,10 @@ public class Fragment_goal extends Fragment {
         return view2;
     }
 
+    /**
+     * 创建表格然后将数据放进表格
+     * @param map
+     */
     public void refreshDate(ArrayList<Object> map) {
         MySmartTable<Object> table = view2.findViewById(R.id.goal_table);
         maplist22.clear();
@@ -61,24 +65,25 @@ public class Fragment_goal extends Fragment {
                     }
                 }
             }
+            //格式化处理数据
             LinkedHashMap<String, String> item2 = new LinkedHashMap<>();
             item2.put("FLAG", "ISG");
-            item2.put("PRE_APJ", "--Goal--");
-            item2.put("APJ", "--Act.--");
-            item2.put("PRE_OPR", "--Goal--");
-            item2.put("OPR", "--Act.--");
-            item2.put("PRE_APCC", "--Goal--");
-            item2.put("APCC", "--Act.--");
-            item2.put("PRE_CCC", "--Goal--");
-            item2.put("CCC", "--Act.--");
-            item2.put("PRE_ICC", "--Goal--");
-            item2.put("ICC", "--Act.--");
-            item2.put("PRE_ODM-PP", "--Goal--");
-            item2.put("ODM-PP", "--Act.--");
-            item2.put("PRE_ODM", "--Goal--");
-            item2.put("ODM", "--Act.--");
-            item2.put("PRE_SS", "--Goal--");
-            item2.put("SS", "--Act.--");
+            item2.put("PRE_APJ", "Goal");
+            item2.put("APJ", "Act.");
+            item2.put("PRE_OPR", "Goal");
+            item2.put("OPR", "Act.");
+            item2.put("PRE_APCC", "Goal");
+            item2.put("APCC", "Act.");
+            item2.put("PRE_CCC", "Goal");
+            item2.put("CCC", "Act.");
+            item2.put("PRE_ICC", "Goal");
+            item2.put("ICC", "Act.");
+            item2.put("PRE_ODM-PP", "Goal");
+            item2.put("ODM-PP", "Act.");
+            item2.put("PRE_ODM", "Goal");
+            item2.put("ODM", "Act.");
+            item2.put("PRE_SS", "Goal");
+            item2.put("SS", "Act.");
             for (int h = 0; h < map.size(); h++) {
                 if (h == 2 && map.size() < 5) {
                     maplist22.add(item2);
@@ -106,6 +111,7 @@ public class Fragment_goal extends Fragment {
             table.getConfig().setShowXSequence(false);
             table.getConfig().setShowYSequence(false);
 
+            //改变特定行的背景颜色
             table.getConfig().setContentCellBackgroundFormat(new ICellBackgroundFormat<CellInfo>() {
                 @Override
                 public void drawBackground(Canvas canvas, Rect rect, CellInfo cellInfo, Paint paint) {
@@ -114,7 +120,6 @@ public class Fragment_goal extends Fragment {
                         canvas.drawRect(rect, paint);
                     }
                 }
-
                 @Override
                 public int getTextColor(CellInfo cellInfo) {
                     if (cellInfo.row % 4 == 2) {
@@ -126,7 +131,6 @@ public class Fragment_goal extends Fragment {
         } else {
             tableData = MapTableData.create("", maplist22);
         }
-
         table.getConfig().setTableTitleStyle(new FontStyle(50, R.color.table_gray));
         table.getConfig().setColumnTitleBackground(new BaseBackgroundFormat(Color.rgb(115, 135, 156)));
         table.getConfig().setContentStyle(new FontStyle(45, Color.rgb(115, 135, 156)));
@@ -135,17 +139,5 @@ public class Fragment_goal extends Fragment {
         Log.e("tableData", tableData.getColumns().size() + "");
         table.setTableData(tableData);
         table.invalidate();
-
     }
-
-    @Override
-    public void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
-    }
-
-    public void initialFragment(ArrayList<Object> map) {
-        maplistNew.clear();
-        maplistNew = map;
-    }
-
 }

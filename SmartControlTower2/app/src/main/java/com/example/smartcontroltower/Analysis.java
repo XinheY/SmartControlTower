@@ -7,7 +7,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
-
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -29,7 +28,6 @@ import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
-
 import com.example.smartcontroltower.Fragment_ana.FragmentClient;
 import com.example.smartcontroltower.Fragment_ana.FragmentClientLob;
 import com.example.smartcontroltower.Fragment_ana.FragmentISG;
@@ -40,7 +38,6 @@ import com.google.android.material.tabs.TabLayout;
 import com.jaygoo.widget.OnRangeChangedListener;
 import com.jaygoo.widget.RangeSeekBar;
 import com.xiasuhuei321.loadingdialog.view.LoadingDialog;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -48,30 +45,28 @@ import java.util.List;
 
 public class Analysis extends AppCompatActivity {
 
-    private DrawerLayout drawerl;
+    private DrawerLayout drawerl;//左侧抽屉
     private int radioid = 0;//给每个radiobutton设立唯一的id
-    private ActionBarDrawerToggle toggle;
+    private ActionBarDrawerToggle toggle;//右侧抽屉
     public static MySmartTable<Object> table;
     private LinkedHashMap<String, List<Object>> maplistSum = new LinkedHashMap<>();
     private HashMap<String, HashMap<String, Boolean>> summary = new LinkedHashMap<>();//所有checkbox的集合
     private HashMap<String, ArrayList<Boolean>> radioSummary = new LinkedHashMap<>();
     private HashMap<String, HashMap<String, Boolean>> summaryOld = new LinkedHashMap<>();//之前所有checkbox的集合
     private HashMap<String, ArrayList<Boolean>> radioOld = new LinkedHashMap<>();
-    private ArrayList<String> allCondition = new ArrayList<>();
-    private ArrayList<String[]> allContent = new ArrayList<>();
     private static ArrayList<LinkedHashMap<String, String>> answerAna;
-    private LoadingDialog ld;
-    private RadioGroup radioGroup, idcEoqGroup,anasv,anasv2,anacv,anacv2,anaSources;
+    private LoadingDialog ld;//加载动画
+    private RadioGroup radioGroup, idcEoqGroup, anasv, anasv2, anacv, anacv2, anaSources;
     private TabLayout tl;
     private NoSrcoll vp;
-    private RangeSeekBar rsb;
+    private RangeSeekBar rangeSeekBar;
     private ViewPagerAdapter adapter;
-    private InitializeInfo info, info2;
-    private int left = 9;
-    private int right = 13;
-    private static int gbChoseCount = 1;
-    private static int tempgbChoseCount=1;
-    private String pre,comp;
+    private InitializeInfo EOQInitialInfo, IDCInitialInfo;
+    private int leftIndicator = 9;
+    private int rightIndicator = 13;
+    private static int gbChoseCount = 1;//当前groupby被选中数
+    private static int tempgbChoseCount = 1;//前一次groupby被选中数
+    private static String submitVersionTitle, compareVersionTitle;
     private int[] AccessRight;
 
     @Override
@@ -82,20 +77,20 @@ public class Analysis extends AppCompatActivity {
             // Restore value of members from saved state
             summaryOld = (HashMap<String, HashMap<String, Boolean>>) savedInstanceState.getSerializable("initial2");
             radioOld = (LinkedHashMap<String, ArrayList<Boolean>>) savedInstanceState.getSerializable("initial3");
-            left = savedInstanceState.getInt("left");
-            right = savedInstanceState.getInt("right");
-            pre=savedInstanceState.getString("pre");
-            comp=savedInstanceState.getString("comp");
+            leftIndicator = savedInstanceState.getInt("leftIndicator");
+            rightIndicator = savedInstanceState.getInt("rightIndicator");
         } else {
             answerAna = new ArrayList<>();
-            gbChoseCount=1;
+            gbChoseCount = 1;
         }
-        info = (InitializeInfo) getIntent().getSerializableExtra("InitializeInfo");
-        info2 = (InitializeInfo) getIntent().getSerializableExtra("InitializeInfo2");
-        AccessRight= (int[]) getIntent().getSerializableExtra("AccessRight");
+        EOQInitialInfo = (InitializeInfo) getIntent().getSerializableExtra("InitializeInfo");
+        IDCInitialInfo = (InitializeInfo) getIntent().getSerializableExtra("InitializeInfo2");
+        AccessRight = (int[]) getIntent().getSerializableExtra("AccessRight");
 
-        pre=info.getVersion_addclosing().get(0);
-        comp=info.getVersion_addclosing().get(1);
+        if (savedInstanceState == null) {
+            submitVersionTitle = EOQInitialInfo.getVersion_addclosing().get(0);
+            compareVersionTitle = EOQInitialInfo.getVersion_addclosing().get(1);
+        }
 
         setContentView(R.layout.activity_analysis);
         radioGroup = findViewById(R.id.ana_range);
@@ -108,26 +103,24 @@ public class Analysis extends AppCompatActivity {
         tl = findViewById(R.id.ana_tablayout);
         vp = findViewById(R.id.ana_viewpager);
 
+        //添加所有的tab进adapter
         adapter = new ViewPagerAdapter(getSupportFragmentManager());
-
         adapter.addFragment(new FragmentSystem(), "System");
         adapter.addFragment(new FragmentClient(), "Client");
         adapter.addFragment(new FragmentClientLob(), "Client(LOB)");
         adapter.addFragment(new FragmentISG(), "ISG");
         adapter.addFragment(new FragmentISGLOB(), "ISG(LOB)");
-
-
-        vp.setAdapter(adapter);
-        tl.setupWithViewPager(vp);
-
-        info = (InitializeInfo) getIntent().getSerializableExtra("InitializeInfo");
+        vp.setAdapter(adapter);//在ViewPager中添加adapter
+        tl.setupWithViewPager(vp);//在tabLayout中添加ViewPager
         /////////////////Table//////////////////////////////////////////////////
         //设置初始值
         if (answerAna.size() != 0 || savedInstanceState != null) {
             setNumber(selectRadioBtn(radioGroup));
         } else {
             ld.show();
-            String sql = "EXEC SP_IDC_EOQ_SNI_CHANGE_ANALYSIS '" + "EoQ" + "','" + "FY20Q2WK12" + "','" + "FY20Q2WK11" + "','" + "Country" + "','" + "Invoice" + "','" + "Sales" + "'";
+            String sql = "EXEC SP_IDC_EOQ_SNI_CHANGE_ANALYSIS '" + "EoQ" + "','" + EOQInitialInfo.getVersion_addclosing().toArray(new String[EOQInitialInfo.getVersion().size()])[0]
+                    + "','" + EOQInitialInfo.getVersion_addclosing().toArray(new String[EOQInitialInfo.getVersion().size()])[1]
+                    + "','" + "Country" + "','" + "MFG-Phasing,MFG-Unshippable,SNI-Phasing,SNI-Unshippable,Invoice" + "','" + "Sales" + "'";
             test(sql);
         }
 
@@ -177,7 +170,7 @@ public class Analysis extends AppCompatActivity {
             }
         });
 
-///////////////////////////////////////***left side///////////////////////////////////////////
+///////////////////////////////////////***leftIndicator side///////////////////////////////////////////
         Toolbar toolbar = findViewById(R.id.ana_toolbar);
         setSupportActionBar(toolbar);
 
@@ -215,9 +208,9 @@ public class Analysis extends AppCompatActivity {
                     case R.id.nav_E2E:
                         Intent intent3 = new Intent(Analysis.this, E2E.class);
                         Bundle bundle3 = new Bundle();
-                        bundle3.putSerializable("InitializeInfo", info);
-                        bundle3.putSerializable("InitializeInfo2", info2);
-                        bundle3.putSerializable("AccessRight",AccessRight);
+                        bundle3.putSerializable("InitializeInfo", EOQInitialInfo);
+                        bundle3.putSerializable("InitializeInfo2", IDCInitialInfo);
+                        bundle3.putSerializable("AccessRight", AccessRight);
                         intent3.putExtras(bundle3);
                         startActivity(intent3);
                         finish();
@@ -225,9 +218,9 @@ public class Analysis extends AppCompatActivity {
                     case R.id.nav_Dynamic:
                         Intent intent2 = new Intent(Analysis.this, Dynamic.class);
                         Bundle bundle2 = new Bundle();
-                        bundle2.putSerializable("InitializeInfo", info);
-                        bundle2.putSerializable("InitializeInfo2", info2);
-                        bundle2.putSerializable("AccessRight",AccessRight);
+                        bundle2.putSerializable("InitializeInfo", EOQInitialInfo);
+                        bundle2.putSerializable("InitializeInfo2", IDCInitialInfo);
+                        bundle2.putSerializable("AccessRight", AccessRight);
                         intent2.putExtras(bundle2);
                         startActivity(intent2);
                         finish();
@@ -235,9 +228,9 @@ public class Analysis extends AppCompatActivity {
                     case R.id.nav_DirectBL:
                         Intent intent4 = new Intent(Analysis.this, DirectBL.class);
                         Bundle bundle4 = new Bundle();
-                        bundle4.putSerializable("InitializeInfo", info);
-                        bundle4.putSerializable("InitializeInfo2", info2);
-                        bundle4.putSerializable("AccessRight",AccessRight);
+                        bundle4.putSerializable("InitializeInfo", EOQInitialInfo);
+                        bundle4.putSerializable("InitializeInfo2", IDCInitialInfo);
+                        bundle4.putSerializable("AccessRight", AccessRight);
                         intent4.putExtras(bundle4);
                         startActivity(intent4);
                         finish();
@@ -253,7 +246,7 @@ public class Analysis extends AppCompatActivity {
             }
         });
 
-////////////////////////////////////////right side////////////////////////////////////////////
+////////////////////////////////////////rightIndicator side////////////////////////////////////////////
 
         //右侧抽屉
         toggle = new ActionBarDrawerToggle(this, drawerl,
@@ -285,22 +278,22 @@ public class Analysis extends AppCompatActivity {
 
         anasv = findViewById(R.id.ana_rg_sv);
         String[] submitVersion;
-        submitVersion = info.getVersion_addclosing().toArray(new String[info.getVersion().size()]);
+        submitVersion = EOQInitialInfo.getVersion_addclosing().toArray(new String[EOQInitialInfo.getVersion().size()]);
         ConstructRadio("sv", submitVersion, anasv, submitVersion[0]);
 
         anasv2 = findViewById(R.id.ana_rg_sv2);
         String[] submitVersion2;
-        submitVersion2 = info2.getVersion_addclosing().toArray(new String[info2.getVersion().size()]);
+        submitVersion2 = IDCInitialInfo.getVersion_addclosing().toArray(new String[IDCInitialInfo.getVersion().size()]);
         ConstructRadio("sv2", submitVersion2, anasv2, submitVersion2[0]);
 
         anacv = findViewById(R.id.ana_rg_cv);
         String[] compareVersion;
-        compareVersion = info.getVersion_addclosing().toArray(new String[info.getVersion().size()]);
+        compareVersion = EOQInitialInfo.getVersion_addclosing().toArray(new String[EOQInitialInfo.getVersion().size()]);
         ConstructRadio("cv", compareVersion, anacv, compareVersion[1]);
 
         anacv2 = findViewById(R.id.ana_rg_cv2);
         String[] compareVersion2;
-        compareVersion2 = info2.getVersion_addclosing().toArray(new String[info2.getVersion().size()]);
+        compareVersion2 = IDCInitialInfo.getVersion_addclosing().toArray(new String[IDCInitialInfo.getVersion().size()]);
         ConstructRadio("cv2", compareVersion2, anacv2, compareVersion2[1]);
 
         LinearLayout anagroupby = findViewById(R.id.ana_gb);
@@ -310,8 +303,10 @@ public class Analysis extends AppCompatActivity {
         LinearLayout anaviewtype = findViewById(R.id.ana_vt);
         String[] viewtype = getResources().getStringArray(R.array.ana_viewtype);
         ConstructCheck("viewtype", viewtype, anaviewtype, "MFG-Phasing,MFG-Unshippable,SNI-Phasing,SNI-Unshippable,Invoice");
-
-
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        /**
+         * 监听器：当sales被选中时，viewtype消失
+         */
         anaSources.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup radioGroup, int i) {
@@ -327,18 +322,20 @@ public class Analysis extends AppCompatActivity {
             }
         });
 
-        //范围选择器初始化和监听器
-        rsb = findViewById(R.id.rangeseek);
-        rsb.setProgress(62f, 92f);
-        rsb.setRange(1f, 14f, 0f);
-        rsb.setProgressHeight(4);
-        rsb.setIndicatorTextDecimalFormat("0");
-        rsb.setSteps(13);
-        rsb.setStepsWidth(10f);
-        rsb.setStepsHeight(25f);
-        rsb.setOnRangeChangedListener(new OnRangeChangedListener() {
+        /**
+         * 范围选择器初始化和监听器
+         */
+        rangeSeekBar = findViewById(R.id.rangeseek);
+        rangeSeekBar.setProgress(62f, 92f);
+        rangeSeekBar.setRange(1f, 14f, 0f);
+        rangeSeekBar.setProgressHeight(4);
+        rangeSeekBar.setIndicatorTextDecimalFormat("0");
+        rangeSeekBar.setSteps(13);
+        rangeSeekBar.setStepsWidth(10f);
+        rangeSeekBar.setStepsHeight(25f);
+        rangeSeekBar.setOnRangeChangedListener(new OnRangeChangedListener() {
             @Override
-            public void onRangeChanged(RangeSeekBar view, float leftValue, float rightValue, boolean isFromUser) {
+            public void onRangeChanged(RangeSeekBar view, float leftIndicatorValue, float rightIndicatorValue, boolean isFromUser) {
             }
 
             @Override
@@ -348,8 +345,8 @@ public class Analysis extends AppCompatActivity {
             @Override
             public void onStopTrackingTouch(RangeSeekBar view, boolean isLeft) {
                 //stop tracking touch
-                left = Math.round(rsb.getLeftSeekBar().getProgress());
-                right = Math.round(rsb.getRightSeekBar().getProgress());
+                leftIndicator = Math.round(rangeSeekBar.getLeftSeekBar().getProgress());
+                rightIndicator = Math.round(rangeSeekBar.getRightSeekBar().getProgress());
                 ((FragmentSystem) adapter.getItem(0)).collapse(adapter.getItem(0));
                 ((FragmentClient) adapter.getItem(1)).collapse(adapter.getItem(1));
                 ((FragmentClientLob) adapter.getItem(2)).collapse(adapter.getItem(2));
@@ -361,7 +358,6 @@ public class Analysis extends AppCompatActivity {
 ///////////////////////////////Checkbox列表结束////////////////////////////////////
         //刷新表格（按钮监听器）
         Button refresh = findViewById(R.id.ana_refresh);
-
         refresh.setOnClickListener(new View.OnClickListener() {//Refresh的动态监控
             @Override
             public void onClick(View view) {
@@ -370,55 +366,49 @@ public class Analysis extends AppCompatActivity {
                 RadioButton CVrb = findViewById(anacv.getCheckedRadioButtonId());
                 RadioButton SVrb2 = findViewById(anasv2.getCheckedRadioButtonId());
                 RadioButton CVrb2 = findViewById(anacv2.getCheckedRadioButtonId());
-                RadioButton Sourb=findViewById(anaSources.getCheckedRadioButtonId());
+                RadioButton Sourb = findViewById(anaSources.getCheckedRadioButtonId());
+                ArrayList<String> searchSum;
+                boolean canrun = true;
+                gbChoseCount = 0;
+
                 ld = new LoadingDialog(view.getContext());
                 ld.setLoadingText("Loading...").setSuccessText("Success").setFailedText("Failed")
                         .closeSuccessAnim().show();
                 toggleRightSliding();
-
                 ((FragmentSystem) adapter.getItem(0)).collapse(adapter.getItem(0));
                 ((FragmentClient) adapter.getItem(1)).collapse(adapter.getItem(1));
                 ((FragmentClientLob) adapter.getItem(2)).collapse(adapter.getItem(2));
                 ((FragmentISG) adapter.getItem(3)).collapse(adapter.getItem(3));
                 ((FragmentISGLOB) adapter.getItem(4)).collapse(adapter.getItem(4));
 
-                ArrayList<String> searchSum;
-                boolean canrun = true;
-                gbChoseCount = 0;
                 summary.clear();
-                searchSum=getSelectedCheckbox();
-                Log.e("summary", summary.size() + " "+searchSum.get(0));
-                Log.e("allcontent", allContent.size() + "");
-                gbChoseCount=searchSum.get(0).split(",").length;
+                searchSum = getSelectedCheckbox();
+                gbChoseCount = searchSum.get(0).split(",").length;
                 if (canrun == false) {
                     Toast.makeText(view.getContext(), "View Type can't be blank", Toast.LENGTH_SHORT).show();
                 } else if (gbChoseCount > 3) {
-                    gbChoseCount=tempgbChoseCount;
+                    gbChoseCount = tempgbChoseCount;
                     ld.loadFailed();
                     Toast.makeText(view.getContext(), "Group By more than 3 level", Toast.LENGTH_SHORT).show();
                 } else if (gbChoseCount == 0) {
-                    gbChoseCount=tempgbChoseCount;
+                    gbChoseCount = tempgbChoseCount;
                     ld.closeFailedAnim().loadFailed();
                     Toast.makeText(view.getContext(), "Group by can't be blank", Toast.LENGTH_SHORT).show();
                 } else {
-                    tempgbChoseCount=gbChoseCount;
+                    tempgbChoseCount = gbChoseCount;
                     String sql = "";
-                    Log.e("IErb",IErb.getText().toString());
+                    Log.e("IErb", IErb.getText().toString());
                     if (IErb.getText().toString().equals("EoQ")) {
-                        pre=SVrb.getText().toString();
-                        comp=CVrb.getText().toString();
+                        submitVersionTitle = SVrb.getText().toString();
+                        compareVersionTitle = CVrb.getText().toString();
                         sql = "EXEC SP_IDC_EOQ_SNI_CHANGE_ANALYSIS '" + IErb.getText() + "','" + SVrb.getText().toString() + "','" + CVrb.getText().toString() + "','" + searchSum.get(0) + "','" + searchSum.get(1) + "','" + Sourb.getText() + "'";
                     } else {
-                        pre=SVrb2.getText().toString();
-                        comp=CVrb2.getText().toString();
-                        Log.e("检测",Sourb.getText().toString());
+                        submitVersionTitle = SVrb2.getText().toString();
+                        compareVersionTitle = CVrb2.getText().toString();
                         sql = "EXEC SP_IDC_EOQ_SNI_CHANGE_ANALYSIS '" + IErb.getText() + "','" + SVrb2.getText().toString() + "','" + CVrb2.getText().toString() + "','" + searchSum.get(0) + "','" + searchSum.get(1) + "','" + Sourb.getText() + "'";
                     }
-
                     test(sql);
                 }
-
-
             }
         });
     }
@@ -433,6 +423,11 @@ public class Analysis extends AppCompatActivity {
         }
     }
 
+    /**
+     * filter中除refresh以外所有按钮的listener
+     *
+     * @param view
+     */
     public void showMutilAlertDialog(View view) {
         LinearLayout ll = null;
         switch (view.getId()) {
@@ -479,25 +474,27 @@ public class Analysis extends AppCompatActivity {
         return true;
     }
 
+    /**
+     * 连接数据库
+     *
+     * @param sql
+     */
     private void test(final String sql) {
         Runnable run = new Runnable() {
             @Override
             public void run() {
-                //测试数据库的语句,在子线程操作
+                //数据库的语句,在子线程操作
                 answerAna = DBUtil.QuerySQL(sql, 2);
                 Message msg = new Message();
                 if (answerAna.size() == 0) {
                     msg.what = 1002;
                 } else {
-                    //answerAna = DBUtil.sendRequestWithOkHttp();
                     setNumber(selectRadioBtn(radioGroup));
                     msg.what = 1001;
                 }
                 Bundle data = new Bundle();
                 msg.setData(data);
                 mHandler.sendMessage(msg);
-                //updateAllTables(map);
-
             }
         };
         new Thread(run).start();
@@ -527,7 +524,6 @@ public class Analysis extends AppCompatActivity {
     public void ConstructCheck(String title, String[] items, LinearLayout ll, String ini) {
         String[] initial = ini.split(",");
         HashMap<String, Boolean> map = new LinkedHashMap<>();
-        allContent.add(items);
         for (int i = 0; i < items.length; i++) {
             CheckBox cb = new CheckBox(this);
             cb.setTextColor(getResources().getColor(R.color.colorAccent));
@@ -558,12 +554,10 @@ public class Analysis extends AppCompatActivity {
             ll.addView(cb);
         }
         summary.put(title, map);
-        allCondition.add(title);
     }
 
     public void ConstructRadio(String title, String[] items, RadioGroup rg, String ini) {
         ArrayList<Boolean> radioButtons = new ArrayList<>();
-        allContent.add(items);
         for (int i = 0; i < items.length; i++) {
             RadioButton rb = new RadioButton(rg.getContext());
             rb.setText(items[i]);
@@ -588,8 +582,8 @@ public class Analysis extends AppCompatActivity {
                     Button vt = findViewById(R.id.ana_vt_btn);
                     LinearLayout vtll = findViewById(R.id.ana_vt);
                     if (title.equals("sources")) {
-                        RadioGroup sources=findViewById(R.id.ana_rg_source);
-                        RadioButton sourrb=findViewById(sources.getCheckedRadioButtonId());
+                        RadioGroup sources = findViewById(R.id.ana_rg_source);
+                        RadioButton sourrb = findViewById(sources.getCheckedRadioButtonId());
                         if (!(sourrb.getText()).equals("Sales")) {
                             vt.setVisibility(View.GONE);
                             vtll.setVisibility(View.GONE);
@@ -605,10 +599,15 @@ public class Analysis extends AppCompatActivity {
             }
         }
         radioSummary.put(title, radioButtons);
-        allCondition.add(title);
     }
 
     //将数字放进table里
+
+    /**
+     * 将数据放进表格中
+     *
+     * @param unit unit/K
+     */
     public void setNumber(String unit) {
         if (answerAna.size() != 0) {
             List<Object> maplist = new ArrayList<>();
@@ -621,23 +620,18 @@ public class Analysis extends AppCompatActivity {
                     maplistSum.put(title, maplist);
                     maplist = new ArrayList<>();
                     title = b.get("Title");
-
                 }
                 maplist.add(b);
             }
             maplistSum.put(title, maplist);
             maplistSum.remove("Empty");
 
-//        for(String s:maplistSum.keySet()){
-//            Log.e("数组",maplistSum.get(s).toString());
-//        }
-
             LinkedHashMap<String, List<Object>> maplistSum2 = new LinkedHashMap<>();
-
             for (String typeTitle : maplistSum.keySet()) {
                 List<Object> templist = new ArrayList<>();
                 for (int h = 0; h < maplistSum.get(typeTitle).size(); h++) {
                     LinkedHashMap<String, String> tempmap = new LinkedHashMap<>();
+                    //格式化数据
                     for (String string : ((LinkedHashMap<String, String>) maplistSum.get(typeTitle).get(h)).keySet()) {
                         if (!string.equals("Title")) {
                             String value = ((LinkedHashMap<String, String>) maplistSum.get(typeTitle).get(h)).get(string);
@@ -677,18 +671,29 @@ public class Analysis extends AppCompatActivity {
         getSelectedCheckbox();
         outState.putSerializable("initial2", summary);
         outState.putSerializable("initial3", radioSummary);
-        outState.putInt("left", left);
-        outState.putInt("right", right);
-        outState.putString("pre",pre);
-        outState.putString("comp",comp);
+        outState.putInt("leftIndicator", leftIndicator);
+        outState.putInt("rightIndicator", rightIndicator);
+        outState.putString("submitVersionTitle", submitVersionTitle);
+        outState.putString("compareVersionTitle", compareVersionTitle);
     }
 
+    /**
+     * 传入的radioGroup中被选中的radiobutton的string
+     *
+     * @param rg
+     * @return
+     */
     private String selectRadioBtn(RadioGroup rg) {
         RadioButton rb = Analysis.this.findViewById(rg.getCheckedRadioButtonId());
         return rb.getText() + "";
 
     }
 
+    /**
+     * 将不同的数据列表传入相应的fragment中
+     *
+     * @param map2 所有从服务器获取的数据
+     */
     private void updateAllTables(LinkedHashMap<String, List<Object>> map2) {
         FragmentSystem fs = new FragmentSystem();
         FragmentClient fc = new FragmentClient();
@@ -700,7 +705,7 @@ public class Analysis extends AppCompatActivity {
         ins.add(map2.get("systemoverall"));
         ins.add(map2.get("systemclient"));
         ins.add(map2.get("systemisg"));
-        fs.setMaplistInFragSys(ins, left, right, gbChoseCount,pre,comp);
+        fs.setMaplistInFragSys(ins, leftIndicator, rightIndicator, gbChoseCount, submitVersionTitle, compareVersionTitle);
 
 
         ArrayList<List<Object>> ins2 = new ArrayList<>();
@@ -715,7 +720,7 @@ public class Analysis extends AppCompatActivity {
         ins2.add(map2.get("CHROME"));
         ins2.add(map2.get("CLOUD_CLIENT_IOT"));
         Log.e("ins2", ins2.size() + "");
-        fc.setMaplistInFragClient(ins2, left, right, gbChoseCount,pre,comp);
+        fc.setMaplistInFragClient(ins2, leftIndicator, rightIndicator, gbChoseCount, submitVersionTitle, compareVersionTitle);
 
         ArrayList<List<Object>> ins3 = new ArrayList<>();
         ins3.add(map2.get("ALIENWARE_DESKTOPS"));
@@ -734,14 +739,14 @@ public class Analysis extends AppCompatActivity {
         ins3.add(map2.get("CLOUD_CLIENT"));
         ins3.add(map2.get("INTERNET_OF_THINGS"));
         Log.e("ins3", ins3.size() + "");
-        fcl.setMaplistInFragcl(ins3, left, right, gbChoseCount,pre,comp);
+        fcl.setMaplistInFragcl(ins3, leftIndicator, rightIndicator, gbChoseCount, submitVersionTitle, compareVersionTitle);
 
         ArrayList<List<Object>> ins4 = new ArrayList<>();
         ins4.add(map2.get("isg_overall"));
         ins4.add(map2.get("isg_system"));
         ins4.add(map2.get("isg_Non_Sys"));
         Log.e("ins4", ins4.size() + "");
-        fisg.setMaplistInFragIsg(ins4, left, right, gbChoseCount,pre,comp);
+        fisg.setMaplistInFragIsg(ins4, leftIndicator, rightIndicator, gbChoseCount, submitVersionTitle, compareVersionTitle);
 
         ArrayList<List<Object>> ins5 = new ArrayList<>();
         ins5.add(map2.get("isg_PowerEdge"));
@@ -750,9 +755,16 @@ public class Analysis extends AppCompatActivity {
         ins5.add(map2.get("isg_Networking"));
         ins5.add(map2.get("isg_hit"));
         Log.e("ins5", ins5.size() + "");
-        fil.setMaplistInFragIsg(ins5, left, right, gbChoseCount,pre,comp);
+        fil.setMaplistInFragIsg(ins5, leftIndicator, rightIndicator, gbChoseCount, submitVersionTitle, compareVersionTitle);
     }
 
+    /**
+     * 返回键退出
+     *
+     * @param keyCode
+     * @param event
+     * @return
+     */
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         switch (keyCode) {
@@ -762,7 +774,6 @@ public class Analysis extends AppCompatActivity {
                 build.setTitle("Notice").setMessage("Do you want to Log out?");
                 build.setPositiveButton("Exit",
                         new DialogInterface.OnClickListener() {
-
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 finish();
@@ -770,7 +781,6 @@ public class Analysis extends AppCompatActivity {
                         });
                 build.setNegativeButton("Cancel",
                         new DialogInterface.OnClickListener() {
-
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                             }
@@ -780,6 +790,11 @@ public class Analysis extends AppCompatActivity {
         return super.onKeyDown(keyCode, event);
     }
 
+    /**
+     * 获取filter中所有被选中的checkbox
+     *
+     * @return 被选中的所有checkbox，按title分类，第一种类中用逗号分隔
+     */
     public ArrayList<String> getSelectedCheckbox() {
         ArrayList<String> searchResult = new ArrayList<>();
 
@@ -795,7 +810,6 @@ public class Analysis extends AppCompatActivity {
                 }
             }
             gbmap.put(((CheckBox) gbll.getChildAt(i)).getText().toString(), ((CheckBox) gbll.getChildAt(i)).isChecked());
-
         }
         summary.put("groupby", gbmap);
         searchResult.add(gb);
@@ -812,7 +826,6 @@ public class Analysis extends AppCompatActivity {
                 }
             }
             vtmap.put(((CheckBox) vtll.getChildAt(i)).getText().toString(), ((CheckBox) vtll.getChildAt(i)).isChecked());
-
         }
         summary.put("viewtype", vtmap);
         searchResult.add(vt);

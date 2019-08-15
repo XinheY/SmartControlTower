@@ -73,7 +73,7 @@ public class E2E extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-         //判断是否存在之前的缓存内容，存在就继承，不存在就创建新的
+         //判断是否存在之前该页面的缓存内容，存在就继承，不存在就创建新的
         if (savedInstanceState != null) {
             // Restore value of members from saved state
             summaryOld = (HashMap<String, HashMap<String, Boolean>>) savedInstanceState.getSerializable("initial2");
@@ -564,6 +564,8 @@ public class E2E extends AppCompatActivity {
                 MapTableData tableData;
                 if (title.equals("Expand")) {
                     tableData = MapTableData.create(ratioText, collapsemap);
+
+                    //给表格特定行添加颜色
                     table.getConfig().setContentCellBackgroundFormat(new ICellBackgroundFormat<CellInfo>() {
                         @Override
                         public void drawBackground(Canvas canvas, Rect rect, CellInfo cellInfo, Paint paint) {
@@ -578,6 +580,8 @@ public class E2E extends AppCompatActivity {
                             return 0;
                         }
                     });
+
+
                 } else {
                     tableData = MapTableData.create(ratioText, maplist);
                     table.getConfig().setContentCellBackgroundFormat(new ICellBackgroundFormat<CellInfo>() {
@@ -598,18 +602,18 @@ public class E2E extends AppCompatActivity {
                     });
                 }
 
-                table.getConfig().setFixedTitle(true);
-                tableData.getColumns().get(0).setFixed(true);
-                tableData.getColumns().get(0).setTextAlign(Paint.Align.LEFT);
-                table.setZoom(true, 2, 1);
-                table.getConfig().setShowXSequence(false);
-                table.getConfig().setShowYSequence(false);
+                table.getConfig().setFixedTitle(true);//将第一行固定
+                tableData.getColumns().get(0).setFixed(true);//固定第一列
+                tableData.getColumns().get(0).setTextAlign(Paint.Align.LEFT);//第一列字向左对齐
+                table.setZoom(true, 2, 1);//缩小放大的倍数
+                table.getConfig().setShowXSequence(false);//不显示顺序行
+                table.getConfig().setShowYSequence(false);//不显示顺序列
                 table.getConfig().setTableTitleStyle(new FontStyle(50, getResources().getColor(R.color.table_gray)));
                 table.getConfig().setColumnTitleBackground(new BaseBackgroundFormat(getResources().getColor(R.color.table_gray)));
                 table.getConfig().setContentStyle(new FontStyle(45, getResources().getColor(R.color.table_gray)));
                 table.getConfig().setColumnTitleStyle(new FontStyle(45, getResources().getColor(R.color.white)));
-                table.getConfig().setVerticalPadding(10);
-                table.setTableData(tableData);
+                table.getConfig().setVerticalPadding(10);//纵向距离
+                table.setTableData(tableData);//将数据放进表格中
                 table.invalidate();
             }
         }
@@ -633,8 +637,8 @@ public class E2E extends AppCompatActivity {
 
     /**
      * 获取在当前radiogroup中被选中的radioButton
-     * @param rg
-     * @return
+     * @param rg radioGroup
+     * @return 该radiogroup被选中的项的字
      */
     private String selectRadioBtn(RadioGroup rg) {
         RadioButton rb = E2E.this.findViewById(rg.getCheckedRadioButtonId());
@@ -675,7 +679,7 @@ public class E2E extends AppCompatActivity {
 
     /**
      * 获取filter中所有被选中的checkbox
-     * @return
+     * @return 每个filter种类被选中的项的string
      */
     public ArrayList<String> getSelectedCheckbox() {
         ArrayList<String> searchResult = new ArrayList<>();

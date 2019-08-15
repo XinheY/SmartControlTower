@@ -8,7 +8,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
-
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -28,14 +27,12 @@ import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
-
 import com.example.smartcontroltower.Fragment_dynamic.Fragment_Dynamic;
 import com.example.smartcontroltower.Fragment_dynamic.Fragment_goal;
 import com.gingold.basislibrary.utils.BasisTimesUtils;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.tabs.TabLayout;
 import com.xiasuhuei321.loadingdialog.view.LoadingDialog;
-
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -55,14 +52,11 @@ public class Dynamic extends AppCompatActivity {
     private HashMap<String, ArrayList<Boolean>> radioSummary = new LinkedHashMap<>();
     private HashMap<String, HashMap<String, Boolean>> summaryOld = new LinkedHashMap<>();//之前所有checkbox的集合
     private HashMap<String, ArrayList<Boolean>> radioOld = new LinkedHashMap<>();
-    private ArrayList<String> allCondition = new ArrayList<>();
-    private ArrayList<String[]> allContent = new ArrayList<>();
-    private static ArrayList<LinkedHashMap<String, String>> answer;
-    private static ArrayList<LinkedHashMap<String, String>> answer2;
+    private static ArrayList<LinkedHashMap<String, String>> answer,answer2;
     private LoadingDialog ld = null;
     private ViewPagerAdapter adapter;
-    private InitializeInfo info = null;
-    private InitializeInfo info2 = null;
+    private InitializeInfo EOQInitialInfo = null;
+    private InitializeInfo IDCInitialInfo = null;
     private String hour = "";
     private int[] AccessRight = null;
 
@@ -94,8 +88,8 @@ public class Dynamic extends AppCompatActivity {
         tl.setupWithViewPager(vp);
         adapter.notifyDataSetChanged();
 
-        info = (InitializeInfo) getIntent().getSerializableExtra("InitializeInfo");
-        info2 = (InitializeInfo) getIntent().getSerializableExtra("InitializeInfo2");
+        EOQInitialInfo = (InitializeInfo) getIntent().getSerializableExtra("InitializeInfo");
+        IDCInitialInfo = (InitializeInfo) getIntent().getSerializableExtra("InitializeInfo2");
         AccessRight = (int[]) getIntent().getSerializableExtra("AccessRight");
 ////////////////////////////////////////////left side///////////////////////////////////////////
         drawerl = findViewById(R.id.dyn_drawer);
@@ -133,8 +127,8 @@ public class Dynamic extends AppCompatActivity {
                     case R.id.nav_E2E:
                         Intent intent2 = new Intent(Dynamic.this, E2E.class);
                         Bundle bundle2 = new Bundle();
-                        bundle2.putSerializable("InitializeInfo", info);
-                        bundle2.putSerializable("InitializeInfo2", info2);
+                        bundle2.putSerializable("InitializeInfo", EOQInitialInfo);
+                        bundle2.putSerializable("InitializeInfo2", IDCInitialInfo);
                         bundle2.putSerializable("AccessRight", AccessRight);
                         intent2.putExtras(bundle2);
                         startActivity(intent2);
@@ -145,8 +139,8 @@ public class Dynamic extends AppCompatActivity {
                     case R.id.nav_DirectBL:
                         Intent intent4 = new Intent(Dynamic.this, DirectBL.class);
                         Bundle bundle4 = new Bundle();
-                        bundle4.putSerializable("InitializeInfo", info);
-                        bundle4.putSerializable("InitializeInfo2", info2);
+                        bundle4.putSerializable("InitializeInfo", EOQInitialInfo);
+                        bundle4.putSerializable("InitializeInfo2", IDCInitialInfo);
                         bundle4.putSerializable("AccessRight", AccessRight);
                         intent4.putExtras(bundle4);
                         startActivity(intent4);
@@ -155,8 +149,8 @@ public class Dynamic extends AppCompatActivity {
                     case R.id.nav_analysis:
                         Intent intent3 = new Intent(Dynamic.this, Analysis.class);
                         Bundle bundle3 = new Bundle();
-                        bundle3.putSerializable("InitializeInfo", info);
-                        bundle3.putSerializable("InitializeInfo2", info2);
+                        bundle3.putSerializable("InitializeInfo", EOQInitialInfo);
+                        bundle3.putSerializable("InitializeInfo2", IDCInitialInfo);
                         bundle3.putSerializable("AccessRight", AccessRight);
                         intent3.putExtras(bundle3);
                         startActivity(intent3);
@@ -322,7 +316,6 @@ public class Dynamic extends AppCompatActivity {
     public void ConstructCheck(String title, String[] items, LinearLayout ll, String ini) {
         String[] initial = ini.split(",");
         HashMap<String, Boolean> map = new LinkedHashMap<>();
-        allContent.add(items);
         for (int i = 0; i < items.length; i++) {
             CheckBox cb = new CheckBox(this);
             cb.setTextColor(getResources().getColor(R.color.colorAccent));
@@ -343,12 +336,10 @@ public class Dynamic extends AppCompatActivity {
             ll.addView(cb);
         }
         summary.put(title, map);
-        allCondition.add(title);
     }
 
     public void ConstructRadio(String title, String[] items, RadioGroup rg, String ini) {
         ArrayList<Boolean> radioButtons = new ArrayList<>();
-        allContent.add(items);
         for (int i = 0; i < items.length; i++) {
             RadioButton rb = new RadioButton(rg.getContext());
             rb.setText(items[i]);
@@ -368,7 +359,6 @@ public class Dynamic extends AppCompatActivity {
             }
         }
         radioSummary.put(title, radioButtons);
-        allCondition.add(title);
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////
@@ -450,6 +440,7 @@ public class Dynamic extends AppCompatActivity {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
+        getSelectedCheckbox();
         outState.putSerializable("initial2", summary);
         outState.putSerializable("initial3", radioSummary);
     }

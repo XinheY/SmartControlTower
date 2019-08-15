@@ -1,14 +1,11 @@
 package com.example.smartcontroltower.Fragment_ana;
 
-import android.graphics.Color;
-import android.graphics.Paint;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.TextView;
-
 import com.bin.david.form.core.SmartTable;
 import com.bin.david.form.data.column.Column;
 import com.bin.david.form.data.format.bg.BaseBackgroundFormat;
@@ -16,11 +13,8 @@ import com.bin.david.form.data.style.FontStyle;
 import com.bin.david.form.data.table.MapTableData;
 import com.example.smartcontroltower.MySmartTable;
 import com.example.smartcontroltower.R;
-
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 public class clientlob_ExpandableAdapter extends BaseExpandableListAdapter {
     private static ArrayList<SmartTable<Object>> tables = new ArrayList<>();
@@ -29,8 +23,8 @@ public class clientlob_ExpandableAdapter extends BaseExpandableListAdapter {
             "Fixed Workstations", "Mobile Workstations", "Chrome", "Cloud Client",
             "Internet of Things"};
     private static ArrayList<List<Object>> maplistInClExp = new ArrayList<>();
-    private static int left, right, count;
-    private static String pre, comp;
+    private static int leftIndicator, rightIndicator, groupbyCount;
+    private static String submitVersionTitle, compareVersionTitle;
 
     @Override
     // 获取分组的个数
@@ -44,7 +38,7 @@ public class clientlob_ExpandableAdapter extends BaseExpandableListAdapter {
         return 1;
     }
 
-    //        获取指定的分组数据
+    //获取指定的分组数据
     @Override
     public Object getGroup(int groupPosition) {
         return groupString[groupPosition];
@@ -126,21 +120,21 @@ public class clientlob_ExpandableAdapter extends BaseExpandableListAdapter {
                 List<Column> list4one = new ArrayList<>();
                 List<Column> list4one2 = new ArrayList<>();
 
-                list4one.addAll(tableData.getColumns().subList(left + count - 1, right + count));
-                list4one.add(tableData.getColumns().get(more + count - 1));
-                list4one.addAll(tableData.getColumns().subList(more + left + count - 1, more + count + right));
-                list4one.add(tableData.getColumns().get(2 * more + count - 1));
-                list4one.addAll(tableData.getColumns().subList(2 * more + left + count - 1, 2 * more + count + right));
-                list4one.add(tableData.getColumns().get(3 * more + count - 1));
+                list4one.addAll(tableData.getColumns().subList(leftIndicator + groupbyCount - 1, rightIndicator + groupbyCount));
+                list4one.add(tableData.getColumns().get(more + groupbyCount - 1));
+                list4one.addAll(tableData.getColumns().subList(more + leftIndicator + groupbyCount - 1, more + groupbyCount + rightIndicator));
+                list4one.add(tableData.getColumns().get(2 * more + groupbyCount - 1));
+                list4one.addAll(tableData.getColumns().subList(2 * more + leftIndicator + groupbyCount - 1, 2 * more + groupbyCount + rightIndicator));
+                list4one.add(tableData.getColumns().get(3 * more + groupbyCount - 1));
 
                 int size1 = list4one.size() / 3;
-                Column one = new Column(pre, list4one.subList(0, size1));
-                Column two = new Column(comp, list4one.subList(size1, 2 * size1));
+                Column one = new Column(submitVersionTitle, list4one.subList(0, size1));
+                Column two = new Column(compareVersionTitle, list4one.subList(size1, 2 * size1));
                 Column three = new Column("Delta", list4one.subList(2 * size1, 3 * size1));
                 list4one2.add(tableData.getColumns().get(0));
-                if (count == 2) {
+                if (groupbyCount == 2) {
                     list4one2.add(tableData.getColumns().get(1));
-                } else if (count == 3) {
+                } else if (groupbyCount == 3) {
                     list4one2.add(tableData.getColumns().get(1));
                     list4one2.add(tableData.getColumns().get(2));
                 }
@@ -151,13 +145,12 @@ public class clientlob_ExpandableAdapter extends BaseExpandableListAdapter {
 
                 table.getConfig().setFixedTitle(true);
                 tableData.getColumns().get(0).setFixed(true);
-                if (count == 2) {
+                if (groupbyCount == 2) {
                     tableData.getColumns().get(1).setFixed(true);
-                } else if (count == 3) {
+                } else if (groupbyCount == 3) {
                     tableData.getColumns().get(1).setFixed(true);
                     tableData.getColumns().get(2).setFixed(true);
                 }
-                //tableData.getColumns().get(0).setTextAlign(Paint.Align.LEFT);
                 table.setZoom(true, 2, 1);
                 table.getConfig().setShowXSequence(false);
                 table.getConfig().setShowYSequence(false);
@@ -169,9 +162,9 @@ public class clientlob_ExpandableAdapter extends BaseExpandableListAdapter {
                 table.getConfig().setVerticalPadding(10);
                 table.setTableData(tableData);
                 tableData.getColumns().get(0).setAutoMerge(true);
-                if (count == 2) {
+                if (groupbyCount == 2) {
                     tableData.getColumns().get(1).setAutoMerge(true);
-                } else if (count == 3) {
+                } else if (groupbyCount == 3) {
                     tableData.getColumns().get(1).setAutoMerge(true);
                     tableData.getColumns().get(2).setAutoMerge(true);
                 }
@@ -179,7 +172,6 @@ public class clientlob_ExpandableAdapter extends BaseExpandableListAdapter {
                 table.invalidate();
             }
         }
-        //childViewHolder.tvTitle.setText(childString[groupPosition][childPosition]);
         return convertView;
     }
 
@@ -198,13 +190,22 @@ public class clientlob_ExpandableAdapter extends BaseExpandableListAdapter {
 
     }
 
-    public void getMaplist(ArrayList<List<Object>> m, int left, int right, int count, String pre, String comp) {
+    /**
+     * 从system fragment获取数据
+     * @param m 表格数据
+     * @param leftIndicator range左侧指标
+     * @param rightIndicator range右侧指标
+     * @param groupbyCount groupby中被选中的数量
+     * @param submitVersionTitle submit version
+     * @param compareVersionTitle compare version
+     */
+    public void getMaplist(ArrayList<List<Object>> m, int leftIndicator, int rightIndicator, int groupbyCount, String submitVersionTitle, String compareVersionTitle) {
         maplistInClExp.clear();
         maplistInClExp = m;
-        this.left = left;
-        this.right = right;
-        this.count = count;
-        this.pre = pre;
-        this.comp = comp;
+        this.leftIndicator = leftIndicator;
+        this.rightIndicator = rightIndicator;
+        this.groupbyCount = groupbyCount;
+        this.submitVersionTitle = submitVersionTitle;
+        this.compareVersionTitle = compareVersionTitle;
     }
 }

@@ -65,7 +65,15 @@ public class FragmentClientLob extends Fragment {
         return view;
     }
 
-
+    /**
+     *从Analysis.java获取生成表格所需要的数据，再将数据传入system adapter
+     * @param m  从主程序获取表格数据
+     * @param left rangeseeker的左侧指针
+     * @param right rangeseeker的右侧指针
+     * @param count groupby中被选中个数（选中个数会影响表格的生成）
+     * @param pre  submit version
+     * @param comp compare version
+     */
     public void setMaplistInFragcl(ArrayList<List<Object>> m,int left,int right,int count,String pre,String comp) {
         maplistInFragcl.clear();
         maplistInFragcl = m;
@@ -78,6 +86,10 @@ public class FragmentClientLob extends Fragment {
         }
     }
 
+    /**
+     * 关闭system fragment中的所有页面
+     * @param frag
+     */
     public void collapse(Fragment frag) {
         if (expandableListView != null) {
             for (int i = 0; i < new clientlob_ExpandableAdapter().getGroupCount(); i++) {
