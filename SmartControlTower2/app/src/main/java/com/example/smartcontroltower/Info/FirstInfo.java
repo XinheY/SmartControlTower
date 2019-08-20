@@ -3,6 +3,7 @@ package com.example.smartcontroltower.Info;
 import com.bin.david.form.annotation.SmartColumn;
 
 public class FirstInfo {
+//创建表格使用，多少列就有多少个变量
 
     @SmartColumn(id =1,name = "Title")
     private String Title;
@@ -64,102 +65,6 @@ public class FirstInfo {
 
     public String getTitle() {
         return Title;
-    }
-
-    public String getEBL_GOAL0() {
-        return EBL_GOAL0;
-    }
-
-    public String getEBL0() {
-        return EBL0;
-    }
-
-    public String getUNIT0() {
-        return UNIT0;
-    }
-
-    public String getEBL_GOAL1() {
-        return EBL_GOAL1;
-    }
-
-    public String getEBL1() {
-        return EBL1;
-    }
-
-    public String getUNIT1() {
-        return UNIT1;
-    }
-
-    public String getEBL_GOAL2() {
-        return EBL_GOAL2;
-    }
-
-    public String getEBL2() {
-        return EBL2;
-    }
-
-    public String getUNIT2() {
-        return UNIT2;
-    }
-
-    public String getEBL_GOAL3() {
-        return EBL_GOAL3;
-    }
-
-    public String getEBL3() {
-        return EBL3;
-    }
-
-    public String getUNIT3() {
-        return UNIT3;
-    }
-
-    public String getEBL_GOAL4() {
-        return EBL_GOAL4;
-    }
-
-    public String getEBL4() {
-        return EBL4;
-    }
-
-    public String getUNIT4() {
-        return UNIT4;
-    }
-
-    public String getEBL_GOAL5() {
-        return EBL_GOAL5;
-    }
-
-    public String getEBL5() {
-        return EBL5;
-    }
-
-    public String getUNIT5() {
-        return UNIT5;
-    }
-
-    public String getEBL_GOAL6() {
-        return EBL_GOAL6;
-    }
-
-    public String getEBL6() {
-        return EBL6;
-    }
-
-    public String getUNIT6() {
-        return UNIT6;
-    }
-
-    public String getEBL_GOAL7() {
-        return EBL_GOAL7;
-    }
-
-    public String getEBL7() {
-        return EBL7;
-    }
-
-    public String getUNIT7() {
-        return UNIT7;
     }
 
     public void setTitle(String title) {

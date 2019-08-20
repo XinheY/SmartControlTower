@@ -20,12 +20,13 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Time;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.LinkedHashMap;
+import java.util.Timer;
 
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
 
 public class DBUtil {
 
@@ -42,6 +43,7 @@ public class DBUtil {
         try {
             Class.forName("net.sourceforge.jtds.jdbc.Driver");
             con = DriverManager.getConnection("jdbc:jtds:sqlserver://" + ip + ":1433/" + db, user, pwd);
+            DriverManager.setLoginTimeout(1000);
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         } catch (SQLException e) {
@@ -75,11 +77,15 @@ public class DBUtil {
             }
             rs.close();
             stmt.close();
-            conn.close();}
+            conn.close();
+            }
+
         } catch (SQLException e) {
             e.printStackTrace();
+            return answer;
         } catch (IOException e) {
             e.printStackTrace();
+            return answer;
         }
         return answer;
     }

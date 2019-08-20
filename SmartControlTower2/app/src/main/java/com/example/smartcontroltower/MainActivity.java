@@ -4,8 +4,11 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -22,6 +25,7 @@ import com.xiasuhuei321.loadingdialog.view.LoadingDialog;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -48,6 +52,7 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * 创建界面，获取layout中组件
+     *
      * @param savedInstanceState
      */
     @Override
@@ -71,13 +76,19 @@ public class MainActivity extends AppCompatActivity {
                 ld.setLoadingText("Loading...").setSuccessText("Success").setFailedText("Failed")
                         .closeSuccessAnim();
                 ld.show();
-                test("sql");
+                if (isNetWorkAvailable(getBaseContext())) {
+                    test("sql");
+                } else {
+                    Log.e("no", "Internet");
+                    ld.setFailedText("No Internet").loadFailed();
+                }
             }
         });
     }
 
     /**
      * 链接数据库获取数据
+     *
      * @param sql
      */
     private void test(final String sql) {
@@ -87,88 +98,97 @@ public class MainActivity extends AppCompatActivity {
 
                 //判断用户名是否拥有权限查看该软件包含的四个表格的内容
                 AccessRight[0] = DBUtil4Initial.QuerySQLAccess("EXEC SP_MENU_PKG_CHECKACCESSRIGHT ?,?,? output", userName.getText().toString(), "/View/SmartControlTower/PerfDashboard/IDC_EOQ_SummaryNew.aspx");
-                AccessRight[1] = DBUtil4Initial.QuerySQLAccess("EXEC SP_MENU_PKG_CHECKACCESSRIGHT ?,?,? output", userName.getText().toString(), "/View/SmartControlTower/PerfDashboard/IDC_EOQ_SNI_ChangeAnalysis.aspx");
-                AccessRight[2] = DBUtil4Initial.QuerySQLAccess("EXEC SP_MENU_PKG_CHECKACCESSRIGHT ?,?,? output", userName.getText().toString(), "/View/SmartControlTower/PerfDashboard/Dynamic_CSR_BL.aspx");
-                AccessRight[3] = DBUtil4Initial.QuerySQLAccess("EXEC SP_MENU_PKG_CHECKACCESSRIGHT ?,?,? output", userName.getText().toString(), "/View/SmartControlTower/PerfDashboard/BacklogTracking.aspx");
+                if (AccessRight[0] == -10) {
+                    Message msg = new Message();
+                    msg.what = 1004;
+                    Bundle data = new Bundle();
+                    msg.setData(data);
+                    mHandler.sendMessage(msg);
 
-                boolean canrun = false;
-                Message msg = new Message();
-                for (int i : AccessRight) {
-                    if (i == 1) {
-                        canrun = true;
-                        break;
-                    }
-                }
-
-                if (canrun) {
-                    /**用户有至少一个表格的权限，获取初始化的信息：version/version_addclosing/version_year/
-                    version_year_quar/version_year_quar_week
-                     初始化包括IDC和EOQ模式**/
-                    answerEOQ = DBUtil4Initial.QuerySQL("EXEC SP_IDC_EOQ_GETFILTER 'EOQ'");
-                    answerIDC = DBUtil4Initial.QuerySQL("EXEC SP_IDC_EOQ_GETFILTER 'IDC'");
-                    if (answerEOQ.size() != 0 && answerIDC.size() != 0) {
-                        ArrayList<String> temp = new ArrayList<>();
-                        ArrayList<String> temp2 = new ArrayList<>();
-                        for (int i = 0; i < answerEOQ.size(); i++) {
-                            if (answerEOQ.get(i).containsValue("version_addclosing")) {
-                                version = (ArrayList<String>) temp.clone();
-                                temp.clear();
-                            } else if (answerEOQ.get(i).containsValue("version_year")) {
-                                version_addclosing = (ArrayList<String>) temp.clone();
-                                temp.clear();
-                            } else if (answerEOQ.get(i).containsValue("version_year_quar")) {
-                                version_year = (ArrayList<String>) temp.clone();
-                                temp.clear();
-                            } else if (answerEOQ.get(i).containsValue("version_year_quar_week")) {
-                                version_year_quar = (ArrayList<String>) temp.clone();
-                                temp.clear();
-                            } else if (answerEOQ.get(i).containsKey("option")) {
-                                temp.add(answerEOQ.get(i).get("option"));
-                            }
-                        }
-                        version_year_quar_week = (ArrayList<String>) temp.clone();
-                        InitializeInfo info = new InitializeInfo(version, version_addclosing, version_year, version_year_quar, version_year_quar_week);
-                        for (int j = 0; j < answerIDC.size(); j++) {
-                            if (answerIDC.get(j).containsValue("version_addclosing")) {
-                                version2 = (ArrayList<String>) temp2.clone();
-                                temp2.clear();
-                            } else if (answerIDC.get(j).containsValue("version_year")) {
-                                version_addclosing2 = (ArrayList<String>) temp2.clone();
-                                temp2.clear();
-                            } else if (answerIDC.get(j).containsValue("version_year_quar")) {
-                                version_year2 = (ArrayList<String>) temp2.clone();
-                                temp2.clear();
-                            } else if (answerIDC.get(j).containsValue("version_year_quar_week")) {
-                                version_year_quar2 = (ArrayList<String>) temp2.clone();
-                                temp2.clear();
-                            } else if (answerIDC.get(j).containsKey("option")) {
-                                temp2.add(answerIDC.get(j).get("option"));
-                            }
-                        }
-                        version_year_quar_week2 = (ArrayList<String>) temp2.clone();
-
-                        InitializeInfo info2 = new InitializeInfo(version2, version_addclosing2, version_year2, version_year_quar2, version_year_quar_week2);
-                        msg.what = 1001;
-                        Intent intent = new Intent(MainActivity.this, WelcomePage.class);
-                        Bundle bundle = new Bundle();
-                        bundle.putSerializable("InitializeInfo", info);
-                        bundle.putSerializable("InitializeInfo2", info2);
-                        bundle.putSerializable("AccessRight", AccessRight);
-                        bundle.putString("username", userName.getText().toString());
-                        intent.putExtras(bundle);
-                        startActivity(intent);
-                    } else {
-                        msg.what = 1002;//加载超时，输出错误代码
-                    }
                 } else {
-                    //用户无权限
-                    msg.what = 1003;
+                    AccessRight[1] = DBUtil4Initial.QuerySQLAccess("EXEC SP_MENU_PKG_CHECKACCESSRIGHT ?,?,? output", userName.getText().toString(), "/View/SmartControlTower/PerfDashboard/IDC_EOQ_SNI_ChangeAnalysis.aspx");
+                    AccessRight[2] = DBUtil4Initial.QuerySQLAccess("EXEC SP_MENU_PKG_CHECKACCESSRIGHT ?,?,? output", userName.getText().toString(), "/View/SmartControlTower/PerfDashboard/Dynamic_CSR_BL.aspx");
+                    AccessRight[3] = DBUtil4Initial.QuerySQLAccess("EXEC SP_MENU_PKG_CHECKACCESSRIGHT ?,?,? output", userName.getText().toString(), "/View/SmartControlTower/PerfDashboard/BacklogTracking.aspx");
+
+                    boolean canrun = false;
+                    Message msg = new Message();
+                    for (int i : AccessRight) {
+                        if (i == 1) {
+                            canrun = true;
+                            break;
+                        }
+                    }
+
+                    if (canrun) {
+                        /**用户有至少一个表格的权限，获取初始化的信息：version/version_addclosing/version_year/
+                         version_year_quar/version_year_quar_week
+                         初始化包括IDC和EOQ模式**/
+                        answerEOQ = DBUtil4Initial.QuerySQL("EXEC SP_IDC_EOQ_GETFILTER 'EOQ'");
+                        answerIDC = DBUtil4Initial.QuerySQL("EXEC SP_IDC_EOQ_GETFILTER 'IDC'");
+                        if (answerEOQ.size() != 0 && answerIDC.size() != 0) {
+                            ArrayList<String> temp = new ArrayList<>();
+                            ArrayList<String> temp2 = new ArrayList<>();
+                            for (int i = 0; i < answerEOQ.size(); i++) {
+                                if (answerEOQ.get(i).containsValue("version_addclosing")) {
+                                    version = (ArrayList<String>) temp.clone();
+                                    temp.clear();
+                                } else if (answerEOQ.get(i).containsValue("version_year")) {
+                                    version_addclosing = (ArrayList<String>) temp.clone();
+                                    temp.clear();
+                                } else if (answerEOQ.get(i).containsValue("version_year_quar")) {
+                                    version_year = (ArrayList<String>) temp.clone();
+                                    temp.clear();
+                                } else if (answerEOQ.get(i).containsValue("version_year_quar_week")) {
+                                    version_year_quar = (ArrayList<String>) temp.clone();
+                                    temp.clear();
+                                } else if (answerEOQ.get(i).containsKey("option")) {
+                                    temp.add(answerEOQ.get(i).get("option"));
+                                }
+                            }
+                            version_year_quar_week = (ArrayList<String>) temp.clone();
+                            InitializeInfo info = new InitializeInfo(version, version_addclosing, version_year, version_year_quar, version_year_quar_week);
+                            for (int j = 0; j < answerIDC.size(); j++) {
+                                if (answerIDC.get(j).containsValue("version_addclosing")) {
+                                    version2 = (ArrayList<String>) temp2.clone();
+                                    temp2.clear();
+                                } else if (answerIDC.get(j).containsValue("version_year")) {
+                                    version_addclosing2 = (ArrayList<String>) temp2.clone();
+                                    temp2.clear();
+                                } else if (answerIDC.get(j).containsValue("version_year_quar")) {
+                                    version_year2 = (ArrayList<String>) temp2.clone();
+                                    temp2.clear();
+                                } else if (answerIDC.get(j).containsValue("version_year_quar_week")) {
+                                    version_year_quar2 = (ArrayList<String>) temp2.clone();
+                                    temp2.clear();
+                                } else if (answerIDC.get(j).containsKey("option")) {
+                                    temp2.add(answerIDC.get(j).get("option"));
+                                }
+                            }
+                            version_year_quar_week2 = (ArrayList<String>) temp2.clone();
+
+                            InitializeInfo info2 = new InitializeInfo(version2, version_addclosing2, version_year2, version_year_quar2, version_year_quar_week2);
+                            msg.what = 1001;
+                            Intent intent = new Intent(MainActivity.this, WelcomePage.class);
+                            Bundle bundle = new Bundle();
+                            bundle.putSerializable("InitializeInfo", info);
+                            bundle.putSerializable("InitializeInfo2", info2);
+                            bundle.putSerializable("AccessRight", AccessRight);
+                            bundle.putString("username", userName.getText().toString());
+                            intent.putExtras(bundle);
+                            startActivity(intent);
+                        } else {
+                            msg.what = 1002;//加载超时，输出错误代码
+                        }
+                    } else {
+                        //用户无权限
+                        Log.e("权限", "asdasdasdad");
+                        msg.what = 1003;
+                    }
+                    Bundle data = new Bundle();
+                    msg.setData(data);
+                    mHandler.sendMessage(msg);
+
                 }
-                Bundle data = new Bundle();
-                msg.setData(data);
-                mHandler.sendMessage(msg);
-
-
             }
         };
         new Thread(run).start();
@@ -191,6 +211,9 @@ public class MainActivity extends AppCompatActivity {
                 case 1003:
                     ld.setFailedText("Access Denied").loadFailed();
                     break;
+                case 1004:
+                    ld.setFailedText("No Internet").loadFailed();
+                    break;
                 default:
                     break;
             }
@@ -199,6 +222,7 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * 返回键退出程序
+     *
      * @param keyCode
      * @param event
      * @return
@@ -207,7 +231,6 @@ public class MainActivity extends AppCompatActivity {
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         switch (keyCode) {
             case KeyEvent.KEYCODE_BACK:
-                ld.close();
                 AlertDialog.Builder build = new AlertDialog.Builder(this);
                 build.setTitle("Notice").setMessage("Do you want to Exit?");
                 build.setPositiveButton("Confirm",
@@ -228,6 +251,22 @@ public class MainActivity extends AppCompatActivity {
                 break;
         }
         return super.onKeyDown(keyCode, event);
+    }
+
+    /**
+     * 判断是否打开网络
+     *
+     * @param context
+     * @return
+     */
+    public static boolean isNetWorkAvailable(Context context) {
+        boolean isAvailable = false;
+        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = cm.getActiveNetworkInfo();
+        if (networkInfo != null && networkInfo.isAvailable()) {
+            isAvailable = true;
+        }
+        return isAvailable;
     }
 
 

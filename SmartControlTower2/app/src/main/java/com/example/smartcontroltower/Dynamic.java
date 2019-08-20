@@ -8,12 +8,16 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.content.res.Resources;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -27,12 +31,14 @@ import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+
 import com.example.smartcontroltower.Fragment_dynamic.Fragment_Dynamic;
 import com.example.smartcontroltower.Fragment_dynamic.Fragment_goal;
 import com.gingold.basislibrary.utils.BasisTimesUtils;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.tabs.TabLayout;
 import com.xiasuhuei321.loadingdialog.view.LoadingDialog;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -44,15 +50,15 @@ public class Dynamic extends AppCompatActivity {
     private DrawerLayout drawerl;
     private ActionBarDrawerToggle toggle;
     private TabLayout tl;
-    private NoSrcoll vp;
-    private Button datepicker;
+    private NoSrcoll vp;//没有scrollbar的ViewPager
+    private Button datepicker;//日期选择器
     private ArrayList<Object> maplist = new ArrayList<>();
     private ArrayList<Object> maplist2 = new ArrayList<>();
     private HashMap<String, HashMap<String, Boolean>> summary = new LinkedHashMap<>();//所有checkbox的集合
     private HashMap<String, ArrayList<Boolean>> radioSummary = new LinkedHashMap<>();
     private HashMap<String, HashMap<String, Boolean>> summaryOld = new LinkedHashMap<>();//之前所有checkbox的集合
     private HashMap<String, ArrayList<Boolean>> radioOld = new LinkedHashMap<>();
-    private static ArrayList<LinkedHashMap<String, String>> answer,answer2;
+    private static ArrayList<LinkedHashMap<String, String>> answer, answer2;
     private LoadingDialog ld = null;
     private ViewPagerAdapter adapter;
     private InitializeInfo EOQInitialInfo = null;
@@ -96,6 +102,7 @@ public class Dynamic extends AppCompatActivity {
         ActionBar actionb = getSupportActionBar();
         NavigationView nv = findViewById(R.id.nav_view);
         Menu munu = nv.getMenu();
+        //根据权限显示选项
         if (AccessRight[0] == 0) {
             munu.findItem(R.id.nav_E2E).setVisible(false);
         }
@@ -108,18 +115,16 @@ public class Dynamic extends AppCompatActivity {
         if (AccessRight[3] == 0) {
             munu.findItem(R.id.nav_DirectBL).setVisible(false);
         }
-
         if (actionb != null) {
             actionb.setDisplayHomeAsUpEnabled(true);
             actionb.setHomeAsUpIndicator(R.drawable.menu);
         }
 
+        //页面切换
         nv.setCheckedItem(R.id.nav_Dynamic);
         Resources resource = (Resources) getBaseContext().getResources();
         ColorStateList csl = (ColorStateList) resource.getColorStateList(R.color.nav_status_color);
         nv.setItemTextColor(csl);
-
-
         nv.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
@@ -158,7 +163,7 @@ public class Dynamic extends AppCompatActivity {
                         break;
                     default:
                 }
-                //Change color base on nav tatus
+                //Change color base on nav status
 
                 drawerl.closeDrawers();
                 return true;
@@ -189,7 +194,6 @@ public class Dynamic extends AppCompatActivity {
                 super.onDrawerOpened(drawerView);//抽屉打开后
             }
         };
-//        drawerl.setDrawerListener(toggle);
 
         Button search = findViewById(R.id.dyn_search);
         search.setOnClickListener(new View.OnClickListener() {
@@ -237,7 +241,11 @@ public class Dynamic extends AppCompatActivity {
                 sql[1] = "EXEC [P_DYNAMIC_BACKLOG_TRACK] '" + searchResult.get(0) + "','" + fourth + "','" + third + "'";
                 Log.e("sql0", sql[0]);
                 Log.e("sql1", sql[1]);
-                test(sql);
+                if(isNetWorkAvailable(getBaseContext())){
+                test(sql);}
+                else{
+                    ld.setFailedText("No Internet").loadFailed();
+                }
                 toggleRightSliding();
             }
         });
@@ -266,6 +274,10 @@ public class Dynamic extends AppCompatActivity {
         }
     }
 
+    /**
+     * 链接数据库，获取xml格式数据
+     * @param sql
+     */
     private void test(final String[] sql) {
         Runnable run = new Runnable() {
             @Override
@@ -276,7 +288,6 @@ public class Dynamic extends AppCompatActivity {
                 Message msg = new Message();
                 answer = DBUtil.QuerySQL(sql[0], 3);
                 answer2 = DBUtil.QuerySQL(sql[1], 3);
-                //answer = DBUtil.sendRequestWithOkHttp();
                 if (answer2.size() != 0 || answer.size() != 0) {
                     msg.what = 1001;
                 } else {
@@ -313,6 +324,13 @@ public class Dynamic extends AppCompatActivity {
         }
     };
 
+    /**
+     * 初始化checkbox
+     * @param title 当前 checkbox group的type
+     * @param items 所有checkbox的string
+     * @param ll 放checkbox的layout
+     * @param ini 初始被check的值
+     */
     public void ConstructCheck(String title, String[] items, LinearLayout ll, String ini) {
         String[] initial = ini.split(",");
         HashMap<String, Boolean> map = new LinkedHashMap<>();
@@ -338,6 +356,13 @@ public class Dynamic extends AppCompatActivity {
         summary.put(title, map);
     }
 
+    /**
+     * 初始化radio button
+     * @param title 当前radiogroup的title
+     * @param items 所有radiobutton的string
+     * @param rg 当前radiogroup
+     * @param ini 初始被check的radio button
+     */
     public void ConstructRadio(String title, String[] items, RadioGroup rg, String ini) {
         ArrayList<Boolean> radioButtons = new ArrayList<>();
         for (int i = 0; i < items.length; i++) {
@@ -362,6 +387,12 @@ public class Dynamic extends AppCompatActivity {
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * 点开左上角按钮显示导航栏
+     * @param item
+     * @return
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -396,6 +427,9 @@ public class Dynamic extends AppCompatActivity {
         }
     }
 
+    /**
+     * daypicker上显示的格式化日期
+     */
     private void showYearMonthDayPicker() {
         BasisTimesUtils.showDatePickerDialog(this, BasisTimesUtils.THEME_HOLO_DARK, "Please Pick your date", 2019, 1, 1, new BasisTimesUtils.OnDatePickerListener() {
 
@@ -437,6 +471,10 @@ public class Dynamic extends AppCompatActivity {
 
     }
 
+    /**
+     * 存储数据在缓存中，主要为了转屏
+     * @param outState
+     */
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -450,6 +488,9 @@ public class Dynamic extends AppCompatActivity {
         super.onPostCreate(savedInstanceState);
     }
 
+    /**
+     * 获取当前filter中所有被check的内容传给数据库，得到返回值以后更新fragment中的表格
+     */
     public void updateTable() {
         hour = "";
         String first = "";
@@ -489,12 +530,21 @@ public class Dynamic extends AppCompatActivity {
         sql[0] = "EXEC [P_DYNAMIC_BACKLOG_XMN_RESULTE] '" + first + "','" + second + "','" + fourth + "','" + third + "'";
         sql[1] = "EXEC [P_DYNAMIC_BACKLOG_TRACK] '" + first + "','" + fourth + "','" + third + "'";
         ld.setLoadingText("Loading...").show();
-        test(sql);
-        Log.e("Size", answer.size() + " " + answer2.size());
+        if(isNetWorkAvailable(getBaseContext())){
+        test(sql);}
+        else{
+            ld.setFailedText("No Internet").loadFailed();
+        }
 
 
     }
 
+    /**
+     * 返回键退出
+     * @param keyCode
+     * @param event
+     * @return
+     */
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         switch (keyCode) {
@@ -521,8 +571,13 @@ public class Dynamic extends AppCompatActivity {
         return super.onKeyDown(keyCode, event);
     }
 
+    /**
+     * 获取所有被check的checkbox数据，并且更新summary中所储存的checkbox status
+     * @return
+     */
     public ArrayList<String> getSelectedCheckbox() {
         ArrayList<String> searchResult = new ArrayList<>();
+        summary.clear();
 
         HashMap<String, Boolean> otmap = new HashMap<>();
         LinearLayout otll = findViewById(R.id.dyn_ot);
@@ -560,4 +615,18 @@ public class Dynamic extends AppCompatActivity {
         return searchResult;
     }
 
+    /**
+     * 判断是否打开网络
+     * @param context
+     * @return
+     */
+    public static boolean isNetWorkAvailable(Context context){
+        boolean isAvailable = false ;
+        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = cm.getActiveNetworkInfo();
+        if(networkInfo!=null && networkInfo.isAvailable()){
+            isAvailable = true;
+        }
+        return isAvailable;
+    }
 }

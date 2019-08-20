@@ -10,6 +10,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.ColorStateList;
@@ -17,6 +18,8 @@ import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -40,6 +43,7 @@ import com.google.android.material.navigation.NavigationView;
 import com.xiasuhuei321.loadingdialog.view.LoadingDialog;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -105,8 +109,13 @@ public class E2E extends AppCompatActivity {
             ld = new LoadingDialog(this);
             ld.setLoadingText("Loading...").setSuccessText("Success").setFailedText("Failed")
                     .closeSuccessAnim().show();
-            test("EXEC [SP_IDC_EOQ_SUMMARY] '" + "EoQ" + "','" + "QuarView" + "','" + EoQInitialInfo.getVersion_year_quar().get(0) + "','" + "" + "','" + "overall" + "','" + "system" + "','" + "overall" + "','" + "overall" + "','" + "overall" + "','" + "overall" + "','" + "overall" + "'");
-        }
+            if(isNetWorkAvailable(getBaseContext())) {
+                test("EXEC [SP_IDC_EOQ_SUMMARY] '" + "EoQ" + "','" + "QuarView" + "','" + EoQInitialInfo.getVersion_year_quar().get(0) + "','" + "" + "','" + "overall" + "','" + "system" + "','" + "overall" + "','" + "overall" + "','" + "overall" + "','" + "overall" + "','" + "overall" + "'");
+            }
+            else{
+                ld.setFailedText("No Internet").loadFailed();
+            }
+            }
         ///////////////////////////////Expand Button 展开or收起数据/////////////////////////////////////
         expand = findViewById(R.id.e2e_isexpand);
         expand.setText(expandTitle);
@@ -341,7 +350,11 @@ public class E2E extends AppCompatActivity {
                     sql = "EXEC [SP_IDC_EOQ_SUMMARY] '" + searchSum.get(0) + "','" + searchSum.get(1) + "','" + searchSum2.get(0) + "','" + searchSum2.get(1) + "','" + searchSum2.get(3) + "','" + searchSum2.get(4) + "','" + searchSum2.get(5) + "','" + searchSum2.get(6) + "','" + searchSum2.get(7) + "','" + searchSum2.get(8) + "','" + searchSum2.get(9) + "'";
                 }
                 toggleRightSliding();
-                test(sql);
+                if(isNetWorkAvailable(view.getContext())){
+                test(sql);}
+                else{
+                    ld.setFailedText("No Internet").loadFailed();
+                }
 
             }
         });
@@ -846,5 +859,18 @@ public class E2E extends AppCompatActivity {
         return searchResult;
     }
 
-
+    /**
+     * 判断是否打开网络
+     * @param context
+     * @return
+     */
+    public static boolean isNetWorkAvailable(Context context){
+        boolean isAvailable = false ;
+        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = cm.getActiveNetworkInfo();
+        if(networkInfo!=null && networkInfo.isAvailable()){
+            isAvailable = true;
+        }
+        return isAvailable;
+    }
 }

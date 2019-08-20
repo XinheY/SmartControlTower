@@ -10,6 +10,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.ColorStateList;
@@ -18,6 +19,8 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -56,17 +59,15 @@ public class DirectBL extends AppCompatActivity {
     private DrawerLayout drawerl;
     private ActionBarDrawerToggle toggle;
     public static MySmartTable<Object> table1, table2, table3, table4;
-    private ArrayList<String> allCondition = new ArrayList<>();
-    private ArrayList<String[]> allContent = new ArrayList<>();
     private static ArrayList<LinkedHashMap<String, String>> answerDir;
-    private InitializeInfo info = null;
-    private InitializeInfo info2=null;
-    private int count = 0;
-    private LoadingDialog ld;
+    private InitializeInfo EOQInitialInfo = null;
+    private InitializeInfo IDCInitialInfo = null;
+    private int count = 0;//为每一个radiobutton设立不同的id
+    private LoadingDialog ld;//加载动画
     private RadioGroup diryear, dirquar, dirweek;
     private HashMap<String, ArrayList<Boolean>> radioSummary = new LinkedHashMap<>();
     private HashMap<String, ArrayList<Boolean>> radioOld = new LinkedHashMap<>();
-    private int[] AccessRight=null;
+    private int[] AccessRight = null;
 
 
     @Override
@@ -75,7 +76,6 @@ public class DirectBL extends AppCompatActivity {
 
         if (savedInstanceState != null) {
             // Restore value of members from saved state
-            answerDir = (ArrayList<LinkedHashMap<String, String>>) savedInstanceState.getSerializable("initial");
             radioOld = (LinkedHashMap<String, ArrayList<Boolean>>) savedInstanceState.getSerializable("initial3");
 
         } else {
@@ -91,9 +91,9 @@ public class DirectBL extends AppCompatActivity {
         table3 = findViewById(R.id.dir_table3);
         table4 = findViewById(R.id.dir_table4);
 
-        info = (InitializeInfo) getIntent().getSerializableExtra("InitializeInfo");
-        info2 = (InitializeInfo) getIntent().getSerializableExtra("InitializeInfo2");
-        AccessRight= (int[]) getIntent().getSerializableExtra("AccessRight");
+        EOQInitialInfo = (InitializeInfo) getIntent().getSerializableExtra("InitializeInfo");
+        IDCInitialInfo = (InitializeInfo) getIntent().getSerializableExtra("InitializeInfo2");
+        AccessRight = (int[]) getIntent().getSerializableExtra("AccessRight");
         /////////////////Table//////////////////////////////////////////////////
         //设置初始值
         if (answerDir.size() != 0 || savedInstanceState != null) {
@@ -103,7 +103,11 @@ public class DirectBL extends AppCompatActivity {
             setNumber4();
         } else {
             ld.show();
-            test("EXEC [SP_CTO_DAILY_REPORT] '','',''");
+            if(isNetWorkAvailable(getBaseContext())){
+            test("EXEC [SP_CTO_DAILY_REPORT] '','',''");}
+            else{
+                ld.setFailedText("No Internet").loadFailed();
+            }
         }
 
 ////////////////////////////////////////////left side///////////////////////////////////////////
@@ -144,9 +148,9 @@ public class DirectBL extends AppCompatActivity {
                     case R.id.nav_E2E:
                         Intent intent4 = new Intent(DirectBL.this, E2E.class);
                         Bundle bundle4 = new Bundle();
-                        bundle4.putSerializable("InitializeInfo", info);
-                        bundle4.putSerializable("InitializeInfo2", info2);
-                        bundle4.putSerializable("AccessRight",AccessRight);
+                        bundle4.putSerializable("InitializeInfo", EOQInitialInfo);
+                        bundle4.putSerializable("InitializeInfo2", IDCInitialInfo);
+                        bundle4.putSerializable("AccessRight", AccessRight);
                         intent4.putExtras(bundle4);
                         startActivity(intent4);
                         finish();
@@ -154,9 +158,9 @@ public class DirectBL extends AppCompatActivity {
                     case R.id.nav_Dynamic:
                         Intent intent2 = new Intent(DirectBL.this, Dynamic.class);
                         Bundle bundle2 = new Bundle();
-                        bundle2.putSerializable("InitializeInfo", info);
-                        bundle2.putSerializable("InitializeInfo2", info2);
-                        bundle2.putSerializable("AccessRight",AccessRight);
+                        bundle2.putSerializable("InitializeInfo", EOQInitialInfo);
+                        bundle2.putSerializable("InitializeInfo2", IDCInitialInfo);
+                        bundle2.putSerializable("AccessRight", AccessRight);
                         intent2.putExtras(bundle2);
                         startActivity(intent2);
                         finish();
@@ -166,9 +170,9 @@ public class DirectBL extends AppCompatActivity {
                     case R.id.nav_analysis:
                         Intent intent3 = new Intent(DirectBL.this, Analysis.class);
                         Bundle bundle3 = new Bundle();
-                        bundle3.putSerializable("InitializeInfo", info);
-                        bundle3.putSerializable("InitializeInfo2", info2);
-                        bundle3.putSerializable("AccessRight",AccessRight);
+                        bundle3.putSerializable("InitializeInfo", EOQInitialInfo);
+                        bundle3.putSerializable("InitializeInfo2", IDCInitialInfo);
+                        bundle3.putSerializable("AccessRight", AccessRight);
                         intent3.putExtras(bundle3);
                         startActivity(intent3);
                         finish();
@@ -230,27 +234,35 @@ public class DirectBL extends AppCompatActivity {
                 ld = new LoadingDialog(view.getContext());
                 ld.setLoadingText("Loading...").setSuccessText("Success").setFailedText("Failed")
                         .closeSuccessAnim().show();
-                LinearLayout l1, l2, l3;
-                toggleRightSliding();
-                answerDir.clear();
-                RadioButton y = findViewById(diryear.getCheckedRadioButtonId());
-                RadioButton q = findViewById(dirquar.getCheckedRadioButtonId());
-                RadioButton w = findViewById(dirweek.getCheckedRadioButtonId());
-                Log.e("y/q/w", y.getText() + "/" + q.getText() + "/" + w.getText());
-                if (!y.getText().toString().equals("---") && !q.getText().toString().equals("---") && !w.getText().toString().equals("---")) {
-                    test("EXEC [SP_CTO_DAILY_REPORT] '" + y.getText().toString().replace("FY", "") +
-                            "','" + q.getText().toString() + "','" + w.getText().toString().replace("WK", "") + "'");
-                    Log.e("Notice", y.getText().toString().replace("FY", "") +
-                            " " + q.getText().toString() + " " + w.getText().toString().replace("WK", ""));
-                } else if (y.getText().toString().equals("---") && q.getText().toString().equals("---") && w.getText().toString().equals("---")) {
-                    test("EXEC [SP_CTO_DAILY_REPORT] '','',''");
+                if (isNetWorkAvailable(getBaseContext())) {
+                    LinearLayout l1, l2, l3;
+                    toggleRightSliding();
+                    answerDir.clear();
+                    RadioButton y = findViewById(diryear.getCheckedRadioButtonId());
+                    RadioButton q = findViewById(dirquar.getCheckedRadioButtonId());
+                    RadioButton w = findViewById(dirweek.getCheckedRadioButtonId());
+                    Log.e("y/q/w", y.getText() + "/" + q.getText() + "/" + w.getText());
+                    if (!y.getText().toString().equals("---") && !q.getText().toString().equals("---") && !w.getText().toString().equals("---")) {
+                        test("EXEC [SP_CTO_DAILY_REPORT] '" + y.getText().toString().replace("FY", "") +
+                                "','" + q.getText().toString() + "','" + w.getText().toString().replace("WK", "") + "'");
+                        Log.e("Notice", y.getText().toString().replace("FY", "") +
+                                " " + q.getText().toString() + " " + w.getText().toString().replace("WK", ""));
+                    } else if (y.getText().toString().equals("---") && q.getText().toString().equals("---") && w.getText().toString().equals("---")) {
+                        test("EXEC [SP_CTO_DAILY_REPORT] '','',''");
+                    } else {
+                        Message msg = new Message();
+                        Bundle data = new Bundle();
+                        msg.what = 1003;
+                        msg.setData(data);
+                        mHandler.sendMessage(msg);
+                        Toast.makeText(view.getContext(), "Filter Condition Wrong", Toast.LENGTH_SHORT).show();
+                    }
                 } else {
                     Message msg = new Message();
                     Bundle data = new Bundle();
-                    msg.what = 1003;
+                    msg.what = 1004;
                     msg.setData(data);
                     mHandler.sendMessage(msg);
-                    Toast.makeText(view.getContext(), "Filter Condition Wrong", Toast.LENGTH_SHORT).show();
                 }
 
 
@@ -269,7 +281,7 @@ public class DirectBL extends AppCompatActivity {
     }
 
     /**
-     * 右侧列表按钮监听：打开选项列表
+     * 右侧列表按钮监听：打开选项列表&打开其中一个table
      *
      * @param view
      */
@@ -358,6 +370,11 @@ public class DirectBL extends AppCompatActivity {
         return true;
     }
 
+    /**
+     * 链接数据库
+     *
+     * @param sql
+     */
     private void test(final String sql) {
         Runnable run = new Runnable() {
             @Override
@@ -395,12 +412,15 @@ public class DirectBL extends AppCompatActivity {
                     ld.loadSuccess();
                     break;
                 case 1002:
-                    Log.e("Timeout", "Timeout in handler");
+                    Log.e("Timeout", "No data");
                     ld.setFailedText("No Data").loadFailed();
                     break;
                 case 1003:
                     Log.e("Timeout", "Timeout in handler");
                     ld.setFailedText("Condition Wrong").loadFailed();
+                    break;
+                case 1004:
+                    ld.setFailedText("No Internet").loadFailed();
                     break;
                 default:
                     break;
@@ -410,9 +430,16 @@ public class DirectBL extends AppCompatActivity {
 
     /////////////////////////////////////////////////////////////////////////////////////////
 
+    /**
+     * 初始化radio button
+     *
+     * @param title radiobutton所属的type
+     * @param items radiobutton string
+     * @param rg    radiogroup
+     * @param ini   最初被check的radiobutton
+     */
     public void ConstructRadio(String title, String[] items, RadioGroup rg, String ini) {
         ArrayList<Boolean> radioButtons = new ArrayList<>();
-        allContent.add(items);
         for (int i = 0; i < items.length; i++) {
             RadioButton rb = new RadioButton(rg.getContext());
             rb.setText(items[i]);
@@ -433,7 +460,6 @@ public class DirectBL extends AppCompatActivity {
             }
         }
         radioSummary.put(title, radioButtons);
-        allCondition.add(title);
     }
 
 
@@ -445,6 +471,9 @@ public class DirectBL extends AppCompatActivity {
         outState.putSerializable("initial3", radioSummary);
     }
 
+    /**
+     * 将数据放进第一个table
+     */
     public static void setNumber1() {
 
         //表格数据 datas 是需要填充的数据
@@ -566,7 +595,7 @@ public class DirectBL extends AppCompatActivity {
             table1.getConfig().setContentCellBackgroundFormat(new ICellBackgroundFormat<CellInfo>() {
                 @Override
                 public void drawBackground(Canvas canvas, Rect rect, CellInfo cellInfo, Paint paint) {
-                   // Log.e("位置", cellInfo.row + "," + cellInfo.col);
+                    // Log.e("位置", cellInfo.row + "," + cellInfo.col);
                     if ((cellInfo.col % 3 == 2 || cellInfo.col % 3 == 0) && cellInfo.col != 0) {
                         paint.setColor(Color.GREEN);
                         canvas.drawRect(rect, paint);
@@ -591,6 +620,9 @@ public class DirectBL extends AppCompatActivity {
         }
     }
 
+    /**
+     * 将数据放进第二个table
+     */
     public static void setNumber2() {
 
         if (answerDir.size() != 0) {
@@ -745,6 +777,9 @@ public class DirectBL extends AppCompatActivity {
         }
     }
 
+    /**
+     * 将数据放进第三个table
+     */
     public static void setNumber3() {
 
         if (answerDir.size() != 0) {
@@ -898,6 +933,9 @@ public class DirectBL extends AppCompatActivity {
         }
     }
 
+    /**
+     * 将数据放进第四个table
+     */
     public static void setNumber4() {
 
         if (answerDir.size() != 0) {
@@ -1051,6 +1089,13 @@ public class DirectBL extends AppCompatActivity {
         }
     }
 
+    /**
+     * 返回键退出
+     *
+     * @param keyCode
+     * @param event
+     * @return
+     */
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         switch (keyCode) {
@@ -1078,4 +1123,19 @@ public class DirectBL extends AppCompatActivity {
     }
 
 
+    /**
+     * 判断是否打开网络
+     *
+     * @param context
+     * @return
+     */
+    public static boolean isNetWorkAvailable(Context context) {
+        boolean isAvailable = false;
+        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = cm.getActiveNetworkInfo();
+        if (networkInfo != null && networkInfo.isAvailable()) {
+            isAvailable = true;
+        }
+        return isAvailable;
+    }
 }

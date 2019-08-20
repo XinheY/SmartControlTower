@@ -36,7 +36,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 
 /**
- * Created by huang on 2017/10/30.
+ * 自定义SmartTable
  * 表格
  */
 

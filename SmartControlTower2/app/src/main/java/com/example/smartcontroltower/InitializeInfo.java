@@ -3,6 +3,9 @@ package com.example.smartcontroltower;
 import java.io.Serializable;
 import java.util.ArrayList;
 
+/**
+ * 用于获取初始化的所有日期信息
+ */
 public class InitializeInfo implements Serializable {
 
     private ArrayList<String> version;

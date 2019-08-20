@@ -9,10 +9,13 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.content.res.Resources;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -121,7 +124,11 @@ public class Analysis extends AppCompatActivity {
             String sql = "EXEC SP_IDC_EOQ_SNI_CHANGE_ANALYSIS '" + "EoQ" + "','" + EOQInitialInfo.getVersion_addclosing().toArray(new String[EOQInitialInfo.getVersion().size()])[0]
                     + "','" + EOQInitialInfo.getVersion_addclosing().toArray(new String[EOQInitialInfo.getVersion().size()])[1]
                     + "','" + "Country" + "','" + "MFG-Phasing,MFG-Unshippable,SNI-Phasing,SNI-Unshippable,Invoice" + "','" + "Sales" + "'";
-            test(sql);
+            if(isNetWorkAvailable(getBaseContext())){
+            test(sql);}
+            else{
+                ld.setFailedText("No Internet").loadFailed();
+            }
         }
 
         //////////////////////////////////RadioGroup//////////////////////////////////////
@@ -407,7 +414,11 @@ public class Analysis extends AppCompatActivity {
                         compareVersionTitle = CVrb2.getText().toString();
                         sql = "EXEC SP_IDC_EOQ_SNI_CHANGE_ANALYSIS '" + IErb.getText() + "','" + SVrb2.getText().toString() + "','" + CVrb2.getText().toString() + "','" + searchSum.get(0) + "','" + searchSum.get(1) + "','" + Sourb.getText() + "'";
                     }
-                    test(sql);
+                    if(isNetWorkAvailable(view.getContext())){
+                    test(sql);}
+                    else{
+                        ld.setFailedText("No Internet").loadFailed();
+                    }
                 }
             }
         });
@@ -830,5 +841,20 @@ public class Analysis extends AppCompatActivity {
         summary.put("viewtype", vtmap);
         searchResult.add(vt);
         return searchResult;
+    }
+
+    /**
+     * 判断是否打开网络
+     * @param context
+     * @return
+     */
+    public static boolean isNetWorkAvailable(Context context){
+        boolean isAvailable = false ;
+        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = cm.getActiveNetworkInfo();
+        if(networkInfo!=null && networkInfo.isAvailable()){
+            isAvailable = true;
+        }
+        return isAvailable;
     }
 }

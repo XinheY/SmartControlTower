@@ -1,5 +1,7 @@
 package com.example.smartcontroltower;
 
+import android.util.Log;
+
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.io.OutputFormat;
@@ -20,6 +22,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.LinkedHashMap;
 
 
